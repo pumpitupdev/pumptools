@@ -29,7 +29,7 @@
 
 ### Log output
 See attachment.
-<!--- Provide log output as attachment. Make sure to censor sensitive data like usernames, home folder paths
+<!--- Provide log output as attachment, e.g. pumptools.log and piueb.log. Make sure to censor sensitive data like usernames, home folder paths
 or device names if necessary -->
 
 ### Configuration files
