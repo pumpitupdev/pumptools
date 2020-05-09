@@ -17,6 +17,18 @@
 3.
 4.
 
+## Further things tested
+<!--- Test further things to provide more data points for debugging. Remove checkboxes that do not apply to your current bug -->
+* [ ] Tested with `ptapi-io-piuio-keyboard.so`
+* [ ] Tested with `ptapi-io-piuio-joystick.so`
+* [ ] Tested with `ptapi-io-piuio-real.so`
+* [ ] Tested with `lib-local.zip` library package
+* [ ] Tested with `lib-ld.zip` library package
+* [ ] Tested with the following different configuration parameters:
+    * "REPLACE ME WITH CONFIG PARAM CHANGED"
+    * "REPLACE ME WITH CONFIG PARAM CHANGED" 
+    * ...
+
 ## Possible solution
 <!--- Not obligatory, but suggest a fix/reason for the bug -->
 
