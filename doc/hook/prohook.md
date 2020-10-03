@@ -91,6 +91,10 @@ If you run into any issues, consider enabling the game's log output to console w
 what's going on. This can be done by editing the `data.Static.ini` file in the `data0.zip` file. Go to the section
 `[Options-arcade]` and change the property `ShowLogOutput=0` to `ShowLogOutput=1`.
 
+## Window/fullscreen mode
+The hook does not have extra settings for changing window/fullscreen modes. Modify the corresponding `Static.ini` file
+and set the value of the key `Windowed` accordingly, e.g. `Windowed=1` for window mode.
+
 ## Switch screen aspect ratio: 4:3 and 16:9
 The game supports 4:3 and 16:9 aspect ratios. To enable 16:9 mode, ensure that an empty file called `FX` is placed
 next to the data zip files inside the `game` directory. For 4:3 mode, simply delete the `FX` file if it exists.

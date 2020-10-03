@@ -82,6 +82,10 @@ The "emulation" part which simply calls back to a real piuio driver takes
 care of handling the kernel hack path then. If you run on a real IO without
 hooking that module, you won't get an inputs or outputs.
 
+## Window/fullscreen mode
+The hook does not have extra settings for changing window/fullscreen modes. Modify the corresponding `Static.ini` file
+and set the value of the key `Windowed` accordingly, e.g. `Windowed=1` for window mode.
+
 ## The game is crashing very early
 This is probably due to not having the right IO hardware connected/emulated.
 The game doesn't have any proper error handling if either the PIUIO or the
