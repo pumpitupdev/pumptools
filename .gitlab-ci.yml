@@ -26,7 +26,7 @@ build:
       - build
   only:
     refs:
-      - master
+      - ci
 
 create-release-package:
   stage: create-release-package
@@ -48,7 +48,7 @@ create-release-package:
       - ./*
   only:
     refs:
-      - master
+      - ci
     
 releasetag:
   stage: releasetag
@@ -64,4 +64,5 @@ releasetag:
         --request POST \
         "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases"
   only:
-    - tags
+    refs:
+      - ci
