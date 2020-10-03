@@ -1,4 +1,6 @@
 # Release history
+## 1.09
+
 ## 1.08
 * Documentation updates
 * Public release, working hooks: mk3, exc, x2, zero, nx, nx2, pro, pro2

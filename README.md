@@ -1,5 +1,5 @@
 # Pumptools: The ultimate toolset to run all Linux based PIU games on any* kernel and distribution
-Version: 1.08</br>
+Version: 1.09</br>
 [Release history](CHANGELOG.md)
 
 This tool-set provides hook libraries that can be pre-loaded to run vanilla dumps of all Pump It Up games running on
