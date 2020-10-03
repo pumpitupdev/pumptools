@@ -1,0 +1,13 @@
+include_directories(${PT_ROOT_IMPORTS})
+include_directories(${PT_ROOT_PTAPI})
+include_directories(${PT_ROOT_MAIN})
+
+add_subdirectory(asset)
+add_subdirectory(capnhook)
+add_subdirectory(crypt)
+add_subdirectory(hook)
+add_subdirectory(io)
+add_subdirectory(ptapi)
+add_subdirectory(pumpnet)
+add_subdirectory(sec)
+add_subdirectory(util)

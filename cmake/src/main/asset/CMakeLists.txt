@@ -1,0 +1,7 @@
+add_subdirectory(f2)
+add_subdirectory(fex)
+add_subdirectory(nx)
+add_subdirectory(nx2)
+add_subdirectory(nxa)
+add_subdirectory(x2)
+add_subdirectory(zero)

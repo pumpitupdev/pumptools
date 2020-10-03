@@ -1,0 +1,10 @@
+.idea
+build
+.vscode
+*.iml
+*.ipr
+*.iws
+.DS_Store
+tmp
+utils
+cmake-build-debug

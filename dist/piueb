@@ -1,0 +1,407 @@
+#!/usr/bin/env bash
+
+###
+# Pump It Up Environment Bootstrap (piueb)
+#
+# This script sets up an environment to run all (MK5/6) Linux based PIU games as well as the MK3 linux ports.
+# It takes care of the following tasks:
+# - Check if all necessary files and directories are available
+# - Verify that local dependencies for the game are used
+# - Force the game into VSYNC
+# - Bootstrap the application executable with:
+#   - A a subset of local libs or even a private ld-linux to ensure highest compatibility accross distros
+#   - A pumptools hook.so
+#
+# Therefore, this script expects the following folder structure and naming (!) to run the game:
+# - game: The game folder with vanilla assets
+# - lib: All (additional) dependencies the game needs to run
+# - (save): Depending on your hook configuration, this can be located somewhere else, too
+# - hook.conf: Configuration file with hook specific settings
+# - hook.so: The game specific hook library compiled from pumptools
+# - piu: The game's executable
+# - piueb: This script
+#
+# To get usage/help output from piueb:
+# ./piueb help
+#
+# To run the game, simply run this script with the "run" command:
+# ./piueb run
+#
+# Additional arguments to hook.so are also supported:
+# ./piueb run arg1 arg2
+#
+# For example, to get help/usage output from the hook library:
+# ./piueb run -h
+#
+# For debugging purpose, a log file (piueb.log) is written to the folder this script is in.
+###
+
+readonly VERSION="1.0"
+
+readonly LOG_LEVEL_ERROR="E"
+readonly LOG_LEVEL_WARN="W"
+readonly LOG_LEVEL_INFO="I"
+readonly LOG_LEVEL_DEBUG="M"
+
+##################################################################################
+
+SELF_DIR="$(dirname "$(readlink -f "$0")")"
+
+LOG_FILE="$SELF_DIR/piueb.log"
+
+GAME_EXEC="$SELF_DIR/piu"
+
+GAME_DIR="$SELF_DIR/game"
+LIBS_DIR="$SELF_DIR/lib"
+
+HOOK_FILE="$SELF_DIR/hook.so"
+HOOK_CONFIG_FILE="$SELF_DIR/hook.conf"
+
+LIBS_LINKER="$SELF_DIR/lib/ld-linux.so.2"
+
+##################################################################################
+
+log_init()
+{
+    rm -f "$LOG_FILE"
+}
+
+log()
+{
+    local level="$1"
+    local msg="$2"
+
+    local timestamp="$(date "+%Y/%m/%d-%H:%M:%S:%3N")"
+
+    local color=""
+
+    case $level in
+        $LOG_LEVEL_ERROR)
+            color="\e[1m\e[31m"
+            ;;
+        $LOG_LEVEL_WARN)
+            color="\e[33m"
+            ;;
+        $LOG_LEVEL_INFO)
+            color="\e[34m"
+            ;;
+        $LOG_LEVEL_DEBUG)
+            color="\e[37m"
+            ;;
+    esac
+
+    echo -e "${color}[$level]\e[0m[$timestamp] ${msg}"
+    echo "[$level][$timestamp] ${msg}" >> "$LOG_FILE"
+}
+
+log_error()
+{
+    log "$LOG_LEVEL_ERROR" "$@"
+}
+
+log_warn()
+{
+    log "$LOG_LEVEL_WARN" "$@"
+}
+
+log_info()
+{
+    log "$LOG_LEVEL_INFO" "$@"
+}
+
+log_debug()
+{
+    log "$LOG_LEVEL_DEBUG" "$@"
+}
+
+verify_running_as_root()
+{
+    log_debug "Verify running as root user/with sudo..."
+
+    if [ "$EUID" -ne 0 ]; then
+        log_error "Running as non-root user, game likely to crash!"
+    fi
+}
+
+verify_file_exists()
+{
+    local file_path="$1"
+    local warn_only="$2"
+
+    log_debug "Verify file/dir exists $file_path..."
+
+    if [ ! -e "$file_path" ]; then
+        if [ "$warn_only" ]; then
+            log_warn "Missing file \"$file_path\""
+        else
+            log_error "Missing required file \"$file_path\""
+            exit 1
+        fi
+    fi
+}
+
+verify_dir_not_empty()
+{
+    local dir_path="$1"
+
+    if [ -z "$(ls -A $dir_path)" ]; then
+        log_error "Directory empty: $dir_path"
+        exit 1
+    fi
+}
+
+verify_deps_all_local()
+{
+    local exec_path="$1"
+    local lib_path="$2"
+
+    local ldd_output="$(ldd $exec_path >&1)"
+
+    log_debug "Verify dependencies all local..."
+
+    log_debug "ldd output for $exec_path:\\n$ldd_output"
+
+    while read -r line; do
+        # Skip any additional output/error messages that are not part of the library listing
+        if [[ "$line:0:1" != "\t" ]]; then
+            continue
+        fi
+
+        local libname="$(echo "$line" | cut -d '.' -f 1)"
+        local libpath="$(echo "$line" | cut -d ' ' -f 3)"
+
+        # Skip a bunch of libs that are kernel specific like bound to GPU drivers
+        case $libname in
+            "linux-gate") ;& # fallthrough
+            "libGL") ;& # fallthrough
+            "libGLX") ;& # fallthrough
+            "libGLdispatch") ;& # fallthrough
+            # That will still point to the current machine's linker
+            # but we will use our own further down to bootstrap the elf
+            "ld-linux") ;& # fallthrough
+            "/lib/ld-linux")
+                log_debug "Skipping $libname"
+                continue
+                ;;
+            *)
+                ;;
+        esac
+
+        log_debug "Checking $libname: $libpath..."
+
+        if [[ $libpath != $LIBS_DIR* ]]; then
+            log_warn "$libname is not local to the game, path $libpath"
+        fi
+    done <<< "$ldd_output"
+}
+
+verify_game_executable()
+{
+    local exec_path="$1"
+
+    log_debug "Verifying that game is executable: $exec_path..."
+
+    if [ ! -x "$exec_path" ]; then
+        log_warn "Game exec $exec_path not executable, fixing..."
+        chmod +x "$exec_path"
+    fi
+}
+
+print_usage()
+{
+    echo "Pump It Up Environment Bootstrap (piueb), version $VERSION"
+    echo "Easily bootstrap linux based Pump games using pumptools."
+    echo "Usage: piueb <cmd> ..."
+    echo "Commands:"
+    echo "  run - Run the game located next to this script"
+    echo "  strace - Run the game with local libraries and strace attached for debugging"
+    echo "  debug - Run the game with local libraries and a GDB debugger server attached for debugging"
+    echo "  help - Print this usage message"
+}
+
+# Supports native mk6 linux games as well as the mk3 linux ports using mk3hook
+cmd_run()
+{
+    local mode="$1"
+
+    log_init
+
+    log_info "Pump It Up Environment Bootstrap (piueb), version $VERSION"
+
+    verify_running_as_root
+
+    log_info "Current path: $SELF_DIR"
+
+    log_debug "File and path verification..."
+
+    # Some file and folder verfication
+
+    verify_file_exists "$GAME_EXEC"
+
+    verify_file_exists "$GAME_DIR"
+    verify_dir_not_empty "$GAME_DIR"
+    verify_file_exists "$LIBS_DIR"
+    verify_dir_not_empty "$LIBS_DIR"
+
+    verify_file_exists "$HOOK_FILE"
+    # Only warn to allow creating of default hook.conf if no file exists
+    verify_file_exists "$HOOK_CONFIG_FILE" 1
+
+    # Support two modes of setting up the runtime environment with the game's
+    # dependencies:
+    # 1. Using a separate linker application which might be necessary when having
+    # to run the application with different libc (and/or other library) versions.
+    # This avoids incompatibilities with newer libc runtime and ld-linux versions
+    # (see f2-crashing-on-modern-linux-post-mortem.md).
+    #
+    # 2. Use only a subset of local libraries and take everything else from the
+    # current system. Your typical LD_LIBRARY_PATH method.
+    local lib_mode=""
+
+    if [ -e "$LIBS_LINKER" ]; then
+        lib_mode="ld"
+    else
+        lib_mode="local"
+    fi
+
+    log_info "Resolving dependencies mode: $lib_mode"
+
+    # LD_LIBRARY_PATH setup to use local libraries instead of system ones
+
+    if [ -z "$LD_LIBRARY_PATH" ]; then
+        LD_LIBRARY_PATH="$LIBS_DIR"
+    else
+        LD_LIBRARY_PATH="$LIBS_DIR:$LD_LIBRARY_PATH"
+    fi
+
+    log_debug "LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
+
+    # Required that ldd shows us the correct paths
+    export LD_LIBRARY_PATH
+
+    # Check if all dependencies used are actually bundled with the game
+    verify_deps_all_local "$GAME_EXEC" "$LIBS_DIR"
+
+    local LD_PRELOAD="$HOOK_FILE"
+
+    local ldd_output_hook="$(ldd $HOOK_FILE >&1)"
+
+    log_debug "ldd output for $HOOK_FILE:\\n$ldd_output_hook"
+
+    if [ "${*:1}" ]; then
+        log_info "Additional cmd arguments provided: ${*:1}"
+    fi
+
+    log_info "Executing game $GAME_EXEC, mode $mode, lib_mode $lib_mode...\n=============================================================================================================================="
+
+    # Because people forget this when setting up the data manually
+    chmod +x "$GAME_EXEC"
+
+    # Force the game to run to vsync blank interval for nvidia cards: __GL_SYNC_TO_VBLANK=1
+
+    if [ "$mode" = "normal" ] && [ "$lib_mode" = "ld" ]; then
+        # / after GAME_DIR required
+        # Use private linker to avoid platform incompatibility issues (see above)
+        exec \
+        env __GL_SYNC_TO_VBLANK=1 \
+        env LD_PRELOAD="$LD_PRELOAD" \
+        "$LIBS_LINKER" \
+        --library-path "$LD_LIBRARY_PATH" \
+        "$GAME_EXEC" \
+        "${GAME_DIR}/" \
+        "--options" "$HOOK_CONFIG_FILE" \
+        "${@:2}"
+    elif [ "$mode" = "normal" ] && [ "$lib_mode" = "local" ]; then
+        # / after GAME_DIR required
+        exec \
+        env __GL_SYNC_TO_VBLANK=1 \
+        env LD_LIBRARY_PATH="$LD_LIBRARY_PATH" \
+        env LD_PRELOAD="$LD_PRELOAD" \
+        "$GAME_EXEC" \
+        "${GAME_DIR}/" \
+        "--options" "$HOOK_CONFIG_FILE" \
+        "${@:2}"
+    elif [ "$mode" = "debug" ] && [ "$lib_mode" = "ld" ]; then
+        log_error "debug mode with lib type ld not supported"
+    elif [ "$mode" = "debug" ] && [ "$lib_mode" = "local" ]; then
+        gdbserver \
+        --wrapper \
+        env \
+        __GL_SYNC_TO_VBLANK=1 \
+        LD_LIBRARY_PATH="$LD_LIBRARY_PATH" \
+        LD_PRELOAD="$LD_PRELOAD" \
+        -- 0.0.0.0:1234 \
+        "$GAME_EXEC" \
+        "${GAME_DIR}/" \
+        "--options" "$HOOK_CONFIG_FILE" \
+        "${@:2}"
+    elif [ "$mode" = "strace" ] && [ "$lib_mode" = "ld" ]; then
+        log_error "strace mode with lib type ld not supported"
+    elif [ "$mode" = "strace" ] && [ "$lib_mode" = "local" ]; then
+        strace \
+        -E __GL_SYNC_TO_VBLANK=1 \
+        -E LD_LIBRARY_PATH="$LD_LIBRARY_PATH" \
+        -E LD_PRELOAD="$LD_PRELOAD" \
+        "$GAME_EXEC" \
+        "${GAME_DIR}/" \
+        "--options" "$HOOK_CONFIG_FILE" \
+        "${@:2}"
+    elif [ "$mode" = "valgrind" ] && [ "$lib_mode" = "ld" ]; then
+        log_error "valgrind mode with lib type ld not supported"
+    elif [ "$mode" = "valgrind" ] && [ "$lib_mode" = "local" ]; then
+        valgrind \
+        --trace-children=yes \
+        env \
+        __GL_SYNC_TO_VBLANK=1 \
+        LD_LIBRARY_PATH="$LD_LIBRARY_PATH" \
+        LD_PRELOAD="$LD_PRELOAD" \
+        "$GAME_EXEC" \
+        "${GAME_DIR}/" \
+        "--options" "$HOOK_CONFIG_FILE" \
+        "${@:2}"
+    else
+        log_error "Unsupported mode ($mode) or lib_mode (($lib_mode)"
+    fi
+}
+
+cmd_help()
+{
+    print_usage
+}
+
+##################################################################################
+
+CMD="$1"
+
+case $CMD in
+    "")
+        echo "Insufficient arguments."
+        print_usage
+        exit 1
+        ;;
+    "help")
+        cmd_help
+        exit 0
+        ;;
+    "run")
+        cmd_run "normal" "${@:2}"
+        exit 0
+        ;;
+    "debug")
+        cmd_run "debug" "${@:2}"
+        exit 0
+        ;;
+    "strace")
+        cmd_run "strace" "${@:2}"
+        exit 0
+        ;;
+    "valgrind")
+        cmd_run "valgrind" "${@:2}"
+        exit 0
+        ;;
+    *)
+        echo "Invalid command."
+        print_usage
+        exit 1
+        ;;
+esac
