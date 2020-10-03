@@ -1,5 +1,8 @@
 # Pumptools: The ultimate toolset to run all Linux based PIU games on any* kernel and distribution
-Version: 1.09</br>
+[![pipeline status](https://dev.s-ul.eu/hackitup/pumptools/badges/master/pipeline.svg)](https://dev.s-ul.eu/hackitup/pumptools/commits/master)
+
+Version: 1.09
+
 [Release history](CHANGELOG.md)
 
 This tool-set provides hook libraries that can be pre-loaded to run vanilla dumps of all Pump It Up games running on
