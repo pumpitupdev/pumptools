@@ -13,6 +13,8 @@
 #define NXAHOOK_OPTIONS_STR_PATCH_HOOK_MAIN_LOOP_X11_INPUT_HANDLER "patch_hook_main_loop.x11_input_handler"
 #define NXAHOOK_OPTIONS_STR_PATCH_NET_PROFILE_SERVER "patch.net_profile.server"
 #define NXAHOOK_OPTIONS_STR_PATCH_NET_PROFILE_MACHINE_ID "patch.net_profile.machine_id"
+#define NXAHOOK_OPTIONS_STR_PATCH_NET_PROFILE_VERBOSE_LOG_OUTPUT "patch.net_profile.verbose_log_output"
+#define NXAHOOK_OPTIONS_STR_PATCH_NET_PROFILE_CERT_DIR_PATH "patch.net_profile.cert_dir_path"
 #define NXAHOOK_OPTIONS_STR_PATCH_PIUIO_EMU_LIB "patch.piuio.emu_lib"
 #define NXAHOOK_OPTIONS_STR_PATCH_PIUIO_EXIT_TEST_SERV "patch.piuio_exit.test_serv"
 #define NXAHOOK_OPTIONS_STR_PATCH_SOUND_DEVICE "patch.sound.device"
@@ -96,7 +98,21 @@ const struct util_options_def nxahook_options_def[] = {
         .description = "Machine id for pumpnet",
         .param = 'm',
         .type = UTIL_OPTIONS_TYPE_STR,
-        .default_value.str = 0,
+        .default_value.str = "0",
+    },
+    {
+        .name = NXAHOOK_OPTIONS_STR_PATCH_NET_PROFILE_VERBOSE_LOG_OUTPUT,
+        .description = "Enable verbose log output for pumpnet related things, e.g. logging network traffic",
+        .param = 'v',
+        .type = UTIL_OPTIONS_TYPE_BOOL,
+        .default_value.b = false,
+    },
+    {
+        .name = NXAHOOK_OPTIONS_STR_PATCH_NET_PROFILE_CERT_DIR_PATH,
+        .description = "Path to a folder containing the client key, certificate and CA bundle to enable https communication",
+        .param = 'c',
+        .type = UTIL_OPTIONS_TYPE_STR,
+        .default_value.str = NULL,
     },
     {
         .name = NXAHOOK_OPTIONS_STR_PATCH_PIUIO_EMU_LIB,
@@ -177,10 +193,14 @@ bool nxahook_options_init(int argc, char** argv, struct nxahook_options* options
     options->patch.main_loop.x11_input_handler_api_lib =
         util_options_get_str(options_opt, NXAHOOK_OPTIONS_STR_PATCH_HOOK_MAIN_LOOP_X11_INPUT_HANDLER);
     options->patch.net.server = util_options_get_str(options_opt, NXAHOOK_OPTIONS_STR_PATCH_NET_PROFILE_SERVER);
-     options->patch.net.machine_id = strtoul(
+    options->patch.net.machine_id = strtoull(
         util_options_get_str(options_opt, NXAHOOK_OPTIONS_STR_PATCH_NET_PROFILE_MACHINE_ID),
         NULL,
         16);
+    options->patch.net.verbose_log_output =
+        util_options_get_bool(options_opt, NXAHOOK_OPTIONS_STR_PATCH_NET_PROFILE_VERBOSE_LOG_OUTPUT);
+    options->patch.net.cert_dir_path =
+        util_options_get_str(options_opt, NXAHOOK_OPTIONS_STR_PATCH_NET_PROFILE_CERT_DIR_PATH);
     options->patch.piuio.api_lib = util_options_get_str(options_opt, NXAHOOK_OPTIONS_STR_PATCH_PIUIO_EMU_LIB);
     options->patch.piuio.exit_test_serv =
         util_options_get_bool(options_opt, NXAHOOK_OPTIONS_STR_PATCH_PIUIO_EXIT_TEST_SERV);
