@@ -28,6 +28,9 @@ static char* _pumpnet_lib_get_endpoint_save(enum asset_game_version game, const 
         case ASSET_GAME_VERSION_NX2:
             return util_str_merge(server_addr, USBPROFILE_ENDPOINT "/nx2/save");
 
+        case ASSET_GAME_VERSION_NXA:
+            return util_str_merge(server_addr, USBPROFILE_ENDPOINT "/nxa/save");
+
         default:
             log_die("Unsupported game version %d", game);
             return NULL;
@@ -39,6 +42,9 @@ static char* _pumpnet_lib_get_endpoint_rank(enum asset_game_version game, const 
     switch (game) {
         case ASSET_GAME_VERSION_NX2:
             return util_str_merge(server_addr, USBPROFILE_ENDPOINT "/nx2/rank");
+
+        case ASSET_GAME_VERSION_NXA:
+            return util_str_merge(server_addr, USBPROFILE_ENDPOINT "/nxa/rank");
 
         default:
             log_die("Unsupported game version %d", game);
