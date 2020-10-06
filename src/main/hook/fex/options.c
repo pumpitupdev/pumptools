@@ -177,7 +177,7 @@ bool fexhook_options_init(int argc, char** argv, struct fexhook_options* options
     options->patch.main_loop.x11_input_handler_api_lib =
         util_options_get_str(options_opt, FEXHOOK_OPTIONS_STR_PATCH_HOOK_MAIN_LOOP_X11_INPUT_HANDLER);
     options->patch.net.server = util_options_get_str(options_opt, FEXHOOK_OPTIONS_STR_PATCH_NET_PROFILE_SERVER);
-         options->patch.net.machine_id = strtoul(
+         options->patch.net.machine_id = strtoull(
         util_options_get_str(options_opt, FEXHOOK_OPTIONS_STR_PATCH_NET_PROFILE_MACHINE_ID),
         NULL,
         16);
