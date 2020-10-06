@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#define ASSET_NXA_USB_RANK_SIZE 24648
+
 enum asset_nxa_usb_rank_sizes {
 	ASSET_NXA_USB_RANK_MAX_STAGES = 3,
 	ASSET_NXA_USB_RANK_MAX_RANK_ENTRIES = 256,
