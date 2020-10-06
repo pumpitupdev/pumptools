@@ -206,6 +206,7 @@ $(zipdir)/doc.zip: \
 		doc/hook/mk3hook.md \
 		doc/hook/nxhook.md \
 		doc/hook/nx2hook.md \
+		doc/hook/nxahook.md \
 		doc/hook/os.md \
 		doc/hook/x2hook.md \
 		doc/hook/zerohook.md \
@@ -252,6 +253,7 @@ $(builddir)/pumptools-public.zip: \
 		$(zipdir)/mk3hook.zip \
 		$(zipdir)/nxhook.zip \
 		$(zipdir)/nx2hook.zip \
+    $(zipdir)/nxahook.zip \
 		$(zipdir)/piubtn.zip \
 		$(zipdir)/piuio.zip \
 		$(zipdir)/x2hook.zip \
