@@ -98,7 +98,7 @@ const struct util_options_def nx2hook_options_def[] = {
         .description = "Machine id for pumpnet",
         .param = 'm',
         .type = UTIL_OPTIONS_TYPE_STR,
-        .default_value.str = "0102030405060708",
+        .default_value.str = "0",
     },
     {
         .name = NX2HOOK_OPTIONS_STR_PATCH_NET_PROFILE_VERBOSE_LOG_OUTPUT,
