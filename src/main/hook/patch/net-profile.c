@@ -355,7 +355,7 @@ static bool _patch_net_profile_determine_is_profile_and_player_and_file_type(
     for (int i = 0; i < PUMPNET_MAX_NUM_PLAYERS; i++) {
         for (int j = 0; j < PUMPNET_LIB_FILE_TYPE_COUNT; j++) {
             if (!strcmp(irp->open_filename,
-                    _patch_net_profile_virtual_mnt_point_infos->player[i].file_info[j].file_path)) {
+                    _patch_net_profile_file_info_ref->player[i].file_info[j].file_path)) {
                 *player = i;
                 *file_type = (enum pumpnet_lib_file_type) j;
                 return true;
@@ -384,7 +384,7 @@ static struct profile_virtual_file* _patch_net_profile_setup_virtual_file(
 
     virtual_file->player_ref_id = player_ref_id;
     virtual_file->handle = cnh_filehook_open_dummy_file_handle();
-    virtual_file->file_info = &_patch_net_profile_virtual_mnt_point_infos->player[player].file_info[file_type];
+    virtual_file->file_info = &_patch_net_profile_file_info_ref->player[player].file_info[file_type];
     virtual_file->buffer_pos = 0;
     virtual_file->is_written = false;
 
