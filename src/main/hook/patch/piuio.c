@@ -13,6 +13,7 @@
 #include "ptapi/io/piuio/util/lib.h"
 
 #include "util/log.h"
+#include "util/time.h"
 
 static bool _patch_piuio_enumerate(bool real_exists);
 static enum cnh_result _patch_piuio_open(void);
@@ -99,35 +100,68 @@ static enum cnh_result _patch_piuio_reset(void)
     return CNH_RESULT_SUCCESS;
 }
 
+// TODO cleanup code and hide measuring time behind feature flag, add this to
+// all supported games + documentation for debugging purpose to detect lag issues
+// (potentially with IO implementations)
+static util_time_counter_t _patch_piuio_poll_timer_start;
+static uint32_t _patch_piuio_poll_counter;
+
 static enum cnh_result _patch_piuio_control_msg(int request_type, int request, int value, int index,
         struct cnh_iobuf* buffer, int timeout)
 {
+    enum cnh_result result;
+    util_time_counter_t time_counter_start;
+    util_time_counter_t time_counter_delta;
+    double time_ms;
+
+    if (_patch_piuio_poll_timer_start == 0) {
+        _patch_piuio_poll_counter = 0;
+        _patch_piuio_poll_timer_start = util_time_get_counter();
+    } else if (util_time_get_elapsed_ms_double(util_time_get_counter() - _patch_piuio_poll_timer_start) >= 1000.0) {
+          log_debug("ctrl_msg refresh rate: %d hz", _patch_piuio_poll_counter);
+          _patch_piuio_poll_counter = 0;
+          _patch_piuio_poll_timer_start = util_time_get_counter();
+    }
+
+    time_counter_start = util_time_get_counter();
+
     if (request_type == PIUIO_DRV_USB_CTRL_TYPE_IN && request == PIUIO_DRV_USB_CTRL_REQUEST) {
         if (buffer->nbytes != PIUIO_DRV_BUFFER_SIZE) {
             log_error("Invalid buffer size for ctrl in: %d", buffer->nbytes);
-            return CNH_RESULT_INVALID_PARAMETER;
+            result = CNH_RESULT_INVALID_PARAMETER;
+        } else {
+            result = _patch_piuio_process_inputs(buffer);
         }
-
-        return _patch_piuio_process_inputs(buffer);
     } else if (request_type == PIUIO_DRV_USB_CTRL_TYPE_OUT && request == PIUIO_DRV_USB_CTRL_REQUEST) {
         if (buffer->nbytes != PIUIO_DRV_BUFFER_SIZE) {
             log_error("Invalid buffer size for ctrl out: %d", buffer->nbytes);
-            return CNH_RESULT_INVALID_PARAMETER;
+            result = CNH_RESULT_INVALID_PARAMETER;
+        } else {
+            result = _patch_piuio_process_outputs(buffer);
         }
-
-        return _patch_piuio_process_outputs(buffer);
     } else if (request_type == 0 && request == 0) {
         /* ITG 2/PIU Pro kernel hack */
         if (buffer->nbytes != PIUIO_DRV_BUFFER_SIZE * 4) {
             log_error("Invalid buffer size for kernel hack: %d", buffer->nbytes);
-            return CNH_RESULT_INVALID_PARAMETER;
+            result = CNH_RESULT_INVALID_PARAMETER;
+        } else {
+            result = _patch_piuio_process_itg_kernel_module_hack(buffer);
         }
-
-        return _patch_piuio_process_itg_kernel_module_hack(buffer);
     } else {
         log_error("Invalid usb control request to PIUIO: 0x%02X", request);
-        return CNH_RESULT_INVALID_PARAMETER;
+        result = CNH_RESULT_INVALID_PARAMETER;
     }
+
+    time_counter_delta = util_time_get_counter() - time_counter_start;
+    time_ms = util_time_get_elapsed_ms_double(time_counter_delta);
+
+    if (time_ms > 0.010) {
+        log_debug("High processing time sample: %f ms", time_ms);
+    }
+
+    _patch_piuio_poll_counter++;
+
+    return result;
 }
 
 static void _patch_piuio_close(void)
