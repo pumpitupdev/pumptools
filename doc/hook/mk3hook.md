@@ -254,6 +254,26 @@ software mixing.
 Choose another device for playback instead, see [this section](#select-another-audio-device), or you can enable
 fmodex debug output to further debug this issue, see [this section](#debugging-fmodex-issues).
 
+### No sound and log is showing some error about audio group
+If you see something like this in the log:
+```text
+Trapping getgrnam_r for audio group of libasound
+audio group entry format in /etc/group invalid. Check your /etc/group file!
+ALSA lib pcm_direct.c:2004:(snd1_pcm_direct_parse_open_conf) The field ipc_gid must be a valid group (create group audio)
+```
+
+You have to setup the audio group properly. Usually the following command gets the job done for this:
+```bash
+sudo usermod -a -G audio piu
+```
+
+Replace `piu` with the username that you are using to run the game (typically user with id 1000). If everything's fine,
+you should see the following output (or similar) instead of the error above:
+```text
+Trapping getgrnam_r for audio group of libasound
+Resulting group struct: audio x 995 piu,
+```
+
 ### 1st/2nd is missing the "Insert Coin" text on the title screen and several other graphics, e.g. life bar during gameplay
 This is a known bug and we do not have a fix for this so far. However, this is not always triggered and if you keep
 restarting the game (with a few seconds of waiting between restarts), you will start the game without this bug being
