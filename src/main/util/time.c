@@ -67,3 +67,37 @@ void util_time_get_current_time(struct util_time_timestamp* timestamp)
     // Years since 1900
     timestamp->year = tm->tm_year + 1900;
 }
+
+util_time_counter_t util_time_get_counter()
+{
+    struct timespec tspec;
+
+    clock_gettime(CLOCK_MONOTONIC, &tspec);
+
+    return tspec.tv_sec * 1000 * 1000 * 1000 + tspec.tv_nsec;
+}
+
+uint64_t util_time_get_elapsed_ns(util_time_counter_t counter_delta)
+{
+    return counter_delta;
+}
+
+uint64_t util_time_get_elapsed_us(util_time_counter_t counter_delta)
+{
+    return counter_delta / 1000;
+}
+
+double util_time_get_elapsed_us_double(util_time_counter_t counter_delta)
+{
+    return ((double) counter_delta) / 1000.0;
+}
+
+uint32_t util_time_get_elapsed_ms(util_time_counter_t counter_delta)
+{
+    return counter_delta / 1000 / 1000;
+}
+
+double util_time_get_elapsed_ms_double(util_time_counter_t counter_delta)
+{
+    return ((double) counter_delta) / 1000.0 / 1000.0;
+}
