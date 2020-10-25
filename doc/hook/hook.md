@@ -19,6 +19,35 @@ A few notable features:
 ## Supported games and versions
 Check each of the dedicated hook readmes which games and versions are supported.
 
+## Dependencies of hook libraries
+Pumptool's hook libraries aim for having no dependencies other than what is already required by the
+different games to run.
+
+However, there are some exceptions that require additional libraries in order to allow the following
+features to work correctly:
+* Hook libraries, e.g. `nx2hook` that support network features, e.g. usb profiles with pumpnet
+* IO API implementations that support real devices, e.g. real PIUIO, which use libusb-1.0
+
+Taken from [the Dockerfile for building pumptools](../../Dockerfile), the following commands install
+the dependencies that you need on an Ubuntu-based system:
+
+```bash
+dpkg --add-architecture i386
+apt-get update && apt-get install -y \
+    g++-multilib \
+    gcc-multilib \
+    libc6-dev-i386 \
+    libusb-1.0-0:i386 \
+    libusb:i386 \
+    libasound2:i386 \
+    libconfig++:i386 \
+    libx11:i386 \
+    libcurl4-gnutls:i386
+```
+
+Further game version specific dependencies and how to set these up is outlined in
+[its own section](#dependencies-of-games).
+
 ## Hardware, operating system and environment
 A general outline is given by [this readme](os.md) if you want to setup something yourself. Otherwise, you should
 checkout the `pumpos` project in a repository nearby which takes care of installing a fully configured OS to a physical
@@ -46,7 +75,7 @@ Exceed `exchook.conf`, to `hook.conf`
 Details to specific games are given in the hook read files dedicated to each supported version. Further general
 configuration and technical details as well as troubleshooting known issues are described in following sections.
 
-## Dependencies
+## Dependencies of games
 A list of dependencies is provided in the dedicated hook readme files for each game. The following is a general guide
 on how dependencies of the games can be resolved to run them.
 
