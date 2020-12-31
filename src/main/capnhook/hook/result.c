@@ -47,6 +47,8 @@ int cnh_result_to_errno(enum cnh_result result)
             return EPIPE;
         case CNH_RESULT_TIMER_EXPIRED:
             return ETIME;
+        case CNH_RESULT_NO_DATA_AVAILABLE:
+            return ENODATA;
         default:
             log_warn("Unhandled other error %d to errno convert might cause bugs", result);
             return EIO;
@@ -92,6 +94,8 @@ enum cnh_result cnh_errno_to_result(int errn)
             return CNH_RESULT_BROKEN_PIPE;
         case ETIME:
             return CNH_RESULT_TIMER_EXPIRED;
+        case ENODATA:
+            return CNH_RESULT_NO_DATA_AVAILABLE;
         default:
             log_warn("Unhandled errno to general error convert might cause bugs, errno: %d", errn);
             return CNH_RESULT_OTHER_ERROR;
