@@ -12,4 +12,4 @@ set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-fPIC")
 # Remove library name "lib" prefix
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
-target_link_libraries(${PROJECT_NAME} io-util util usb-1.0)
+target_link_libraries(${PROJECT_NAME} io-piubtn io-util util usb-1.0)
