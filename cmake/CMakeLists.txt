@@ -1,11 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
 
-option(PT_PUBLIC_RELEASE "PT_PUBLIC_RELEASE" "0")
-
-if (PT_PUBLIC_RELEASE STREQUAL "1")
-    message(WARNING "[1;31m!!! Compiling public release !!!\n!!! Compiling public release !!!\n!!! Compiling public release !!![m")
-endif ()
-
 # set git revision
 execute_process(COMMAND git log -1 --format=%h --date=short HEAD WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} OUTPUT_VARIABLE GITREV ERROR_QUIET)
 string(STRIP "${GITREV}" GITREV)
@@ -46,19 +40,11 @@ set(CMAKE_CXX_STANDARD 14)
 # Important note: Don't use -O3 because that will break the dongle emulation code for microdog40 (wtf)
 # Also, -O3 seems to optimize too much stuff and kills the amixer-block module entirely (the system() preload
 # can't be called anymore)
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DGITREV=${GITREV} -pipe -Wall -Werror -std=gnu99 -D_GNU_SOURCE -Wno-attributes -m32")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DGITREV=${GITREV} -pipe -Wall -Werror -std=gnu99 -D_GNU_SOURCE -Wno-attributes -m32 -g")
 set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -Wl,--no-undefined -m32")
 
 # Enable debug flags on non public builds
-if (PT_PUBLIC_RELEASE STREQUAL "0")
-    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -g -rdynamic")
-endif ()
-
-# Disable asserts and strip binary
-if (PT_PUBLIC_RELEASE STREQUAL "1")
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -DNDEBUG -DPT_PUBLIC_RELEASE")
-    set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -s")
-endif ()
+set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -rdynamic")
 
 add_subdirectory(src)
 
