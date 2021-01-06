@@ -16,6 +16,7 @@
 #define PROTOCOL_VERSION 0x11
 
 enum sec_microdog40_req_opcode {
+    SEC_MICRODOG40_REQ_OPCODE_DOG_CHECK = 0x01,
     SEC_MICRODOG40_REQ_OPCODE_SET_SHARE = 0x08,
     SEC_MICRODOG40_REQ_OPCODE_GET_LOCK_NO = 0x0B,
     SEC_MICRODOG40_REQ_OPCODE_GET_ID = 0x14,
@@ -275,6 +276,13 @@ static void sec_microdog40_dispatch(const struct sec_microdog40_req* req,
 
     switch (req->req_type)
     {
+        case SEC_MICRODOG40_REQ_OPCODE_DOG_CHECK:
+        {
+                log_debug("SEC_MICRODOG40_REQ_OPCODE_DOG_CHECK");
+                /* no-op */
+                break;
+        }
+
         case SEC_MICRODOG40_REQ_OPCODE_SET_SHARE:
         {
         	log_debug("SEC_MICRODOG40_REQ_OPCODE_SET_SHARE");
