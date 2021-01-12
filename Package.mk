@@ -175,6 +175,15 @@ $(zipdir)/pumpnet.zip: \
 	$(V)zip -j $@ $^
 
 ################################################
+# Security: Lexical sorting
+
+$(zipdir)/security.zip: \
+                $(builddir)/bin/microdog40d \
+		| $(zipdir)/
+	$(V)echo ... $@
+	$(V)zip -j $@ $^
+
+################################################
 # Documentation
 
 $(zipdir)/doc.zip: \
@@ -234,6 +243,7 @@ $(builddir)/pumptools.zip: \
 		$(zipdir)/pro2hook.zip \
 		$(zipdir)/prohook.zip \
 		$(zipdir)/pumpnet.zip \
+		$(zipdir)/security.zip \
 		$(zipdir)/x2hook.zip \
 		$(zipdir)/zerohook.zip \
 		CHANGELOG.md \

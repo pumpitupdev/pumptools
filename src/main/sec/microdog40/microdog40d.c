@@ -15,6 +15,7 @@ static const char* sec_microdog40d_sock_path = "/var/run/microdog/u.daemon";
 
 static bool sec_microdog40d_run_d;
 static bool sec_microdog40d_is_running_d;
+struct timeval tv;
 
 void sec_microdog40d_init(const uint8_t* key_data, size_t len)
 {
@@ -49,6 +50,13 @@ void sec_microdog40d_run(void)
         return;
     }
 
+    tv.tv_sec=5;
+    tv.tv_usec = 0;
+    if (setsockopt(fd, SOL_SOCKET, SO_RCVTIMEO,&tv,sizeof(tv)) < 0) {
+        sec_microdog40d_is_running_d = false;
+        return;
+    }
+
     memset(&peer_addr, 0, sizeof(struct sockaddr_un));
     peer_addr.sun_family = AF_UNIX;
     strcpy(peer_addr.sun_path, sec_microdog40d_sock_path);
@@ -72,6 +80,8 @@ void sec_microdog40d_run(void)
 
             if (errno == EBADF) {
                 break;
+            } else if (errno == EAGAIN) {
+                continue;
             } else {
                 log_error("Receiving data failed: %s", strerror(errno));
                 sec_microdog40d_is_running_d = false;
