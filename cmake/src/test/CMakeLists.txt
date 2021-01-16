@@ -5,5 +5,6 @@ include_directories(${PT_ROOT_TEST})
 
 add_subdirectory(capnhook)
 add_subdirectory(hook)
+add_subdirectory(sec)
 add_subdirectory(test-util)
 add_subdirectory(util)
