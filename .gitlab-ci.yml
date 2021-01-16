@@ -13,7 +13,7 @@ stages:
   - build
   - test
   - create-release-package
-  - releasetag
+  - upload-release
 
 build:
   stage: build
@@ -66,19 +66,15 @@ create-release-package:
   only:
     refs:
       - master
-    
-releasetag:
-  stage: releasetag
-  dependencies: []
+
+upload-release:
+  stage: upload-release
+  dependencies:
+    - create-release-package
   before_script:
     - apk update && apk add curl > /dev/null
   script:
-    - |
-      curl --silent --show-error \
-        --data "{\"tag_name\": \"${CI_COMMIT_TAG}\", \"name\": \"${CI_PROJECT_NAME}-${CI_COMMIT_TAG}\", \"description\": \"${CI_COMMIT_TAG_MESSAGE:-No release notes.}\"}" \
-        --header "Content-Type: application/json" \
-        --header "Private-Token: ${CI_PRIVATE_TOKEN}" \
-        --request POST \
-        "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases"
+    - echo "Uploading ${CI_PROJECT_NAME}-${CI_COMMIT_TAG}..."
+    - curl --silent --show-error -F "key=${CI_UPLOAD_KEY}" -F "filename=${CI_PROJECT_NAME}-v${CI_COMMIT_TAG}.zip" -F "file=@./pumptools.zip" ${CI_UPLOAD_URL}
   only:
     - tags
