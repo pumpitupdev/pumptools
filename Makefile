@@ -43,7 +43,7 @@ test: build
 build-docker:
 	$(V)rm -rf $(BUILDDIR)/docker
 	$(V)mkdir -p $(BUILDDIR)/docker
-	$(V)docker build -t pumptools:build .
+	$(V)docker build -f Dockerfile.build -t pumptools:build .
 	$(V)docker create --name pumptools-build pumptools:build
 	$(V)docker cp pumptools-build:/pumptools/build $(BUILDDIR)/docker
 	$(V)mv $(BUILDDIR)/docker/build/* $(BUILDDIR)/docker

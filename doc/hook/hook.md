@@ -28,7 +28,7 @@ features to work correctly:
 * Hook libraries, e.g. `nx2hook` that support network features, e.g. usb profiles with pumpnet
 * IO API implementations that support real devices, e.g. real PIUIO, which use libusb-1.0
 
-Taken from [the Dockerfile for building pumptools](../../Dockerfile), the following commands install
+Taken from [the Dockerfile for building pumptools](../../Dockerfile.build), the following commands install
 the dependencies that you need on an Ubuntu-based system:
 
 ```bash
