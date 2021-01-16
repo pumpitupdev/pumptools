@@ -9,6 +9,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+extern const int INVALID_SOCK_HANDLE;
+
 bool util_sock_tcp_is_connectable(const char* ipv4, uint32_t timeout_ms);
 
 bool util_sock_tcp_is_connectable2(const char* ipv4, uint16_t port, uint32_t timeout_ms);

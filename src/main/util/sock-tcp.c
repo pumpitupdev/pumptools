@@ -10,6 +10,8 @@
 #include "util/log.h"
 #include "util/sock-tcp.h"
 
+const int INVALID_SOCK_HANDLE = -1;
+
 bool util_sock_tcp_is_connectable(const char* ipv4, uint32_t timeout_ms)
 {
     char* address;
