@@ -1,0 +1,9 @@
+FROM pumptools:build
+
+LABEL description="Test environment for pumptools"
+
+WORKDIR /pumptools
+
+COPY scripts/run-tests.sh scripts/run-tests.sh
+
+RUN make test

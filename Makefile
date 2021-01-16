@@ -23,6 +23,7 @@ usage:
 	$(V)echo "  clean: Clean up all build output"
 	$(V)echo "  test: Run pumptools's unit tests"
 	$(V)echo "  build-docker: Build the pumptools project in a docker container"
+	$(V)echo "  test-docker: Run pumptools's unit tests in a docker container"
 	$(V)echo "  git-version: Generate a text file with the current git revision"
 	$(V)echo "  libc-version: Generate a text file with the libc version available"
 	$(V)echo "  clang-format: Apply code style defined in .clang-format style to all code in src/"
@@ -50,6 +51,9 @@ build-docker:
 	$(V)rm -r $(BUILDDIR)/docker/build
 	$(V)docker rm -f pumptools-build
 	$(V)echo "Build output of docker build can be found in build/docker subfolder."
+
+test-docker:
+	$(V)docker build -f Dockerfile.test -t pumptools:test .
 
 # Generate a version file to identify the build
 git-version:
