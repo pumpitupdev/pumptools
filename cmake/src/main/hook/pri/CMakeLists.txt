@@ -8,6 +8,7 @@ add_resources(DOG_KEY ${SRC} prihook.hasp.key)
 
 set(SOURCE_FILES
         ${SRC}/main.c
+        ${SRC}/net-crypt.c
         ${SRC}/options.c
         ${SRC}/usb-updates.c)
 
