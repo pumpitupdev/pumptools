@@ -6,6 +6,7 @@ set(SRC ${PT_ROOT_MAIN}/pumpnet/lib)
 set(SOURCE_FILES
         ${SRC}/base.c
         ${SRC}/http.c
+        ${SRC}/prinet.c
         ${SRC}/profile-token.c
         ${SRC}/usbprofile.c)
 
