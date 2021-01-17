@@ -6,7 +6,7 @@
 #include "asset/nx2/lib/usb-rank.h"
 #include "asset/nx2/lib/usb-save.h"
 
-#include "pumpnet/lib/pumpnet.h"
+#include "pumpnet/lib/usbprofile.h"
 
 #include "util/fs.h"
 #include "util/log.h"
@@ -43,13 +43,13 @@ static size_t _get_size_rank_file(enum asset_game_version game_version)
     }
 }
 
-static size_t _get_size_usb_file(enum asset_game_version game_version, enum pumpnet_lib_file_type file_type)
+static size_t _get_size_usb_file(enum asset_game_version game_version, enum pumpnet_lib_usbprofile_file_type file_type)
 {
     switch (file_type) {
-        case PUMPNET_LIB_FILE_TYPE_SAVE:
+        case PUMPNET_LIB_USBPROFILE_FILE_TYPE_SAVE:
             return _get_size_save_file(game_version);
 
-        case PUMPNET_LIB_FILE_TYPE_RANK:
+        case PUMPNET_LIB_USBPROFILE_FILE_TYPE_RANK:
             return _get_size_rank_file(game_version);
 
         default:
@@ -69,14 +69,14 @@ int main(int argc, char** argv)
     const char* server_addr = argv[1];
     const char* cmd = argv[2];
     enum asset_game_version game_version = strtol(argv[3], NULL, 10);
-    enum pumpnet_lib_file_type file_type = strtol(argv[4], NULL, 10);
+    enum pumpnet_lib_usbprofile_file_type file_type = strtol(argv[4], NULL, 10);
     uint64_t machine_id = strtol(argv[5], NULL, 16);
     uint64_t player_ref_id = strtol(argv[6], NULL, 16);
     const char* file_path = argv[7];
 
     bool success;
 
-    pumpnet_lib_init(game_version, server_addr, machine_id, NULL, true);
+    pumpnet_lib_usbprofile_init(game_version, server_addr, machine_id, NULL, true);
 
     if (!strcmp(cmd, "put")) {
         size_t size;
@@ -86,13 +86,13 @@ int main(int argc, char** argv)
             log_error("Loading data from %s failed", file_path);
             success = false;
         } else {
-            success = pumpnet_lib_put(file_type, player_ref_id, buffer, sizeof(buffer));
+            success = pumpnet_lib_usbprofile_put(file_type, player_ref_id, buffer, sizeof(buffer));
         }
     } else if (!strcmp(cmd, "get")) {
         size_t buffer_size = _get_size_usb_file(game_version, file_type);
         uint8_t* buffer = malloc(buffer_size);
 
-        success = pumpnet_lib_get(file_type, player_ref_id, buffer, sizeof(buffer));
+        success = pumpnet_lib_usbprofile_get(file_type, player_ref_id, buffer, sizeof(buffer));
 
         if (success) {
             if (!util_file_save(file_path, buffer, buffer_size)) {
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
         success = false;
     }
 
-    pumpnet_lib_shutdown();
+    pumpnet_lib_usbprofile_shutdown();
 
     if (success) {
         exit(EXIT_SUCCESS);
