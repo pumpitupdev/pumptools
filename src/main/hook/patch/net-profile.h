@@ -4,7 +4,7 @@
 #ifndef HOOK_PATCH_NET_PROFILE_H
 #define HOOK_PATCH_NET_PROFILE_H
 
-#include "pumpnet/lib/pumpnet.h"
+#include "pumpnet/lib/usbprofile.h"
 
 /**
  * Initialize the module.

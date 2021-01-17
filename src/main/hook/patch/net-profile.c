@@ -9,7 +9,7 @@
 #include "capnhook/hook/filehook.h"
 
 #include "pumpnet/lib/profile-token.h"
-#include "pumpnet/lib/pumpnet.h"
+#include "pumpnet/lib/usbprofile.h"
 
 #include "util/fs.h"
 #include "util/log.h"
@@ -21,14 +21,14 @@
 
 struct profile_virtual_mnt_point_file_info {
     int player;
-    enum pumpnet_lib_file_type file_type;
+    enum pumpnet_lib_usbprofile_file_type file_type;
     const char* file_path;
     size_t file_size;
 };
 
 struct profile_virtual_mnt_point_info {
     struct {
-        struct profile_virtual_mnt_point_file_info file_info[PUMPNET_LIB_FILE_TYPE_COUNT];
+        struct profile_virtual_mnt_point_file_info file_info[PUMPNET_LIB_USBPROFILE_FILE_TYPE_COUNT];
     } player[PUMPNET_MAX_NUM_PLAYERS];
 };
 
@@ -42,7 +42,7 @@ struct profile_virtual_file {
 };
 
 struct profile_virtual_mnt_point {
-    struct profile_virtual_file files[PUMPNET_LIB_FILE_TYPE_COUNT];
+    struct profile_virtual_file files[PUMPNET_LIB_USBPROFILE_FILE_TYPE_COUNT];
 };
 
 static enum cnh_result _patch_net_profile_filehook(struct cnh_filehook_irp* irp);
@@ -64,11 +64,11 @@ static struct profile_virtual_file* _patch_net_profile_get_virtual_mnt_point(FIL
 static bool _patch_net_profile_determine_is_profile_and_player_and_file_type(
         struct cnh_filehook_irp* irp,
         uint8_t* player,
-        enum pumpnet_lib_file_type* file_type);
+        enum pumpnet_lib_usbprofile_file_type* file_type);
 static enum cnh_result _patch_net_profile_open_pumpnet_profile_file(
         struct cnh_filehook_irp* irp,
         uint8_t player,
-        enum pumpnet_lib_file_type file_type);
+        enum pumpnet_lib_usbprofile_file_type file_type);
 static bool _patch_net_profile_close_pumpnet_profile_file(struct profile_virtual_file* virtual_file);
 
 static const struct profile_virtual_mnt_point_info _patch_net_profile_virtual_mnt_point_infos[] = {
@@ -78,13 +78,13 @@ static const struct profile_virtual_mnt_point_info _patch_net_profile_virtual_mn
                 .file_info = {
                     {
                         .player = 0,
-                        .file_type = PUMPNET_LIB_FILE_TYPE_SAVE,
+                        .file_type = PUMPNET_LIB_USBPROFILE_FILE_TYPE_SAVE,
                         .file_path = "/mnt/0/nx2save.bin",
                         .file_size = ASSET_NX2_USB_SAVE_SIZE
                     },
                     {
                         .player = 0,
-                        .file_type = PUMPNET_LIB_FILE_TYPE_RANK,
+                        .file_type = PUMPNET_LIB_USBPROFILE_FILE_TYPE_RANK,
                         .file_path = "/mnt/0/nx2rank.bin",
                         .file_size = ASSET_NX2_USB_RANK_SIZE
                     }
@@ -94,13 +94,13 @@ static const struct profile_virtual_mnt_point_info _patch_net_profile_virtual_mn
                 .file_info = {
                     {
                         .player = 1,
-                        .file_type = PUMPNET_LIB_FILE_TYPE_SAVE,
+                        .file_type = PUMPNET_LIB_USBPROFILE_FILE_TYPE_SAVE,
                         .file_path = "/mnt/1/nx2save.bin",
                         .file_size = ASSET_NX2_USB_SAVE_SIZE
                     },
                     {
                         .player = 1,
-                        .file_type = PUMPNET_LIB_FILE_TYPE_RANK,
+                        .file_type = PUMPNET_LIB_USBPROFILE_FILE_TYPE_RANK,
                         .file_path = "/mnt/1/nx2rank.bin",
                         .file_size = ASSET_NX2_USB_RANK_SIZE
                     }
@@ -158,9 +158,9 @@ static enum cnh_result _patch_net_profile_filehook(struct cnh_filehook_irp* irp)
 static enum cnh_result _patch_net_profile_fopen(struct cnh_filehook_irp* irp)
 {
     uint8_t player;
-    enum pumpnet_lib_file_type file_type;
+    enum pumpnet_lib_usbprofile_file_type file_type;
     player = -1;
-    file_type = PUMPNET_LIB_FILE_TYPE_COUNT;
+    file_type = PUMPNET_LIB_USBPROFILE_FILE_TYPE_COUNT;
 
     // not a profile file, pass
     if (!_patch_net_profile_determine_is_profile_and_player_and_file_type(irp, &player, &file_type)) {
@@ -294,7 +294,7 @@ static enum cnh_result _patch_net_profile_feof(struct cnh_filehook_irp* irp,
 static struct profile_virtual_file* _patch_net_profile_get_virtual_mnt_point(FILE* handle)
 {
     for (int i = 0; i < PUMPNET_MAX_NUM_PLAYERS; i++) {
-        for (int j = 0; j < PUMPNET_LIB_FILE_TYPE_COUNT; j++) {
+        for (int j = 0; j < PUMPNET_LIB_USBPROFILE_FILE_TYPE_COUNT; j++) {
             if (_patch_net_profile_virtual_mnt_points->files[j].handle == handle) {
                 return &_patch_net_profile_virtual_mnt_points->files[j];
             }
@@ -307,7 +307,7 @@ static struct profile_virtual_file* _patch_net_profile_get_virtual_mnt_point(FIL
 static bool _patch_net_profile_determine_is_profile_and_player_and_file_type(
         struct cnh_filehook_irp* irp,
         uint8_t* player,
-        enum pumpnet_lib_file_type* file_type)
+        enum pumpnet_lib_usbprofile_file_type* file_type)
 {
     log_assert(irp);
     log_assert(player);
@@ -315,11 +315,11 @@ static bool _patch_net_profile_determine_is_profile_and_player_and_file_type(
 
     // compare to static string to avoid slowing everything down
     for (int i = 0; i < PUMPNET_MAX_NUM_PLAYERS; i++) {
-        for (int j = 0; j < PUMPNET_LIB_FILE_TYPE_COUNT; j++) {
+        for (int j = 0; j < PUMPNET_LIB_USBPROFILE_FILE_TYPE_COUNT; j++) {
             if (!strcmp(irp->open_filename,
                     _patch_net_profile_virtual_mnt_point_infos->player[i].file_info[j].file_path)) {
                 *player = i;
-                *file_type = (enum pumpnet_lib_file_type) j;
+                *file_type = (enum pumpnet_lib_usbprofile_file_type) j;
                 return true;
             }
         }
@@ -330,7 +330,7 @@ static bool _patch_net_profile_determine_is_profile_and_player_and_file_type(
 
 static struct profile_virtual_file* _patch_net_profile_setup_virtual_file(
         uint8_t player,
-        enum pumpnet_lib_file_type file_type,
+        enum pumpnet_lib_usbprofile_file_type file_type,
         uint64_t player_ref_id)
 {
     struct profile_virtual_file* virtual_file;
@@ -357,7 +357,7 @@ static struct profile_virtual_file* _patch_net_profile_setup_virtual_file(
     return virtual_file;
 }
 
-static void _patch_net_profile_destroy_virtual_file(uint8_t player, enum pumpnet_lib_file_type file_type)
+static void _patch_net_profile_destroy_virtual_file(uint8_t player, enum pumpnet_lib_usbprofile_file_type file_type)
 {
     struct profile_virtual_file* virtual_file;
 
@@ -407,7 +407,7 @@ static bool _patch_net_profile_get_token(int player, uint64_t* player_ref_id)
 static bool _patch_net_profile_download_profile_file(struct profile_virtual_file* virtual_file)
 {
     int player;
-    enum pumpnet_lib_file_type file_type;
+    enum pumpnet_lib_usbprofile_file_type file_type;
     uint64_t player_ref_id;
 
     player = virtual_file->file_info->player;
@@ -419,7 +419,7 @@ static bool _patch_net_profile_download_profile_file(struct profile_virtual_file
         file_type,
         player_ref_id);
 
-    if (!pumpnet_lib_get(file_type, player_ref_id, virtual_file->buffer, virtual_file->file_info->file_size)) {
+    if (!pumpnet_lib_usbprofile_get(file_type, player_ref_id, virtual_file->buffer, virtual_file->file_info->file_size)) {
         log_error("Downloading file player %d, file_type %d, refId %llX failed",
             player,
             file_type,
@@ -437,7 +437,7 @@ static bool _patch_net_profile_download_profile_file(struct profile_virtual_file
 static enum cnh_result _patch_net_profile_open_pumpnet_profile_file(
         struct cnh_filehook_irp* irp,
         uint8_t player,
-        enum pumpnet_lib_file_type file_type)
+        enum pumpnet_lib_usbprofile_file_type file_type)
 {
     uint64_t player_ref_id;
 
@@ -470,7 +470,7 @@ static enum cnh_result _patch_net_profile_open_pumpnet_profile_file(
 static bool _patch_net_profile_upload_profile_file(struct profile_virtual_file* virtual_file)
 {
     int player;
-    enum pumpnet_lib_file_type file_type;
+    enum pumpnet_lib_usbprofile_file_type file_type;
     uint64_t player_ref_id;
 
     player = virtual_file->file_info->player;
@@ -482,7 +482,7 @@ static bool _patch_net_profile_upload_profile_file(struct profile_virtual_file* 
         file_type,
         player_ref_id);
 
-    if (!pumpnet_lib_put(file_type, player_ref_id, virtual_file->buffer, virtual_file->file_info->file_size)) {
+    if (!pumpnet_lib_usbprofile_put(file_type, player_ref_id, virtual_file->buffer, virtual_file->file_info->file_size)) {
         log_error("Uploading file player %d, file_type %d, refId %llX failed",
             player,
             file_type,
@@ -561,12 +561,12 @@ void patch_net_profile_init(
     size_t max_data_size = 0;
 
     // determine max file size for network buffers, file sizes identical on for all players.
-    for (int i = 0; i < PUMPNET_LIB_FILE_TYPE_COUNT; i++) {
+    for (int i = 0; i < PUMPNET_LIB_USBPROFILE_FILE_TYPE_COUNT; i++) {
         max_data_size += _patch_net_profile_file_info_ref->player[0].file_info[i].file_size;
     }
 
     // set buffers to NULL to detect illegal states
-    for (int i = 0; i < PUMPNET_LIB_FILE_TYPE_COUNT; i++) {
+    for (int i = 0; i < PUMPNET_LIB_USBPROFILE_FILE_TYPE_COUNT; i++) {
         for (int j = 0; j < PUMPNET_MAX_NUM_PLAYERS; j++) {
             _patch_net_profile_virtual_mnt_points[j].files[i].player_ref_id = 0;
             _patch_net_profile_virtual_mnt_points[j].files[i].handle = NULL;
@@ -575,7 +575,7 @@ void patch_net_profile_init(
         }
     }
 
-    pumpnet_lib_init(game, pumpnet_server_addr, machine_id, cert_dir_path, verbose_debug_log);
+    pumpnet_lib_usbprofile_init(game, pumpnet_server_addr, machine_id, cert_dir_path, verbose_debug_log);
 
     cnh_filehook_push_handler(_patch_net_profile_filehook);
 
@@ -586,7 +586,7 @@ void patch_net_profile_init(
 
 void patch_net_profile_shutdown()
 {
-    pumpnet_lib_shutdown();
+    pumpnet_lib_usbprofile_shutdown();
 
     pthread_mutex_destroy(&_patch_net_profile_mutex);
 
