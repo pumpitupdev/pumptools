@@ -26,7 +26,7 @@ const struct util_options_def _options_def[] = {
         .param = 'p',
         .type = UTIL_OPTIONS_TYPE_INT,
         // stock port used on prime
-        .default_value.i = 60000,
+        .default_value.i = 27370,
     },
     {
         .name = PUMPNET_PRINET_PROXY_OPTIONS_STR_PROXY_PUMPNET_SERVER,
