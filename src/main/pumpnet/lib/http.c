@@ -10,7 +10,6 @@
 #include "util/str.h"
 
 #define MEDIA_TYPE "text/plain"
-#define RECV_BUFFER_SIZE 1024 * 512
 #define CLIENT_CRT "/client-crt.pem"
 #define CLIENT_KEY "/client-key.pem"
 #define CA_BUNDLE_CRT "/ca-bundle-crt.pem"
@@ -20,6 +19,12 @@ struct pumpnet_lib_http_buffer {
     size_t size;
     size_t pos;
 };
+
+static char* pumpnet_lib_http_client_crt_path;
+static char* pumpnet_lib_http_client_key_path;
+static char* pumpnet_lib_http_ca_bundle_crt_path;
+static bool pumpnet_lib_http_verbose_debug_log;
+static size_t pumpnet_lib_http_recv_buffer_size;
 
 static size_t _pumpnet_lib_http_curl_cb_write_data(void* ptr, size_t size, size_t nmemb, void* ctx)
 {
@@ -110,13 +115,13 @@ int _pumpnet_libcurl_debug_callback(
     return 0;
 }
 
-static char* pumpnet_lib_http_client_crt_path;
-static char* pumpnet_lib_http_client_key_path;
-static char* pumpnet_lib_http_ca_bundle_crt_path;
-static bool pumpnet_lib_http_verbose_debug_log;
-
-void pumpnet_lib_http_init(const char* cert_dir_path, bool verbose_debug_log)
+void pumpnet_lib_http_init(
+        const char* cert_dir_path,
+        size_t recv_buffer_size,
+        bool verbose_debug_log)
 {
+    pumpnet_lib_http_recv_buffer_size = recv_buffer_size;
+
     if (cert_dir_path) {
         char* absolute_path = util_fs_get_abs_path(cert_dir_path);
 
@@ -129,11 +134,13 @@ void pumpnet_lib_http_init(const char* cert_dir_path, bool verbose_debug_log)
 
     pumpnet_lib_http_verbose_debug_log = verbose_debug_log;
 
-    log_info("Initialized, client crt %s, client key %s, ca bundle crt %s, verbose debug log %d",
+    log_info("Initialized, client crt %s, client key %s, ca bundle crt %s, "
+        "recv buffer size: %d, verbose debug log %d",
         pumpnet_lib_http_client_crt_path,
         pumpnet_lib_http_client_key_path,
         pumpnet_lib_http_ca_bundle_crt_path,
-        verbose_debug_log);
+        pumpnet_lib_http_recv_buffer_size,
+        pumpnet_lib_http_verbose_debug_log);
 }
 
 void pumpnet_lib_http_shutdown()
@@ -151,7 +158,7 @@ void pumpnet_lib_http_shutdown()
     }
 }
 
-bool pumpnet_lib_http_get_put(
+ssize_t pumpnet_lib_http_get_put(
         uint64_t trace_id,
         const char* address,
         void* send_data,
@@ -178,14 +185,14 @@ bool pumpnet_lib_http_get_put(
 
     if (!curl_handle) {
         log_error("[%llX] Initializing curl backend failed", trace_id);
-        return false;
+        return -1;
     }
 
     send_buffer.data = util_base64_encode(send_data, send_size, &send_buffer.size);
     send_buffer.pos = 0;
 
-    recv_buffer.data = util_xmalloc(RECV_BUFFER_SIZE);
-    recv_buffer.size = RECV_BUFFER_SIZE;
+    recv_buffer.data = util_xmalloc(pumpnet_lib_http_recv_buffer_size);
+    recv_buffer.size = pumpnet_lib_http_recv_buffer_size;
     recv_buffer.pos = 0;
 
     if (is_post) {
@@ -268,7 +275,7 @@ bool pumpnet_lib_http_get_put(
 
         free(send_buffer.data);
         free(recv_buffer.data);
-        return false;
+        return -1;
     }
 
     free(send_buffer.data);
@@ -278,8 +285,8 @@ bool pumpnet_lib_http_get_put(
 
     free(recv_buffer.data);
 
-    if (recv_size_decoded != recv_size) {
-        log_error("[%llX][%s][%d] Invalid recv data size: %d != %d",
+    if (recv_size_decoded > recv_size) {
+        log_error("[%llX][%s][%d] Invalid recv data size, does not fit buffer: %d > %d",
             trace_id,
             address,
             is_post,
@@ -287,11 +294,11 @@ bool pumpnet_lib_http_get_put(
             recv_size);
 
         free(tmp_recv_decoded);
-        return false;
+        return -1;
     }
 
-    memcpy(recv_data, tmp_recv_decoded, recv_size);
+    memcpy(recv_data, tmp_recv_decoded, recv_size_decoded);
     free(tmp_recv_decoded);
 
-    return true;
+    return recv_size_decoded;
 }

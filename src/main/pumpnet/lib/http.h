@@ -7,11 +7,14 @@
 #define HTTP_CODE_OK 200
 #define HTTP_CODE_PRECONDITION_FAILED 412
 
-void pumpnet_lib_http_init(const char* cert_dir_path, bool verbose_debug_log);
+void pumpnet_lib_http_init(
+        const char* cert_dir_path,
+        size_t recv_buffer_size,
+        bool verbose_debug_log);
 
 void pumpnet_lib_http_shutdown();
 
-bool pumpnet_lib_http_get_put(
+ssize_t pumpnet_lib_http_get_put(
         uint64_t trace_id,
         const char* address,
         void* send_data,
