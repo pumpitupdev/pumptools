@@ -234,11 +234,12 @@ static void prihook_patch_net_init(struct prihook_options* options)
         }
     } else {
         // Redirect to avoid phoning home if no server address is set
-        patch_network_redirect_server_address("115.68.108.183", "127.0.0.1", 12345);
+        patch_network_redirect_server_address("115.68.108.183", "127.0.0.1", 27370);
     }
 
-    // Idk what this address is...redirect to something save for now
-    patch_network_redirect_server_address("45.76.222.114", "127.0.0.1", 12345);
+    // Idk what these addresses are...redirect to something save for now
+    patch_network_redirect_server_address("45.76.222.114", "127.0.0.1", 60000);
+    patch_network_redirect_server_address("45.76.192.243", "127.0.0.1", 32019);
 }
 
 static void prihook_patch_usb_init()
