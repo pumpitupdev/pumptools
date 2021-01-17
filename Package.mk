@@ -170,6 +170,7 @@ $(zipdir)/profile-tools.zip: \
 
 $(zipdir)/pumpnet.zip: \
 		$(builddir)/bin/pumpnet-client \
+		$(builddir)/bin/pumpnet-prinet-proxy \
 		| $(zipdir)/
 	$(V)echo ... $@
 	$(V)zip -j $@ $^
