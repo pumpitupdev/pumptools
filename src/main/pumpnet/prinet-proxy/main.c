@@ -12,7 +12,10 @@
 #include "util/mem.h"
 #include "util/sock-tcp.h"
 
-static const uint32_t NUM_CONNECTIONS = 10;
+// Since handling multiple connection requires multiple threads with sync
+// receives here (see notes about bad connection management below), allowing
+// more than one connection in the queue doesn't make sense
+static const uint32_t NUM_CONNECTIONS = 1;
 static const size_t PUMPNET_MAX_RESP_SIZE = 1024 * 1024;
 
 static atomic_int _source_sock;
@@ -207,12 +210,22 @@ int main(int argc, char** argv)
 
     signal(SIGINT, _sigint_handler);
 
+    // Bad network plumbing on the game/client side:
+    // The game expects to leave the connection open once established on the
+    // first request to the server. A server side heartbeat package helps or
+    // even ensures (depending how badly you implemented this) to detect if the
+    // connection is dead and can be closed server side this does not just
+    // hinder scalability server side regarding the number of connects that
+    // might need to be kept open if potentially thousands of clients are
+    // active at the same time, but also makes the entire connection layer of
+    // the plumbing absolutely awful to maintain.
+    // i guess the devs never expected to see more than a few hundred clients
+    // active at the same time~
+
     while (true) {
         int source_con = INVALID_SOCK_HANDLE;
-        struct pumpnet_prinet_proxy_packet* source_req = NULL;
-        struct util_iobuf pumpnet_data_req;
-        struct util_iobuf pumpnet_data_resp;
-        struct pumpnet_prinet_proxy_packet* source_resp = NULL;
+
+        log_debug("Waiting for incoming connection...");
 
         source_con = util_sock_tcp_wait_and_accept_remote_connection(_source_sock);
 
@@ -220,71 +233,80 @@ int main(int argc, char** argv)
 
         if (source_con == INVALID_SOCK_HANDLE) {
             log_error("Waiting and accepting source connection failed");
-            goto cleanup_iteration;
+            continue;
         }
 
-        source_req = _recv_request_source(source_con);
+        while (true) {
+            struct pumpnet_prinet_proxy_packet* source_req = NULL;
+            struct util_iobuf pumpnet_data_req;
+            struct util_iobuf pumpnet_data_resp;
+            struct pumpnet_prinet_proxy_packet* source_resp = NULL;
 
-        if (!source_req) {
-            log_error("Receiving request from source failed");
-            goto cleanup_iteration;
+            source_req = _recv_request_source(source_con);
+
+            if (!source_req) {
+                log_error("Receiving request from source failed");
+                goto cleanup_iteration;
+            }
+
+            size_t source_data_len = pumpnet_prinet_proxy_packet_get_data_len(source_req);
+            util_iobuf_alloc(&pumpnet_data_req, source_data_len);
+
+            if (!_transform_data_request(source_req, &pumpnet_data_req)) {
+                log_error("Transforming data request for destination failed");
+                goto cleanup_iteration;
+            }
+
+            util_iobuf_alloc(&pumpnet_data_resp, PUMPNET_MAX_RESP_SIZE);
+
+            ssize_t pumpnet_recv_size = pumpnet_lib_prinet_msg(
+                pumpnet_data_req.bytes,
+                pumpnet_data_req.pos,
+                pumpnet_data_resp.bytes,
+                pumpnet_data_resp.nbytes);
+
+            if (pumpnet_recv_size < 0) {
+                log_error("Request to pumpnet failed");
+                goto cleanup_iteration;
+            }
+
+            // Communicate actual data size
+            pumpnet_data_resp.pos = pumpnet_recv_size;
+
+            source_resp = pumpnet_prinet_proxy_packet_alloc_response(pumpnet_data_resp.pos);
+
+            if (!_transform_data_response(source_req, &pumpnet_data_resp, source_resp)) {
+                log_error("Transforming data response for source failed");
+                goto cleanup_iteration;
+            }
+
+            if (!_send_response_source(source_con, source_resp)) {
+                log_error("Sending response to source failed");
+                goto cleanup_iteration;
+            }
+
+            continue;
+
+        cleanup_iteration:
+            if (source_req != NULL) {
+                util_xfree((void**) &source_req);
+            }
+
+            if (pumpnet_data_req.bytes != NULL) {
+                util_iobuf_free(&pumpnet_data_req);
+            }
+
+            if (pumpnet_data_resp.bytes != NULL) {
+                util_iobuf_free(&pumpnet_data_resp);
+            }
+
+            if (source_resp != NULL) {
+                util_xfree((void**) &source_resp);
+            }
+
+            break;
         }
 
-        size_t source_data_len = pumpnet_prinet_proxy_packet_get_data_len(source_req);
-        util_iobuf_alloc(&pumpnet_data_req, source_data_len);
-
-        if (!_transform_data_request(source_req, &pumpnet_data_req)) {
-            log_error("Transforming data request for destination failed");
-            goto cleanup_iteration;
-        }
-
-        util_iobuf_alloc(&pumpnet_data_resp, PUMPNET_MAX_RESP_SIZE);
-
-        ssize_t pumpnet_recv_size = pumpnet_lib_prinet_msg(
-            pumpnet_data_req.bytes,
-            pumpnet_data_req.pos,
-            pumpnet_data_resp.bytes,
-            pumpnet_data_resp.nbytes);
-
-        if (pumpnet_recv_size < 0) {
-            log_error("Request to pumpnet failed");
-            goto cleanup_iteration;
-        }
-
-        // Communicate actual data size
-        pumpnet_data_resp.pos = pumpnet_recv_size;
-
-        source_resp = pumpnet_prinet_proxy_packet_alloc_response(pumpnet_data_resp.pos);
-
-        if (!_transform_data_response(source_req, &pumpnet_data_resp, source_resp)) {
-            log_error("Transforming data response for source failed");
-            goto cleanup_iteration;
-        }
-
-        if (!_send_response_source(source_con, source_resp)) {
-            log_error("Sending response to source failed");
-            goto cleanup_iteration;
-        }
-
-    cleanup_iteration:
-        if (source_con != INVALID_SOCK_HANDLE) {
-            util_sock_tcp_close(source_con);
-        }
-
-        if (source_req != NULL) {
-            util_xfree((void**) &source_req);
-        }
-
-        if (pumpnet_data_req.bytes != NULL) {
-            util_iobuf_free(&pumpnet_data_req);
-        }
-
-        if (pumpnet_data_resp.bytes != NULL) {
-            util_iobuf_free(&pumpnet_data_resp);
-        }
-
-        if (source_resp != NULL) {
-            util_xfree((void**) &source_resp);
-        }
+        util_sock_tcp_close(source_con);
     }
 }
