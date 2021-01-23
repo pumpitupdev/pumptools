@@ -68,31 +68,25 @@ void util_time_get_current_time(struct util_time_timestamp* timestamp)
     timestamp->year = tm->tm_year + 1900;
 }
 
-uint64_t util_time_now_ns()
+uint64_t util_time_now_us()
 {
-    struct timespec ts;
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
 
-    clock_gettime(0, &ts);
-
-    return ts.tv_sec * 1000000000 + ts.tv_nsec;
+    return tv.tv_sec * 1000000 + tv.tv_usec;
 }
 
-uint64_t util_time_delta_ns(uint64_t prev_ns, uint64_t now_ns)
+double util_time_delta_us(uint64_t prev_us, uint64_t now_us)
 {
-    return now_ns - prev_ns;
+    return now_us - prev_us;
 }
 
-double util_time_delta_us(uint64_t prev_ns, uint64_t now_ns)
+double util_time_delta_ms(uint64_t prev_us, uint64_t now_us)
 {
-    return util_time_delta_ns(prev_ns, now_ns) / 1000.0;
+    return util_time_delta_us(prev_us, now_us) / 1000.0;
 }
 
-double util_time_delta_ms(uint64_t prev_ns, uint64_t now_ns)
+double util_time_delta_sec(uint64_t prev_us, uint64_t now_us)
 {
-    return util_time_delta_ns(prev_ns, now_ns) / 1000.0 / 1000.0;
-}
-
-double util_time_delta_sec(uint64_t prev_ns, uint64_t now_ns)
-{
-    return util_time_delta_ns(prev_ns, now_ns) / 1000.0 / 1000.0 / 1000.0;
+    return util_time_delta_us(prev_us, now_us) / 1000.0 / 1000.0;
 }

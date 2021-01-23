@@ -23,14 +23,12 @@ void util_time_sleep_sec(uint64_t time_sec);
 
 void util_time_get_current_time(struct util_time_timestamp* timestamp);
 
-uint64_t util_time_now_ns();
+uint64_t util_time_now_us();
 
-uint64_t util_time_delta_ns();
+double util_time_delta_us(uint64_t prev_us, uint64_t now_us);
 
-double util_time_delta_us(uint64_t prev_ns, uint64_t now_ns);
+double util_time_delta_ms(uint64_t prev_us, uint64_t now_us);
 
-double util_time_delta_ms(uint64_t prev_ns, uint64_t now_ns);
-
-double util_time_delta_sec(uint64_t prev_ns, uint64_t now_ns);
+double util_time_delta_sec(uint64_t prev_us, uint64_t now_us);
 
 #endif //UTIL_TIME_H
