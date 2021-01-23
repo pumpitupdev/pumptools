@@ -5,6 +5,7 @@
 #include "util/log.h"
 #include "util/mem.h"
 #include "util/sock-tcp.h"
+#include "util/time.h"
 
 struct pumpnet_prinet_proxy_client_connection {
     int handle;
@@ -28,6 +29,9 @@ static bool _pumpnet_prinet_proxy_client_recv_packet_length(struct pumpnet_prine
 
         if (read == 0) {
             // no data, repeat
+            // Avoid banging immediately on socket/mutex. Other threads, e.g. keepalive, might want to send something as well
+            util_time_sleep_ms(10);
+
             continue;
         }
 

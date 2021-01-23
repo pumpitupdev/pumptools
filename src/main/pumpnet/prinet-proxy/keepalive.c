@@ -19,18 +19,18 @@ static atomic_bool _pumpnet_prinet_proxy_keepalive_thread_run;
 static void* _pumpnet_prinet_proxy_keepalive_proc(void* ctx)
 {
     struct pumpnet_prinet_proxy_packet* keepalive_packet;
-    uint64_t time_prev_ns;
+    uint64_t time_prev_us;
 
-    time_prev_ns = util_time_now_ns();
+    time_prev_us = util_time_now_us();
 
     log_debug("Keepalive thread started");
 
     while (_pumpnet_prinet_proxy_keepalive_thread_run) {
-        uint64_t time_now_ns = util_time_now_ns();
-        double time_delta_ms = util_time_delta_ms(time_prev_ns, time_now_ns);
+        uint64_t time_now_us = util_time_now_us();
+        double time_delta_ms = util_time_delta_ms(time_prev_us, time_now_us);
 
         if (time_delta_ms >= _pumpnet_prinet_proxy_keepalive_poll_ms) {
-            time_prev_ns = time_now_ns;
+            time_prev_us = time_now_us;
 
             if (pumpnet_prinet_proxy_client_connection_is_active(_pumpnet_prinet_proxy_client_connection)) {
                 log_debug("Sending keepalive");
