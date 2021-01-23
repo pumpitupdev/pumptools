@@ -7,6 +7,7 @@ add_resources(PRI_PRIVATE_KEY ${SRC} prime.private.key)
 add_resources(PRI_PUBLIC_KEY ${SRC} prime.public.key)
 
 set(SOURCE_FILES
+        ${SRC}/client.c
         ${SRC}/main.c
         ${SRC}/options.c
         ${SRC}/packet.c)
