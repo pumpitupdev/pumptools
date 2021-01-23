@@ -63,7 +63,7 @@ bool pumpnet_prinet_proxy_client_connection_accept(int socket, struct pumpnet_pr
 
     handle = util_sock_tcp_wait_and_accept_remote_connection(socket);
 
-    log_debug("Received connection: %X", socket);
+    log_debug("Received connection on socket: %X", socket);
 
     if (socket == INVALID_SOCK_HANDLE) {
         log_error("Waiting and accepting source connection failed");
@@ -74,7 +74,7 @@ bool pumpnet_prinet_proxy_client_connection_accept(int socket, struct pumpnet_pr
 
     connection->handle = handle;
 
-    log_debug("Received connection: %X", handle);
+    log_debug("Received remote connection: %X", handle);
 
     pthread_mutex_unlock(&connection->mutex);
 
