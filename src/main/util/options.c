@@ -318,6 +318,8 @@ static struct util_options_opts* util_options_get2(
     options->defs = option_defs;
     options->entries = option_defs->ndefs;
 
+    log_warn(">>>> %d", option_defs->ndefs);
+
     options->values = (struct util_options_value*) util_xmalloc(
         sizeof(struct util_options_value) * options->entries);
 

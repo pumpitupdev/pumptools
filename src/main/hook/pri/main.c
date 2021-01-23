@@ -56,7 +56,7 @@ static void prihook_bootstrapping(int argc, char** argv, struct prihook_options*
         return;
     }
 
-    hook_core_piu_log_init(argc, argv);
+//    hook_core_piu_log_init(argc, argv);
 
     if (!prihook_options_init(argc, argv, options)) {
         exit(0);

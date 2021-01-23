@@ -150,6 +150,8 @@ bool prihook_options_init(int argc, char** argv, struct prihook_options* options
 
     struct util_options_opts* options_opt;
 
+    log_warn("!!!! %d", prihook_options_defs.ndefs);
+
     util_options_init(argc, argv);
     options_opt = util_options_get(&prihook_options_defs);
 
