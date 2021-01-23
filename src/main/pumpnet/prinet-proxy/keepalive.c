@@ -9,6 +9,8 @@
 #include "util/mem.h"
 #include "util/time.h"
 
+static const uint32_t _pumpnet_prinet_proxy_keepalive_thread_pause_ms = 1000;
+
 static struct pumpnet_prinet_proxy_client_connection* _pumpnet_prinet_proxy_client_connection;
 static uint32_t _pumpnet_prinet_proxy_keepalive_poll_ms;
 static pthread_t _pumpnet_prinet_proxy_keepalive_thread;
@@ -17,38 +19,44 @@ static atomic_bool _pumpnet_prinet_proxy_keepalive_thread_run;
 static void* _pumpnet_prinet_proxy_keepalive_proc(void* ctx)
 {
     struct pumpnet_prinet_proxy_packet* keepalive_packet;
+    uint64_t time_prev_ns;
+
+    time_prev_ns = util_time_now_ns();
 
     log_debug("Keepalive thread started");
 
     while (_pumpnet_prinet_proxy_keepalive_thread_run) {
-        // TODO we need to get the current CPU time and check if we have to do the below again
-        // reduce the sleep at the end of the loop to ensure this loop can exit easily
+        uint64_t time_now_ns = util_time_now_ns();
+        double time_delta_ms = util_time_delta_ms(time_prev_ns, time_now_ns);
 
-        if (pumpnet_prinet_proxy_client_connection_is_active(_pumpnet_prinet_proxy_client_connection)) {
-            log_debug("Sending keepalive");
+        if (time_delta_ms >= _pumpnet_prinet_proxy_keepalive_poll_ms) {
+            time_prev_ns = time_now_ns;
 
-            keepalive_packet = pumpnet_prinet_proxy_packet_create_keepalive();
+            if (pumpnet_prinet_proxy_client_connection_is_active(_pumpnet_prinet_proxy_client_connection)) {
+                log_debug("Sending keepalive");
 
-            size_t enc_data_len = sec_prinet_encrypt(
-                keepalive_packet->nounce,
-                sizeof(keepalive_packet->nounce),
-                keepalive_packet->data,
-                pumpnet_prinet_proxy_packet_get_data_len(keepalive_packet),
-                keepalive_packet->data);
+                keepalive_packet = pumpnet_prinet_proxy_packet_create_keepalive();
 
-            keepalive_packet->length = pumpnet_prinet_proxy_packet_get_header_len() + enc_data_len;
+                size_t enc_data_len = sec_prinet_encrypt(
+                    keepalive_packet->nounce,
+                    sizeof(keepalive_packet->nounce),
+                    keepalive_packet->data,
+                    pumpnet_prinet_proxy_packet_get_data_len(keepalive_packet),
+                    keepalive_packet->data);
 
-            if (!pumpnet_prinet_proxy_client_send_response(_pumpnet_prinet_proxy_client_connection, keepalive_packet)) {
-                log_error("Sending keepalive packet failed");
+                keepalive_packet->length = pumpnet_prinet_proxy_packet_get_header_len() + enc_data_len;
+
+                if (!pumpnet_prinet_proxy_client_send_response(_pumpnet_prinet_proxy_client_connection, keepalive_packet)) {
+                    log_error("Sending keepalive packet failed");
+                }
+
+                util_xfree((void**) &keepalive_packet);
+            } else {
+                log_debug("Skipping keepalive, no connection active");
             }
-
-            util_xfree((void**) &keepalive_packet);
-        } else {
-            log_debug("Skipped keepalive, no connection active");
         }
 
-        //util_time_sleep_ms(500);
-        util_time_sleep_ms(_pumpnet_prinet_proxy_keepalive_poll_ms);
+        util_time_sleep_ms(_pumpnet_prinet_proxy_keepalive_thread_pause_ms);
     }
 
     log_debug("Keep alive thread finished");
