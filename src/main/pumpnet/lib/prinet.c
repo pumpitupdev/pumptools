@@ -116,12 +116,11 @@ ssize_t pumpnet_lib_prinet_msg(const void* req_buffer, size_t req_size, void* re
     if (recv_size < 0) {
         free(req);
         free(resp);
-        return -1;
+        return -2;
     }
 
-    if (recv_size < sizeof(struct pumpnet_lib_prinet_resp)) {
-        log_error("Amount of data received too small: %d", recv_size);
-
+    // No response because uni-directional message
+    if (recv_size == 0) {
         free(req);
         free(resp);
         return -1;
@@ -133,7 +132,7 @@ ssize_t pumpnet_lib_prinet_msg(const void* req_buffer, size_t req_size, void* re
 
         free(req);
         free(resp);
-        return -1;
+        return -2;
     }
 
     memcpy(resp_buffer, resp->data, resp->size);
