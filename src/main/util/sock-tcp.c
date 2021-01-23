@@ -260,9 +260,12 @@ ssize_t util_sock_tcp_recv(int handle, void* buffer, size_t size, uint32_t timeo
         }
 
         return -1;
+    } else if (length == 0) {
+        // connection lost
+        return -1;
+    } else {
+      return length;
     }
-
-    return length;
 }
 
 void util_sock_tcp_close(int handle)
