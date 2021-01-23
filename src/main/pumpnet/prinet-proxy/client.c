@@ -11,7 +11,7 @@ struct pumpnet_prinet_proxy_client_connection {
     pthread_mutex_t mutex;
 };
 
-static const uint32_t _pumpnet_prinet_proxy_client_recv_length_timeout_ms = 200;
+static const uint32_t _pumpnet_prinet_proxy_client_recv_length_timeout_ms = 500;
 
 static bool _pumpnet_prinet_proxy_client_recv_packet_length(struct pumpnet_prinet_proxy_client_connection* connection, uint32_t* length)
 {
