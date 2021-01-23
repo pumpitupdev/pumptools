@@ -1,19 +1,34 @@
+#include <pthread.h>
+
 #include "pumpnet/prinet-proxy/client.h"
 
 #include "util/log.h"
 #include "util/mem.h"
 #include "util/sock-tcp.h"
 
-static bool _pumpnet_prinet_proxy_client_recv_packet_length(int handle, uint32_t* length)
+struct pumpnet_prinet_proxy_client_connection {
+    int handle;
+    pthread_mutex_t mutex;
+};
+
+static const uint32_t _pumpnet_prinet_proxy_client_recv_length_timeout_ms = 200;
+
+static bool _pumpnet_prinet_proxy_client_recv_packet_length(struct pumpnet_prinet_proxy_client_connection* connection, uint32_t* length)
 {
     uint32_t packet_length;
 
     while (true) {
-        ssize_t read = util_sock_tcp_recv_block(handle, &packet_length, sizeof(uint32_t));
+        ssize_t read;
+
+        pthread_mutex_lock(&connection->mutex);
+
+        read = util_sock_tcp_recv(connection->handle, &packet_length, sizeof(uint32_t), _pumpnet_prinet_proxy_client_recv_length_timeout_ms);
+
+        pthread_mutex_unlock(&connection->mutex);
 
         if (read == 0) {
-            log_error("Unexpected remote close and no data");
-            return NULL;
+            // no data, repeat
+            continue;
         }
 
         if (read != sizeof(uint32_t)) {
@@ -28,16 +43,107 @@ static bool _pumpnet_prinet_proxy_client_recv_packet_length(int handle, uint32_t
     return true;
 }
 
-struct pumpnet_prinet_proxy_packet* pumpnet_prinet_proxy_client_recv_request(int handle)
+struct pumpnet_prinet_proxy_client_connection* pumpnet_prinet_proxy_client_connection_alloc()
 {
+    struct pumpnet_prinet_proxy_client_connection* connection;
+
+    connection = util_xmalloc(sizeof(struct pumpnet_prinet_proxy_client_connection));
+
+    connection->handle = INVALID_SOCK_HANDLE;
+    pthread_mutex_init(&connection->mutex, NULL);
+
+    return connection;
+}
+
+bool pumpnet_prinet_proxy_client_connection_accept(int socket, struct pumpnet_prinet_proxy_client_connection* connection)
+{
+    int handle;
+
+    log_debug("Waiting for incoming connection...");
+
+    handle = util_sock_tcp_wait_and_accept_remote_connection(socket);
+
+    log_debug("Received connection: %X", socket);
+
+    if (socket == INVALID_SOCK_HANDLE) {
+        log_error("Waiting and accepting source connection failed");
+        return NULL;
+    }
+
+    pthread_mutex_lock(&connection->mutex);
+
+    connection->handle = handle;
+
+    log_debug("Received connection: %X", handle);
+
+    pthread_mutex_unlock(&connection->mutex);
+
+    return connection;
+}
+
+bool pumpnet_prinet_proxy_client_connection_is_active(struct pumpnet_prinet_proxy_client_connection* connection)
+{
+    log_assert(connection);
+
+    bool is_active;
+
+    pthread_mutex_lock(&connection->mutex);
+
+    is_active = connection->handle != INVALID_SOCK_HANDLE;
+
+    pthread_mutex_unlock(&connection->mutex);
+
+    return is_active;
+}
+
+void pumpnet_prinet_proxy_client_connection_close(struct pumpnet_prinet_proxy_client_connection* connection)
+{
+    log_assert(connection);
+
+    pthread_mutex_lock(&connection->mutex);
+
+    if (connection->handle != INVALID_SOCK_HANDLE) {
+        util_sock_tcp_close(connection->handle);
+
+        connection->handle = INVALID_SOCK_HANDLE;
+    }
+
+    pthread_mutex_unlock(&connection->mutex);
+}
+
+void pumpnet_prinet_proxy_client_connection_free(struct pumpnet_prinet_proxy_client_connection** connection)
+{
+    log_assert(connection);
+
+    struct pumpnet_prinet_proxy_client_connection* con = *connection;
+
+    pthread_mutex_lock(&con->mutex);
+
+    if (con->handle != INVALID_SOCK_HANDLE) {
+        log_error("Freeing connection %X which is not closed", con->handle);
+    }
+
+    pthread_mutex_unlock(&con->mutex);
+
+    pthread_mutex_destroy(&con->mutex);
+    util_xfree((void**) connection);
+}
+
+struct pumpnet_prinet_proxy_packet* pumpnet_prinet_proxy_client_recv_request(struct pumpnet_prinet_proxy_client_connection* connection)
+{
+    log_assert(connection);
+
     uint32_t packet_length;
 
-    if (!_pumpnet_prinet_proxy_client_recv_packet_length(handle, &packet_length)) {
+    // locking is handled inside this function
+    if (!_pumpnet_prinet_proxy_client_recv_packet_length(connection, &packet_length)) {
         log_error("Receiving length field for request from source failed");
         return NULL;
     }
 
-    log_debug("Received length source request (%X): %d", handle, packet_length);
+    pthread_mutex_lock(&connection->mutex);
+
+    log_debug("Received length source request (%X): %d", connection->handle, packet_length);
 
     struct pumpnet_prinet_proxy_packet* packet = util_xmalloc(packet_length);
     packet->length = packet_length;
@@ -50,18 +156,20 @@ struct pumpnet_prinet_proxy_packet* pumpnet_prinet_proxy_client_recv_request(int
         size_t remaining_size = packet->length - sizeof(uint32_t) - read_pos;
 
         ssize_t read = util_sock_tcp_recv_block(
-            handle,
+            connection->handle,
             ((uint8_t*) packet) + sizeof(uint32_t) + read_pos,
             remaining_size);
 
         if (read == 0) {
             log_error("Unexpected remote close and no data");
-            return NULL;
+            util_xfree((void**) &packet);
+            break;
         }
 
         if (read == -1) {
             log_error("Receiving length field for request from source failed: %d", read);
-            return NULL;
+            util_xfree((void**) &packet);
+            break;
         }
 
         read_pos += read;
@@ -71,23 +179,39 @@ struct pumpnet_prinet_proxy_packet* pumpnet_prinet_proxy_client_recv_request(int
         }
     }
 
+    pthread_mutex_unlock(&connection->mutex);
+
     return packet;
 }
 
-bool pumpnet_prinet_proxy_client_send_response(int handle, const struct pumpnet_prinet_proxy_packet* packet)
+bool pumpnet_prinet_proxy_client_send_response(struct pumpnet_prinet_proxy_client_connection* connection, const struct pumpnet_prinet_proxy_packet* packet)
 {
-    log_debug("Sending source response (%X): %d", handle, packet->length);
+    log_assert(connection);
+    log_assert(packet);
 
-    if (util_sock_tcp_send_block(handle, packet, packet->length) != packet->length) {
+    bool result;
+
+    result = true;
+
+    pthread_mutex_lock(&connection->mutex);
+
+    log_debug("Sending source response (%X): %d", connection->handle, packet->length);
+
+    if (util_sock_tcp_send_block(connection->handle, packet, packet->length) != packet->length) {
         log_error("Sending response, len %d, to source failed", packet->length);
-        return false;
-    } else {
-        return true;
+        result = false;
     }
+
+    pthread_mutex_unlock(&connection->mutex);
+
+    return result;
 }
 
 bool pumpnet_prinet_proxy_client_unpack_data_request(const struct pumpnet_prinet_proxy_packet* packet, struct util_iobuf* dec_data)
 {
+    log_assert(packet);
+    log_assert(dec_data);
+
     size_t enc_data_len = pumpnet_prinet_proxy_packet_get_data_len(packet);
 
     size_t dec_data_len = sec_prinet_decrypt(
@@ -109,6 +233,10 @@ bool pumpnet_prinet_proxy_client_unpack_data_request(const struct pumpnet_prinet
 
 bool pumpnet_prinet_proxy_client_pack_data_response(const struct pumpnet_prinet_proxy_packet* req_packet, const struct util_iobuf* dec_data, struct pumpnet_prinet_proxy_packet* resp_packet)
 {
+    log_assert(req_packet);
+    log_assert(dec_data);
+    log_assert(resp_packet);
+
     size_t enc_data_len = sec_prinet_encrypt(
         req_packet->nounce,
         sizeof(req_packet->nounce),

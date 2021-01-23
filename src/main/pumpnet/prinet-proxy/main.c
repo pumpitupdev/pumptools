@@ -1,4 +1,3 @@
-#include <stdatomic.h>
 #include <signal.h>
 #include <stdbool.h>
 
@@ -20,7 +19,12 @@
 static const uint32_t NUM_CONNECTIONS = 1;
 static const size_t PUMPNET_MAX_RESP_SIZE = 1024 * 1024;
 
-static atomic_int _source_sock;
+// Client closes their sending socket after 60 sec of inactivity...jeez, why
+// can't you implement a damn session layer correctly?!
+static const uint32_t KEEPALIVE_POLL_MS = 30000;
+
+static int _source_sock;
+struct pumpnet_prinet_proxy_client_connection* _source_con;
 
 /* Compiled binary data from data folder. Symbols are defined by compiler */
 extern const uint8_t _binary_prime_private_key_start[];
@@ -31,6 +35,11 @@ extern const uint8_t _binary_prime_public_key_end[];
 static void _sigint_handler(int sig)
 {
     log_info("SIGINT, exiting");
+
+    pumpnet_prinet_proxy_keepalive_shutdown();
+
+    pumpnet_prinet_proxy_client_connection_close(_source_con);
+    pumpnet_prinet_proxy_client_connection_free(&_source_con);
 
     util_sock_tcp_close(_source_sock);
 
@@ -84,6 +93,11 @@ int main(int argc, char** argv)
         return -3;
     }
 
+    _source_con = pumpnet_prinet_proxy_client_connection_alloc();
+
+    // See comment of KEEPALIVE_POLL_MS
+    pumpnet_prinet_proxy_keepalive_init(_source_con, KEEPALIVE_POLL_MS);
+
     log_info("Running proxy loop");
 
     signal(SIGINT, _sigint_handler);
@@ -101,15 +115,9 @@ int main(int argc, char** argv)
     // active at the same time~
 
     while (true) {
-        int source_con = INVALID_SOCK_HANDLE;
-
         log_debug("Waiting for incoming connection...");
 
-        source_con = util_sock_tcp_wait_and_accept_remote_connection(_source_sock);
-
-        log_debug("Received connection: %X", source_con);
-
-        if (source_con == INVALID_SOCK_HANDLE) {
+        if (!pumpnet_prinet_proxy_client_connection_accept(_source_sock, _source_con)) {
             log_error("Waiting and accepting source connection failed");
             continue;
         }
@@ -124,7 +132,7 @@ int main(int argc, char** argv)
             struct util_iobuf pumpnet_data_resp;
             struct pumpnet_prinet_proxy_packet* source_resp = NULL;
 
-            source_req = pumpnet_prinet_proxy_client_recv_request(source_con);
+            source_req = pumpnet_prinet_proxy_client_recv_request(_source_con);
 
             if (!source_req) {
                 log_error("Receiving request from source failed");
@@ -173,7 +181,7 @@ int main(int argc, char** argv)
                 goto cleanup_iteration;
             }
 
-            if (!pumpnet_prinet_proxy_client_send_response(source_con, source_resp)) {
+            if (!pumpnet_prinet_proxy_client_send_response(_source_con, source_resp)) {
                 log_error("Sending response to source failed");
                 inner_loop = false;
                 goto cleanup_iteration;
@@ -197,6 +205,6 @@ int main(int argc, char** argv)
             }
         } while (inner_loop);
 
-        util_sock_tcp_close(source_con);
+        pumpnet_prinet_proxy_client_connection_close(_source_con);
     }
 }
