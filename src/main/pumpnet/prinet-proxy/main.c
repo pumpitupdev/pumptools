@@ -236,7 +236,11 @@ int main(int argc, char** argv)
             continue;
         }
 
-        while (true) {
+        bool inner_loop;
+
+        inner_loop = true;
+
+        do {
             struct pumpnet_prinet_proxy_packet* source_req = NULL;
             struct util_iobuf pumpnet_data_req;
             struct util_iobuf pumpnet_data_resp;
@@ -246,6 +250,7 @@ int main(int argc, char** argv)
 
             if (!source_req) {
                 log_error("Receiving request from source failed");
+                inner_loop = false;
                 goto cleanup_iteration;
             }
 
@@ -254,6 +259,7 @@ int main(int argc, char** argv)
 
             if (!_transform_data_request(source_req, &pumpnet_data_req)) {
                 log_error("Transforming data request for destination failed");
+                inner_loop = false;
                 goto cleanup_iteration;
             }
 
@@ -265,8 +271,16 @@ int main(int argc, char** argv)
                 pumpnet_data_resp.bytes,
                 pumpnet_data_resp.nbytes);
 
+            // Uni-directional message, no response received
+            // Skip response processing because there is nothing to process
+            if (pumpnet_recv_size == -1) {
+                log_debug("Request was uni-directional message, skipping response");
+                goto cleanup_iteration;
+            }
+
             if (pumpnet_recv_size < 0) {
                 log_error("Request to pumpnet failed");
+                inner_loop = false;
                 goto cleanup_iteration;
             }
 
@@ -277,15 +291,15 @@ int main(int argc, char** argv)
 
             if (!_transform_data_response(source_req, &pumpnet_data_resp, source_resp)) {
                 log_error("Transforming data response for source failed");
+                inner_loop = false;
                 goto cleanup_iteration;
             }
 
             if (!_send_response_source(source_con, source_resp)) {
                 log_error("Sending response to source failed");
+                inner_loop = false;
                 goto cleanup_iteration;
             }
-
-            continue;
 
         cleanup_iteration:
             if (source_req != NULL) {
@@ -303,9 +317,7 @@ int main(int argc, char** argv)
             if (source_resp != NULL) {
                 util_xfree((void**) &source_resp);
             }
-
-            break;
-        }
+        } while (inner_loop);
 
         util_sock_tcp_close(source_con);
     }
