@@ -34,7 +34,7 @@ static bool _transform_data_request(const struct pumpnet_prinet_proxy_packet* pa
         enc_data_len,
         dec_data->bytes);
 
-    if (dec_data_len != enc_data_len) {
+    if (dec_data_len < 0) {
         log_error("Decrypting data failed");
         return false;
     }

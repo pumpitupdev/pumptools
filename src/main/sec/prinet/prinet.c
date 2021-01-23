@@ -83,7 +83,8 @@ size_t sec_prinet_decrypt(
         return -1;
     }
 
-    return enc_data_len;
+    // cut off the macbytes at the end of the message
+    return enc_data_len - crypto_box_MACBYTES;
 }
 
 size_t sec_prinet_encrypt(
