@@ -18,3 +18,5 @@ struct pumpnet_prinet_proxy_packet* pumpnet_prinet_proxy_packet_alloc_response(s
 size_t pumpnet_prinet_proxy_packet_get_header_len();
 
 size_t pumpnet_prinet_proxy_packet_get_data_len(const struct pumpnet_prinet_proxy_packet* packet);
+
+struct pumpnet_prinet_proxy_packet* pumpnet_prinet_proxy_packet_create_keepalive();
