@@ -102,6 +102,8 @@ void pumpnet_prinet_proxy_client_connection_close(struct pumpnet_prinet_proxy_cl
 
     pthread_mutex_lock(&connection->mutex);
 
+    log_debug("Closing remote connection: %X", connection->handle);
+
     if (connection->handle != INVALID_SOCK_HANDLE) {
         util_sock_tcp_close(connection->handle);
 
