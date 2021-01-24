@@ -17,7 +17,7 @@ struct pumpnet_prinet_proxy_packet_data_keepalive {
 static const size_t HEADER_SIZE = sizeof(uint32_t) + sizeof(uint8_t) * SEC_PRINET_NOUNCE_LEN;
 
 static const uint32_t PACKET_KEEPALIVE_ID = 0x3000000;
-static const uint32_t PACKET_KEEPALIVE_SIZE =
+const uint32_t PUMPNET_PRINET_PROXY_PACKET_KEEPALIVE_SIZE =
         sizeof(struct pumpnet_prinet_proxy_packet_data) +
         sizeof(struct pumpnet_prinet_proxy_packet_data_keepalive);
 
@@ -61,7 +61,7 @@ struct pumpnet_prinet_proxy_packet* pumpnet_prinet_proxy_packet_create_keepalive
     struct pumpnet_prinet_proxy_packet* packet;
     struct pumpnet_prinet_proxy_packet_data* data;
 
-    packet = pumpnet_prinet_proxy_packet_alloc_response(PACKET_KEEPALIVE_SIZE);
+    packet = pumpnet_prinet_proxy_packet_alloc_response(PUMPNET_PRINET_PROXY_PACKET_KEEPALIVE_SIZE);
 
     util_rand_gen_bytes(packet->nounce, SEC_PRINET_NOUNCE_LEN);
 

@@ -11,6 +11,8 @@ struct pumpnet_prinet_proxy_packet {
     uint8_t data[];
 } __attribute__((__packed__));
 
+extern const uint32_t PUMPNET_PRINET_PROXY_PACKET_KEEPALIVE_SIZE;
+
 struct pumpnet_prinet_proxy_packet* pumpnet_prinet_proxy_packet_alloc(size_t data_len);
 
 struct pumpnet_prinet_proxy_packet* pumpnet_prinet_proxy_packet_alloc_response(size_t data_len);

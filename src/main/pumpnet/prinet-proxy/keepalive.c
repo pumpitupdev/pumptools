@@ -41,7 +41,7 @@ static void* _pumpnet_prinet_proxy_keepalive_proc(void* ctx)
                     keepalive_packet->nounce,
                     sizeof(keepalive_packet->nounce),
                     keepalive_packet->data,
-                    pumpnet_prinet_proxy_packet_get_data_len(keepalive_packet),
+                    PUMPNET_PRINET_PROXY_PACKET_KEEPALIVE_SIZE,
                     keepalive_packet->data);
 
                 keepalive_packet->length = pumpnet_prinet_proxy_packet_get_header_len() + enc_data_len;
