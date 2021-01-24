@@ -1,4 +1,5 @@
 #include <pthread.h>
+#include <stdatomic.h>
 
 #include "pumpnet/prinet-proxy/client.h"
 
@@ -14,11 +15,13 @@ struct pumpnet_prinet_proxy_client_connection {
 
 static const uint32_t _pumpnet_prinet_proxy_client_recv_length_timeout_ms = 500;
 
+static atomic_bool _pumpnet_prinet_proxy_client_recv_block = true;
+
 static bool _pumpnet_prinet_proxy_client_recv_packet_length(struct pumpnet_prinet_proxy_client_connection* connection, uint32_t* length)
 {
     uint32_t packet_length;
 
-    while (true) {
+    while (_pumpnet_prinet_proxy_client_recv_block) {
         ssize_t read;
 
         pthread_mutex_lock(&connection->mutex);
@@ -39,12 +42,15 @@ static bool _pumpnet_prinet_proxy_client_recv_packet_length(struct pumpnet_prine
             return false;
         }
 
-        break;
+        *length = packet_length;
+
+        return true;
     }
 
-    *length = packet_length;
+    log_warn("Recv block disabled, exiting with error");
 
-    return true;
+    // thread blocking disabled externally -> shutdown signaled
+    return false;
 }
 
 struct pumpnet_prinet_proxy_client_connection* pumpnet_prinet_proxy_client_connection_alloc()
@@ -135,6 +141,13 @@ void pumpnet_prinet_proxy_client_connection_free(struct pumpnet_prinet_proxy_cli
     util_xfree((void**) connection);
 }
 
+void pumpnet_prinet_proxy_client_exit_recv_request_blocking()
+{
+    log_debug("Disable recv blocking");
+
+    _pumpnet_prinet_proxy_client_recv_block = false;
+}
+
 struct pumpnet_prinet_proxy_packet* pumpnet_prinet_proxy_client_recv_request(struct pumpnet_prinet_proxy_client_connection* connection)
 {
     log_assert(connection);
@@ -147,8 +160,6 @@ struct pumpnet_prinet_proxy_packet* pumpnet_prinet_proxy_client_recv_request(str
         return NULL;
     }
 
-    pthread_mutex_lock(&connection->mutex);
-
     log_debug("Received length source request (%X): %d", connection->handle, packet_length);
 
     struct pumpnet_prinet_proxy_packet* packet = util_xmalloc(packet_length);
@@ -158,13 +169,17 @@ struct pumpnet_prinet_proxy_packet* pumpnet_prinet_proxy_client_recv_request(str
 
     size_t read_pos = 0;
 
-    while (true) {
+    while (_pumpnet_prinet_proxy_client_recv_block) {
         size_t remaining_size = packet->length - sizeof(uint32_t) - read_pos;
+
+        pthread_mutex_lock(&connection->mutex);
 
         ssize_t read = util_sock_tcp_recv_block(
             connection->handle,
             ((uint8_t*) packet) + sizeof(uint32_t) + read_pos,
             remaining_size);
+
+        pthread_mutex_unlock(&connection->mutex);
 
         if (read == 0) {
             log_error("Unexpected remote close and no data");
@@ -185,7 +200,11 @@ struct pumpnet_prinet_proxy_packet* pumpnet_prinet_proxy_client_recv_request(str
         }
     }
 
-    pthread_mutex_unlock(&connection->mutex);
+    if (!_pumpnet_prinet_proxy_client_recv_block) {
+        log_warn("Recv block disabled, exiting with error");
+        util_xfree((void**) &packet);
+        return NULL;
+    }
 
     return packet;
 }

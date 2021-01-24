@@ -1,4 +1,5 @@
 #include <signal.h>
+#include <stdatomic.h>
 #include <stdbool.h>
 
 #include "pumpnet/lib/prinet.h"
@@ -24,7 +25,8 @@ static const size_t PUMPNET_MAX_RESP_SIZE = 1024 * 1024;
 static const uint32_t KEEPALIVE_POLL_MS = 30000;
 
 static int _source_sock;
-struct pumpnet_prinet_proxy_client_connection* _source_con;
+static struct pumpnet_prinet_proxy_client_connection* _source_con;
+static atomic_bool _run_loop;
 
 /* Compiled binary data from data folder. Symbols are defined by compiler */
 extern const uint8_t _binary_prime_private_key_start[];
@@ -36,18 +38,9 @@ static void _sigint_handler(int sig)
 {
     log_info("SIGINT, exiting");
 
-    pumpnet_prinet_proxy_keepalive_shutdown();
+    pumpnet_prinet_proxy_client_exit_recv_request_blocking();
 
-    pumpnet_prinet_proxy_client_connection_close(_source_con);
-    pumpnet_prinet_proxy_client_connection_free(&_source_con);
-
-    util_sock_tcp_close(_source_sock);
-
-    sec_prinet_finit();
-
-    pumpnet_lib_prinet_shutdown();
-
-    exit(EXIT_SUCCESS);
+    _run_loop = false;
 }
 
 int main(int argc, char** argv)
@@ -114,7 +107,9 @@ int main(int argc, char** argv)
     // i guess the devs never expected to see more than a few hundred clients
     // active at the same time~
 
-    while (true) {
+    _run_loop = true;
+
+    while (_run_loop) {
         log_debug("Waiting for incoming connection...");
 
         if (!pumpnet_prinet_proxy_client_connection_accept(_source_sock, _source_con)) {
@@ -203,8 +198,19 @@ int main(int argc, char** argv)
             if (source_resp != NULL) {
                 util_xfree((void**) &source_resp);
             }
-        } while (inner_loop);
+        } while (inner_loop && _run_loop);
 
         pumpnet_prinet_proxy_client_connection_close(_source_con);
     }
+
+    pumpnet_prinet_proxy_keepalive_shutdown();
+
+    pumpnet_prinet_proxy_client_connection_close(_source_con);
+    pumpnet_prinet_proxy_client_connection_free(&_source_con);
+
+    util_sock_tcp_close(_source_sock);
+
+    sec_prinet_finit();
+
+    pumpnet_lib_prinet_shutdown();
 }
