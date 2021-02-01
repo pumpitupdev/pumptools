@@ -18,6 +18,7 @@ struct sec_hasp_key_table {
 /* static const uint32_t sec_hasp_features[] = {2, 3001}; */
 static const uint32_t sec_hasp_key_id = 0xDEADBEEF;
 static struct sec_hasp_key_table sec_hasp_keys;
+static uint32_t sec_hasp_buffer_leak_count;
 
 void sec_hasp_init(const uint8_t* key_data, size_t len)
 {
@@ -55,6 +56,30 @@ int sec_hasp_api_logout(int handle)
 unsigned int sec_hasp_api_getid(void)
 {
     return sec_hasp_key_id;
+}
+
+int sec_hasp_api_get_session_info(int handle, const char* format, char** info)
+{
+    log_debug("get session info, handle 0x%X, format %s", handle, format);
+
+    // The string to be returned should be in some XML format. However, the
+    // game is just using strstr to check for the following substring
+    // Furthermore, memory leaking the returned *info buffer as well as not
+    // knowing if other versions are actually freeing this using the correct
+    // free method of the hasp API.
+    // Since this function is not called a lot, i guess letting it leak is the
+    // most pragmatic solution. Let's keep track of that anyway and print
+    // some warnings once we reach quite a number of leaked buffers to not
+    // lose visibility if something bad ever happens
+    *info = util_str_dup("p id 322376503"); // 0x13371337
+
+    // Assuming the above buffers with alignment and some metadata needs
+    // ~32 bytes -> 1 MB = 32768 -> ~10 MB = 327680
+    if (++sec_hasp_buffer_leak_count >= 327680) {
+        log_warn("Memory leakage for unmanaged buffer exceeds 10 MB");
+    }
+
+    return 0;
 }
 
 int sec_hasp_api_decrypt(int handle, void* buffer, size_t length)

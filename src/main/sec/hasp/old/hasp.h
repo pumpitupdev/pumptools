@@ -30,6 +30,8 @@ int sec_hasp_api_logout(int handle);
 
 unsigned int sec_hasp_api_getid(void);
 
+int sec_hasp_api_get_session_info(int handle, const char* format, char** info);
+
 int sec_hasp_api_decrypt(int handle, void* buffer, size_t length);
 
 #endif
