@@ -18,7 +18,8 @@ RUN apt-get update && apt-get install -y \
     libasound2-dev:i386 \
     libconfig++-dev:i386 \
     libx11-dev:i386 \
-    libcurl4-gnutls-dev:i386
+    libcurl4-gnutls-dev:i386 && \
+    rm -rf /var/lib/apt/lists/*
 
 # Copy files for building to container
 RUN mkdir /pumptools

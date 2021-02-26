@@ -118,3 +118,12 @@ something for pumptools.
 ## License
 Source code license is the Unlicense; you are permitted to do with this as thou wilt. For details, please refer to the
 [LICENSE file](LICENSE) included with the source code.
+
+## Docker notes
+* What's the minimum driver version you need on the host? Is there also a maximum? -> offer different docker containers?
+* nvidia driver in docker container needs to match host driver apparently? -> confirm this
+    * offer different dockerfiles with different nvidia versions
+    * libmesa better alternative here?
+* dockerfile for sgl -> sgl repo
+* for the nvidia dockerfiles you need nvidia-docker installed
+* debugging container: check if GPU is accessible in container: `nvidia-smi`, `glxgears` to test 3d acceleration 

@@ -369,6 +369,54 @@ cmd_help()
     print_usage
 }
 
+cmd_docker_build()
+{
+    # TODO check if docker installed
+
+    docker rm -f pumptools-run
+    docker build -t pumptools:run .
+    docker create --name pumptools-run pumptools:run
+}
+
+cmd_docker_run()
+{
+    # TODO check if docker installed
+
+    local game_data_path="$1"
+    local params_piueb="${@:2}"
+
+    if [ ! "$game_data_path" ]; then
+        log_error "No path to game data given"
+        exit 1
+    fi
+
+    local game_data_path_abs="$(realpath $game_data_path)"
+
+    if [ ! -d "$game_data_path_abs" ]; then
+        log_error "Game data path is either not a directory or does not exist: $game_data_path_abs"
+        exit 1
+    fi
+
+    log_debug "Path to game data for docker run: $game_data_path_abs"
+
+    log_info "Running in docker container..."
+
+    # Reference: https://gitlab.com/nvidia/container-images/samples/-/raw/master/opengl/ubuntu16.04/glxgears/Dockerfile
+    xhost +si:localuser:root
+
+    docker run \
+        -it \
+        --rm \
+        --privileged \
+        --gpus all \
+        -v /dev/bus/usb:/dev/bus/usb \
+        -v "$game_data_path_abs:/piu" \
+        -v /tmp/.X11-unix:/tmp/.X11-unix \
+        -e DISPLAY \
+        pumptools:run \
+        /bin/bash
+}
+
 ##################################################################################
 
 CMD="$1"
@@ -397,6 +445,14 @@ case $CMD in
         ;;
     "valgrind")
         cmd_run "valgrind" "${@:2}"
+        exit 0
+        ;;
+    "docker-build")
+        cmd_docker_build
+        exit 0
+        ;;
+    "docker-run")
+        cmd_docker_run "${@:2}"
         exit 0
         ;;
     *)
