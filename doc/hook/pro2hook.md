@@ -1,31 +1,15 @@
-# Notable features
+# pro2hook: Pro 2
+This readme covers any matters that are relevant for this hook, only. Anything that applies to **all** hooks is covered
+in a [main hook readme file](../hook.md) including general data setup and a quick start guide.
 
-* Runs on recent kernel versions
-* Runs on 32-bit and 64-bit distros (64-bit distros require additional 32-bit libs to be installed)
-* Dongle stuff must be patched out
-* You need decrypted data zips to run this
-* Full MK6IO emulation with API hook: Keyboard or your own custom IO
-* Full PIUBTN emulation with API hook: Keyboard or your own custom IO
-* Real IO passthrough (for MK6 usb io and PIUBTN)
+## Versions supported
+All known versions supported as long as it uses fully unpacked assets and a nodongle executable.
 
-# Versions supported
-Currently, only the latest revision is supported (I think that's R5?)
+## Dependencies
+Make sure to read the different methods of dependency resolution available in the [main hook readme file](../hook.md),
+first.
 
-# Data setup
-A clean set of data won't work here. Glenn protected the data with his own life
-(pretty much) and made it as obnoxious as possible to unpack it. So good luck
-getting the original data out of a drive image (if you didn't get it already
-from somewhere).
-
-All access to files and folders are detoured to two folders which makes setting
-up everything easier.
-
-You need one main folder:
-* game/pro2 (contains all the game data, stepmania layout)
-
-## Executable dependencies
-All dependencies must be compiled as 32-bit binaries. Here is a list of
-dependencies (with versions) required to run the game:
+The following **direct** dependencies (cmd: `readelf -d piu`) are required:
 * libXtst.so.6
 * libXrandr.so.2
 * libGL.so.1
@@ -42,54 +26,41 @@ dependencies (with versions) required to run the game:
 * libgcc_s.so.1
 * libc.so.6
 * libX11.so.6
-* libXext.so.6
-* libXi.so.6
-* libXrender.so.1
-* libnvidia-tls.so.340.106
-* libnvidia-glcore.so.340.106
-* libstdc++.so.6
-* libxcb.so.1
-* libXau.so.6
-* libXdmcp.so.6
 
-# Hook module configuration file
-Checkout the usage information of the hook and set the option values according
-to your needs. Here is an example option configuration file:
-```
-log_file_path=./pumptools.log
-log_level=3
-enable_file_monitor=0
-enable_io_monitor=0
-piubtn_emu_lib_path=
-piubtn_real_passthrough=1
-piuio_emu_lib_path=./piuio.so
-piuio_real_passthrough=1
-piuio_exit_test_service=1
-game_data_path=./game
-```
+As for method 1, when using Ubuntu, the dependencies can be found in the following packages:
+* libc-bin (or gcc-multilib on a 64-bit platform)
+* libx11-6
+* libusb-0.1-4
+* libasound2
+* ffmpeg
 
-# Run the game
-Ensure you are running an X screen. Run the game using
-Ensure you are running an X screen. Otherwise, you have to start one along with the game. Various library/system-calls
-require root privileges. Make sure to run the game as root or with sudo (otherwise you get various sorts of errors,
-typically permission denied). Use the included *run.sh* file to start the game on a desktop environment.
+## Data setup
+A clean set of data won't work here. You need the dumped and unpacked/decrypted data and a patched
+executable that runs either on plain zip or files.
 
-# Further notes
-## ITG2 PIUIO kernel module hack
-If you don't have the original kernel module installed and you are running a
-real PIUIO, you have to hook the *piuio.so* lib which implements the piuio api.
-The "emulation" part which simply calls back to a real piuio driver takes
-care of handling the kernel hack path then. If you run on a real IO without
-hooking that module, you won't get an inputs or outputs.
+All access to files and folders are detoured to one folder, the `game` folder, which makes setting
+up everything easier. The `game` folder contains the typical StepMania folders:
+* BGAnimations
+* BackgroundEffects
+* BackgroundTransitions
+* Characters
+* Courses
+* Data
+* Logs
+* NoteSkins
+* RandomMovies
+* Save
+* SongMovies
+* Songs
+* Themes
 
-## Window/fullscreen mode
-The hook does not have extra settings for changing window/fullscreen modes. Modify the corresponding `Static.ini` file
-and set the value of the key `Windowed` accordingly, e.g. `Windowed=1` for window mode.
+Each folder with the content from the dump.
 
-## The game is crashing very early
-This is probably due to not having the right IO hardware connected/emulated.
-The game doesn't have any proper error handling if either the PIUIO or the
-button IO is missing/not connected (or not emulated).
+## USB thumb drive/profile support
+See instructions on the [prohook readme](19-pro.md#usb-thumb-drive-profile-support).
 
-## Vsync
-The game is required to run with vsync on.
+## Troubleshooting and FAQ
+Since the game is based on Pro 1, have a look at the
+[troubleshooting section there](19-pro.md#troubleshooting-and-faq). Most of the things listed there
+apply to Pro 2 as well (or are very similar). Further Pro 2 exclusive items are listed in this
+section.
