@@ -22,3 +22,4 @@ game modes, unlock and modifier codes etc.
 * [Pump it Up NX: New Xenesis](18-nx.md)
 * [Pump it Up: PRO](19-pro.md)
 * [Pump it Up NX2: Next Xenesis](20-nx2.md)
+* [Pump it Up: PRO 2](22-pro2.md)
