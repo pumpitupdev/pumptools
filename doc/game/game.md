@@ -20,4 +20,5 @@ game modes, unlock and modifier codes etc.
 * [Exceed 2: The International 6th Dance Floor](16-exc2.md)
 * [Pump it Up Zero: International 7th Dance Floor](17-zero.md)
 * [Pump it Up NX: New Xenesis](18-nx.md)
+* [Pump it Up: PRO](19-pro.md)
 * [Pump it Up NX2: Next Xenesis](20-nx2.md)
