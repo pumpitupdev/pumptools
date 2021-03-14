@@ -1,5 +1,8 @@
 # Release history
 ## 1.09
+* Include pro and pro2 hooks into actual public release
+* Various documentation updates
+* Minor bugfixes
 
 ## 1.08
 * Documentation updates
