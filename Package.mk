@@ -210,6 +210,7 @@ $(zipdir)/doc.zip: \
 		doc/game/18-nx.md \
 		doc/game/19-pro.md \
 		doc/game/20-nx2.md \
+		doc/game/22-pro2.md \
 		doc/game/game.md \
 		doc/hook/exchook.md \
 		doc/hook/hook.md \
@@ -217,6 +218,7 @@ $(zipdir)/doc.zip: \
 		doc/hook/nxhook.md \
 		doc/hook/nx2hook.md \
 		doc/hook/os.md \
+		doc/hook/pro2hook.md \
 		doc/hook/prohook.md \
 		doc/hook/x2hook.md \
 		doc/hook/zerohook.md \
@@ -266,6 +268,7 @@ $(builddir)/pumptools-public.zip: \
 		$(zipdir)/nx2hook.zip \
 		$(zipdir)/piubtn.zip \
 		$(zipdir)/piuio.zip \
+		$(zipdir)/pro2hook.zip \
 		$(zipdir)/prohook.zip \
 		$(zipdir)/x2hook.zip \
 		$(zipdir)/zerohook.zip \
