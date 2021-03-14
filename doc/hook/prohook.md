@@ -32,6 +32,7 @@ As for method 1, when using Ubuntu, the dependencies can be found in the followi
 * libx11-6
 * libusb-0.1-4
 * libasound2
+* ffmpeg
 
 ## Data setup
 A clean set of data won't work here. You need the decrypted data zip files and a patched executable that uses plain zip
