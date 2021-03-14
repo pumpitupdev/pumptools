@@ -55,10 +55,10 @@ available per game version)
 * [Exceed 2](doc/hook/x2hook.md): 102
 * [Zero](doc/hook/zerohook.md): 103
 * [NX](doc/hook/nxhook.md): 108
+* [Pro](doc/hook/prohook.md): R5 nodongle
 * [NX2](doc/hook/nx2hook.md): 154
 
 Not available, yet:
-* [Pro](doc/hook/prohook.md): R5 nodongle
 * [NXA](doc/hook/nxahook.md): 110
 * [Pro2](doc/hook/pro2hook.md): R5 nodongle
 * [Fiesta](doc/hook/fsthook.md): 120
