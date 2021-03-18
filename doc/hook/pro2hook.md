@@ -57,7 +57,7 @@ up everything easier. The `game` folder contains the typical StepMania folders:
 Each folder with the content from the dump.
 
 ## USB thumb drive/profile support
-See instructions on the [prohook readme](prohook.md#usb-thumb-drive-profile-support).
+See instructions on the [prohook readme](prohook.md#usb-thumb-driveprofile-support).
 
 ## Troubleshooting and FAQ
 Since the game is based on Pro 1, have a look at the
