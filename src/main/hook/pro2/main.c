@@ -162,8 +162,9 @@ static void pro2hook_patch_piuio_init(struct pro2hook_options* options)
 
     // The order of layering the hooks is important here because of deps
     // 1. Fix low level libusb thing with init
-    // 2. Introduce the shim layer to allow adding fakedevs required for forther software emulation
-    // 3. Turn the ITG 2 piuio kernel hack calls into normal piuio ctrl transfer calls
+    // 2. Turn the ITG 2 piuio kernel hack calls into normal piuio ctrl transfer calls
+    // 3. Introduce an abstraction layer to allow, to abstract libusb0.1 and allow adding fakedevs
+    //    required for further software emulation
     // 4. Exit module to allow exiting the game with test + service
     // 5. Software emulation layer for piuio
     //
@@ -173,8 +174,8 @@ static void pro2hook_patch_piuio_init(struct pro2hook_options* options)
     // that have to detour to real hardware again
 
     patch_usb_init_fix_init();
-    patch_usb_emu_init();
     patch_piuio_khack_init();
+    patch_usb_emu_init();
 
     /* Hook before PIUIO emulation */
     if (options->patch.piuio.exit_test_serv) {
