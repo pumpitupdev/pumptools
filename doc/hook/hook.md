@@ -261,3 +261,11 @@ If you have a multi-monitor setup, things are getting quite complicated. Therefo
 
 Also note that if you want the game to render at a higher resolution than its defined one, e.g. 640x480, this is not
 possible right now. The output you get from the frame buffer will always be its native resolution.
+
+### The game window is small and the 4:3 games are stretched when full screen on modern widescreen displays
+On supported games, you can change the option `gfx.scaling_mode` in the `hook.conf` file to enable different pre-defined
+scaling modes. Especially for the SD 640x480 4:3 games, this allows you to upscale the rendered output to a widescreen
+display resolution while keeping the aspect ratio (pillarbox).
+
+Note: This does not change the enhance the image quality. It just uses the GPU to interpolate the lower resolution
+output and stretches it to the target surface area.
