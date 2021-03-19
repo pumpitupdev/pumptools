@@ -19,30 +19,30 @@
  * Available operations to hook
  */
 enum cnh_fshook_irp_op {
-    CNH_FSHOOK_IRP_OP_DIR_OPEN = 0,
-    CNH_FSHOOK_IRP_OP_LXSTAT = 1,
-    CNH_FSHOOK_IRP_OP_XSTAT = 2,
-    CNH_FSHOOK_IRP_OP_RENAME = 3,
-    CNH_FSHOOK_IRP_OP_REMOVE = 4,
-    CNH_FSHOOK_IRP_OP_ACCESS = 5,
+  CNH_FSHOOK_IRP_OP_DIR_OPEN = 0,
+  CNH_FSHOOK_IRP_OP_LXSTAT = 1,
+  CNH_FSHOOK_IRP_OP_XSTAT = 2,
+  CNH_FSHOOK_IRP_OP_RENAME = 3,
+  CNH_FSHOOK_IRP_OP_REMOVE = 4,
+  CNH_FSHOOK_IRP_OP_ACCESS = 5,
 };
 
 /**
  * I/O request packet
  */
 struct cnh_fshook_irp {
-    enum cnh_fshook_irp_op op;
-    size_t next_handler;
-    const char* opendir_name;
-    DIR* opendir_ret;
-    int xstat_version;
-    const char* xstat_file;
-    struct stat* xstat_buf;
-    const char* rename_old;
-    const char* rename_new;
-    const char* remove_pathname;
-    const char* access_path;
-    int access_amode;
+  enum cnh_fshook_irp_op op;
+  size_t next_handler;
+  const char *opendir_name;
+  DIR *opendir_ret;
+  int xstat_version;
+  const char *xstat_file;
+  struct stat *xstat_buf;
+  const char *rename_old;
+  const char *rename_new;
+  const char *remove_pathname;
+  const char *access_path;
+  int access_amode;
 };
 
 /**

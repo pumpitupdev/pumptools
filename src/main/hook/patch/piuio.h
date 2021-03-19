@@ -12,7 +12,7 @@
  *
  * @param piuio_lib_path Path to a library implementing the piuio API
  */
-void patch_piuio_init(const char* piuio_lib_path);
+void patch_piuio_init(const char *piuio_lib_path);
 
 /**
  * Shut down the patch module

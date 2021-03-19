@@ -18,6 +18,7 @@ void patch_network_init();
  * @param new_ipv4 IPV4 address of the new server to redirect to
  * @param new_port Port of server to redirect to (-1 to keep old port)
  */
-void patch_network_redirect_server_address(const char* orig_ipv4, const char* new_ipv4, uint16_t new_port);
+void patch_network_redirect_server_address(
+    const char *orig_ipv4, const char *new_ipv4, uint16_t new_port);
 
 #endif

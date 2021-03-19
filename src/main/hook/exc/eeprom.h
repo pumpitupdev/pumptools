@@ -14,6 +14,7 @@
  * @param eeprom_file Path to existing eeprom file to read from and new eeprom
  *                    file to store to
  */
-void exchook_eeprom_init(const struct exchook_mempatch_table* patch_table, const char* eeprom_file);
+void exchook_eeprom_init(
+    const struct exchook_mempatch_table *patch_table, const char *eeprom_file);
 
 #endif

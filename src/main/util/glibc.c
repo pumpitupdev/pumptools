@@ -6,5 +6,8 @@
 
 void util_glibc_info_log()
 {
-    log_info("glibc release '%s', version '%s'", gnu_get_libc_release(), gnu_get_libc_version());
+  log_info(
+      "glibc release '%s', version '%s'",
+      gnu_get_libc_release(),
+      gnu_get_libc_version());
 }

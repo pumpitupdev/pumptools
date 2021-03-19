@@ -16,18 +16,18 @@
  * I/O buffer
  */
 struct cnh_iobuf {
-    uint8_t *bytes;
-    size_t nbytes;
-    size_t pos;
+  uint8_t *bytes;
+  size_t nbytes;
+  size_t pos;
 };
 
 /**
  * I/O buffer
  */
 struct cnh_const_iobuf {
-    const uint8_t *bytes;
-    size_t nbytes;
-    size_t pos;
+  const uint8_t *bytes;
+  size_t nbytes;
+  size_t pos;
 };
 
 /**
@@ -39,10 +39,12 @@ struct cnh_const_iobuf {
 void cnh_iobuf_flip(struct cnh_const_iobuf *child, struct cnh_iobuf *parent);
 
 /**
- * Move the contents currently enclosed by pos and end of an I/O buffer to a destination.
+ * Move the contents currently enclosed by pos and end of an I/O buffer to a
+ * destination.
  *
  * @param dest Destination buffer to move the source to, starting at current pos
- * @param src Source to move to the destination, starting at current pos up to end of the buffer
+ * @param src Source to move to the destination, starting at current pos up to
+ * end of the buffer
  * @return Number of bytes copied to destination
  */
 size_t cnh_iobuf_move(struct cnh_iobuf *dest, struct cnh_const_iobuf *src);
@@ -57,7 +59,8 @@ size_t cnh_iobuf_shift(struct cnh_iobuf *dest, struct cnh_iobuf *src);
  * @param nbytes Number of bytes to read
  * @return Result of operation
  */
-enum cnh_result cnh_iobuf_read(struct cnh_const_iobuf *src, void *bytes, size_t nbytes);
+enum cnh_result
+cnh_iobuf_read(struct cnh_const_iobuf *src, void *bytes, size_t nbytes);
 
 /**
  * Read a byte from an I/O buffer
@@ -75,7 +78,8 @@ enum cnh_result cnh_iobuf_read_8(struct cnh_const_iobuf *src, uint8_t *value);
  * @param value Pointer to variable to read the data into
  * @return Result of operation
  */
-enum cnh_result cnh_iobuf_read_be16(struct cnh_const_iobuf *src, uint16_t *value);
+enum cnh_result
+cnh_iobuf_read_be16(struct cnh_const_iobuf *src, uint16_t *value);
 
 /**
  * Read a 4 byte value, big endian byte order, from an I/O buffer
@@ -84,7 +88,8 @@ enum cnh_result cnh_iobuf_read_be16(struct cnh_const_iobuf *src, uint16_t *value
  * @param value Pointer to variable to read the data into
  * @return Result of operation
  */
-enum cnh_result cnh_iobuf_read_be32(struct cnh_const_iobuf *src, uint32_t *value);
+enum cnh_result
+cnh_iobuf_read_be32(struct cnh_const_iobuf *src, uint32_t *value);
 
 /**
  * Read a 2 byte value, little endian byte order, from an I/O buffer
@@ -93,7 +98,8 @@ enum cnh_result cnh_iobuf_read_be32(struct cnh_const_iobuf *src, uint32_t *value
  * @param value Pointer to variable to read the data into
  * @return Result of operation
  */
-enum cnh_result cnh_iobuf_read_le16(struct cnh_const_iobuf *src, uint16_t *value);
+enum cnh_result
+cnh_iobuf_read_le16(struct cnh_const_iobuf *src, uint16_t *value);
 
 /**
  * Read a 4 byte value, little endian byte order, from an I/O buffer
@@ -102,7 +108,8 @@ enum cnh_result cnh_iobuf_read_le16(struct cnh_const_iobuf *src, uint16_t *value
  * @param value Pointer to variable to read the data into
  * @return Result of operation
  */
-enum cnh_result cnh_iobuf_read_le32(struct cnh_const_iobuf *src, uint32_t *value);
+enum cnh_result
+cnh_iobuf_read_le32(struct cnh_const_iobuf *src, uint32_t *value);
 
 /**
  * Write data to an I/O buffer
@@ -112,7 +119,8 @@ enum cnh_result cnh_iobuf_read_le32(struct cnh_const_iobuf *src, uint32_t *value
  * @param nbytes Number of bytes to write
  * @return Result of operation
  */
-enum cnh_result cnh_iobuf_write(struct cnh_iobuf *dest, const void *bytes, size_t nbytes);
+enum cnh_result
+cnh_iobuf_write(struct cnh_iobuf *dest, const void *bytes, size_t nbytes);
 
 /**
  * Write a byte to an I/O buffer

@@ -17,34 +17,34 @@
  * Available operations to hook
  */
 enum cnh_iohook_irp_op {
-    CNH_IOHOOK_IRP_OP_OPEN = 0,
-    CNH_IOHOOK_IRP_OP_FDOPEN = 1,
-    CNH_IOHOOK_IRP_OP_CLOSE = 2,
-    CNH_IOHOOK_IRP_OP_READ = 3,
-    CNH_IOHOOK_IRP_OP_WRITE = 4,
-    CNH_IOHOOK_IRP_OP_SEEK = 5,
-    CNH_IOHOOK_IRP_OP_IOCTL = 6,
+  CNH_IOHOOK_IRP_OP_OPEN = 0,
+  CNH_IOHOOK_IRP_OP_FDOPEN = 1,
+  CNH_IOHOOK_IRP_OP_CLOSE = 2,
+  CNH_IOHOOK_IRP_OP_READ = 3,
+  CNH_IOHOOK_IRP_OP_WRITE = 4,
+  CNH_IOHOOK_IRP_OP_SEEK = 5,
+  CNH_IOHOOK_IRP_OP_IOCTL = 6,
 };
 
 /**
  * I/O request packet
  */
 struct cnh_iohook_irp {
-    enum cnh_iohook_irp_op op;
-    size_t next_handler;
-    int fd;
-    const char *open_filename;
-    int open_flags;
-    int fdopen_fd;
-    const char* fdopen_mode;
-    FILE* fdopen_res;
-    struct cnh_iobuf read;
-    struct cnh_const_iobuf write;
-    int seek_origin;
-    int64_t seek_offset;
-    uint64_t seek_pos;
-    int ioctl_req;
-    struct cnh_iobuf ioctl;
+  enum cnh_iohook_irp_op op;
+  size_t next_handler;
+  int fd;
+  const char *open_filename;
+  int open_flags;
+  int fdopen_fd;
+  const char *fdopen_mode;
+  FILE *fdopen_res;
+  struct cnh_iobuf read;
+  struct cnh_const_iobuf write;
+  int seek_origin;
+  int64_t seek_offset;
+  uint64_t seek_pos;
+  int ioctl_req;
+  struct cnh_iobuf ioctl;
 };
 
 /**
@@ -80,8 +80,9 @@ enum cnh_result cnh_iohook_invoke_next(struct cnh_iohook_irp *irp);
 int cnh_iohook_open_dummy_fd();
 
 /**
- * Close a dummy file handle. Make sure to free your previously allocated handles
- * to avoid resource leaks. Do not free them using the real close function.
+ * Close a dummy file handle. Make sure to free your previously allocated
+ * handles to avoid resource leaks. Do not free them using the real close
+ * function.
  *
  * @param file Dummy file handle to free
  */

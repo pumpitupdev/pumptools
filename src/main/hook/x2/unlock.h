@@ -1,5 +1,6 @@
 /**
- * Patch module to force unlock all permanently unlockable songs and additional difficulties in the game.
+ * Patch module to force unlock all permanently unlockable songs and additional
+ * difficulties in the game.
  */
 #ifndef HOOK_X2_UNLOCK_H
 #define HOOK_X2_UNLOCK_H

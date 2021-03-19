@@ -22,7 +22,7 @@ bool piuio_drv_device_open(void);
  * @param len Number of bytes to read
  * @return True if reading data to device was successful, false otherwise
  */
-bool piuio_drv_device_read(uint8_t* buffer, uint8_t len);
+bool piuio_drv_device_read(uint8_t *buffer, uint8_t len);
 
 /**
  * Write raw data to the piuio device
@@ -31,7 +31,7 @@ bool piuio_drv_device_read(uint8_t* buffer, uint8_t len);
  * @param len Number of bytes to write
  * @return True if writing data to device was successful, false otherwise
  */
-bool piuio_drv_device_write(uint8_t* buffer, uint8_t len);
+bool piuio_drv_device_write(uint8_t *buffer, uint8_t len);
 
 /**
  * Close the opened piuio device

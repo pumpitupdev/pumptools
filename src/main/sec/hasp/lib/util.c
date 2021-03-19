@@ -6,10 +6,10 @@
 
 uint32_t sec_hasp_util_make_fake_handle_value()
 {
-    return util_rand_gen_32();
+  return util_rand_gen_32();
 }
 
 uint32_t sec_hasp_util_get_timestamp()
 {
-    return (uint32_t) time(NULL);
+  return (uint32_t) time(NULL);
 }

@@ -9,11 +9,11 @@
  * Value types support by option values
  */
 enum util_options_type {
-    UTIL_OPTIONS_TYPE_INT,
-    UTIL_OPTIONS_TYPE_DOUBLE,
-    UTIL_OPTIONS_TYPE_STR,
-    UTIL_OPTIONS_TYPE_BOOL,
-    UTIL_OPTIONS_TYPE_BIN,
+  UTIL_OPTIONS_TYPE_INT,
+  UTIL_OPTIONS_TYPE_DOUBLE,
+  UTIL_OPTIONS_TYPE_STR,
+  UTIL_OPTIONS_TYPE_BOOL,
+  UTIL_OPTIONS_TYPE_BIN,
 };
 
 /**
@@ -21,20 +21,20 @@ enum util_options_type {
  * key-value tuples to parse from an argument list
  */
 struct util_options_def {
-    const char* name;
-    const char* description;
-    const char param;
-    enum util_options_type type;
-    union {
-        int i;
-        double d;
-        const char* str;
-        bool b;
-        struct {
-            const uint8_t* data;
-            size_t len;
-        } bin;
-    } default_value;
+  const char *name;
+  const char *description;
+  const char param;
+  enum util_options_type type;
+  union {
+    int i;
+    double d;
+    const char *str;
+    bool b;
+    struct {
+      const uint8_t *data;
+      size_t len;
+    } bin;
+  } default_value;
 };
 
 /**
@@ -42,36 +42,36 @@ struct util_options_def {
  * as well as usage information for the application
  */
 struct util_options_defs {
-    const char* usage_header;
-    char usage_param;
-    const struct util_options_def* defs;
-    uint32_t ndefs;
+  const char *usage_header;
+  char usage_param;
+  const struct util_options_def *defs;
+  uint32_t ndefs;
 };
 
 /**
  * A single option value as part of the key-value tuple
  */
 struct util_options_value {
-    bool avail;
-    union {
-        int i;
-        double d;
-        char* str;
-        bool b;
-        struct {
-            uint8_t* data;
-            size_t len;
-        } bin;
-    } value;
+  bool avail;
+  union {
+    int i;
+    double d;
+    char *str;
+    bool b;
+    struct {
+      uint8_t *data;
+      size_t len;
+    } bin;
+  } value;
 };
 
 /**
  * Parsed option values based on an options definition
  */
 struct util_options_opts {
-    const struct util_options_defs* defs;
-    struct util_options_value* values;
-    uint32_t entries;
+  const struct util_options_defs *defs;
+  struct util_options_value *values;
+  uint32_t entries;
 };
 
 /**
@@ -83,7 +83,7 @@ struct util_options_opts {
  * @param argc Argc from main
  * @param argv Argv from main
  */
-void util_options_init(int argc, char** argv);
+void util_options_init(int argc, char **argv);
 
 /**
  * Get options from the initial argument list
@@ -94,8 +94,8 @@ void util_options_init(int argc, char** argv);
  * @return A list of parsed options based on the specified definitions or
  *         NULL if usage information was printed.
  */
-struct util_options_opts* util_options_get(
-    const struct util_options_defs* option_defs);
+struct util_options_opts *
+util_options_get(const struct util_options_defs *option_defs);
 
 /**
  * Get an integer value from an options list
@@ -105,8 +105,8 @@ struct util_options_opts* util_options_get(
  * @return Value of the options key converted to an integer value. If the type
  *         of the options key is not matching, 0 is returned
  */
-int util_options_get_int(const struct util_options_opts* opts,
-    const char* name);
+int util_options_get_int(
+    const struct util_options_opts *opts, const char *name);
 
 /**
  * Get a double value from an options list
@@ -116,7 +116,8 @@ int util_options_get_int(const struct util_options_opts* opts,
  * @return Value of the options key converted to a double value. If the type
  *         of the options key is not matching, 0 is returned
  */
-double util_options_get_double(const struct util_options_opts* opts, const char* name);
+double
+util_options_get_double(const struct util_options_opts *opts, const char *name);
 
 /**
  * Get a string from an options list
@@ -126,8 +127,8 @@ double util_options_get_double(const struct util_options_opts* opts, const char*
  * @return Value of the options key converted to a string. If the type
  *         of the options key is not matching, NULL is returned
  */
-const char* util_options_get_str(const struct util_options_opts* opts,
-    const char* name);
+const char *
+util_options_get_str(const struct util_options_opts *opts, const char *name);
 
 /**
  * Get a bool value from an options list
@@ -137,8 +138,8 @@ const char* util_options_get_str(const struct util_options_opts* opts,
  * @return Value of the options key converted to a bool value. If the type
  *         of the options key is not matching, false is returned
  */
-bool util_options_get_bool(const struct util_options_opts* opts,
-    const char* name);
+bool util_options_get_bool(
+    const struct util_options_opts *opts, const char *name);
 
 /**
  * Get binary data from an options list
@@ -150,21 +151,21 @@ bool util_options_get_bool(const struct util_options_opts* opts,
  * @return Value of the options key converted to a binary array. If the type
  *         of the options key is not matching, NULL is returned
  */
-const uint8_t* util_options_get_bin(const struct util_options_opts* opts,
-    const char* name, size_t* length);
+const uint8_t *util_options_get_bin(
+    const struct util_options_opts *opts, const char *name, size_t *length);
 
 /**
  * Print usage information
  *
  * @param option_defs A list of option definitions.
  */
-void util_options_print_usage(const struct util_options_defs* opts);
+void util_options_print_usage(const struct util_options_defs *opts);
 
 /**
  * Free an options list
  *
  * @param opts Options list to free
  */
-void util_options_free(struct util_options_opts* opts);
+void util_options_free(struct util_options_opts *opts);
 
 #endif

@@ -6,50 +6,52 @@
 #include "util/log.h"
 #include "util/mem.h"
 
-void util_array_init(struct util_array* array)
+void util_array_init(struct util_array *array)
 {
-    memset(array, 0, sizeof(*array));
+  memset(array, 0, sizeof(*array));
 }
 
-void util_array_remove_(size_t itemsz, struct util_array* array, size_t i)
+void util_array_remove_(size_t itemsz, struct util_array *array, size_t i)
 {
-    array->nitems--;
+  array->nitems--;
 
-    memmove(((uint8_t *) array->items) + i * itemsz,
-            ((uint8_t *) array->items) + (i + 1) * itemsz,
-            (array->nitems - i) * itemsz);
+  memmove(
+      ((uint8_t *) array->items) + i * itemsz,
+      ((uint8_t *) array->items) + (i + 1) * itemsz,
+      (array->nitems - i) * itemsz);
 }
 
-void* util_array_reserve_(size_t itemsz, struct util_array* array, size_t nitems)
+void *
+util_array_reserve_(size_t itemsz, struct util_array *array, size_t nitems)
 {
-    size_t new_nalloced;
-    size_t new_nitems;
-    void* result;
+  size_t new_nalloced;
+  size_t new_nitems;
+  void *result;
 
-    new_nitems = array->nitems + nitems;
+  new_nitems = array->nitems + nitems;
 
-    if (new_nitems > array->nalloced) {
-        new_nalloced = array->nalloced;
+  if (new_nitems > array->nalloced) {
+    new_nalloced = array->nalloced;
 
-        if (new_nalloced == 0) {
-            new_nalloced = 1;
-        }
-
-        while (new_nalloced < new_nitems) {
-            new_nalloced *= 2;
-        }
-
-        array->items = util_xrealloc(array->items, new_nalloced * itemsz);
-        array->nalloced = new_nalloced;
+    if (new_nalloced == 0) {
+      new_nalloced = 1;
     }
 
-    result = ((uint8_t *) array->items) + array->nitems * itemsz;
-    array->nitems = new_nitems;
+    while (new_nalloced < new_nitems) {
+      new_nalloced *= 2;
+    }
 
-    return result;
+    array->items = util_xrealloc(array->items, new_nalloced * itemsz);
+    array->nalloced = new_nalloced;
+  }
+
+  result = ((uint8_t *) array->items) + array->nitems * itemsz;
+  array->nitems = new_nitems;
+
+  return result;
 }
 
-void util_array_fini(struct util_array* array)
+void util_array_fini(struct util_array *array)
 {
-    free(array->items);
+  free(array->items);
 }

@@ -8,33 +8,32 @@
 
 static pthread_t patch_hasp_thread;
 
-static void* patch_hasp_thread_run(void* args)
+static void *patch_hasp_thread_run(void *args)
 {
-    log_info("Running hasp server thread");
+  log_info("Running hasp server thread");
 
-    sec_hasp_server_run();
+  sec_hasp_server_run();
 
-    log_info("Finished hasp server thread");
+  log_info("Finished hasp server thread");
 
-    return NULL;
+  return NULL;
 }
 
-void patch_hasp_init(const uint8_t* key_data, size_t len)
+void patch_hasp_init(const uint8_t *key_data, size_t len)
 {
-    sec_hasp_server_init(key_data, len);
+  sec_hasp_server_init(key_data, len);
 
-    /* Run the daemon in another thread */
-    pthread_create(&patch_hasp_thread, NULL,
-        patch_hasp_thread_run, NULL);
+  /* Run the daemon in another thread */
+  pthread_create(&patch_hasp_thread, NULL, patch_hasp_thread_run, NULL);
 
-    log_info("Initialized");
+  log_info("Initialized");
 }
 
 void patch_hasp_shutdown(void)
 {
-    log_info("Shutting down");
+  log_info("Shutting down");
 
-    sec_hasp_server_shutdown();
+  sec_hasp_server_shutdown();
 
-    pthread_join(patch_hasp_thread_run, NULL);
+  pthread_join(patch_hasp_thread_run, NULL);
 }

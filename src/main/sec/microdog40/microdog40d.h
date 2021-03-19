@@ -14,7 +14,7 @@
  * @param key_data Pointer to loaded key data (dog attributes, key table)
  * @param len Length of the buffer
  */
-void sec_microdog40d_init(const uint8_t* key_data, size_t len);
+void sec_microdog40d_init(const uint8_t *key_data, size_t len);
 
 /**
  * Run the daemon. This call blocks until the daemon is shut down.

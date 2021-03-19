@@ -15,7 +15,9 @@
  * @param piuio_lib_path Path to piuio lib to use for emulation
  * @parma exit_on_service_test Exit the game when pressing service + test
  */
-void exchook_io_init(const struct exchook_mempatch_table* patch_table, const char* piuio_lib_path,
+void exchook_io_init(
+    const struct exchook_mempatch_table *patch_table,
+    const char *piuio_lib_path,
     bool exit_on_service_test);
 
 /**

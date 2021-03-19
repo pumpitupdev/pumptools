@@ -9,7 +9,8 @@
 #include "capnhook/hook/iohook.h"
 
 /**
- * Hook function to add to the hook module for monitoring open file calls on file operations
+ * Hook function to add to the hook module for monitoring open file calls on
+ * file operations
  *
  * @param irp I/O request package of hook module received
  * @return Result of operation
@@ -17,7 +18,8 @@
 enum cnh_result cnh_fileopen_mon_filehook(struct cnh_filehook_irp *irp);
 
 /**
- * Hook function to add to the hook module for monitoring open file calls on file system related operations
+ * Hook function to add to the hook module for monitoring open file calls on
+ * file system related operations
  *
  * @param irp I/O request package of hook module received
  * @return Result of operation
@@ -25,7 +27,8 @@ enum cnh_result cnh_fileopen_mon_filehook(struct cnh_filehook_irp *irp);
 enum cnh_result cnh_fileopen_mon_fshook(struct cnh_fshook_irp *irp);
 
 /**
- * Hook function to add to the hook module for monitoring open file/device calls on I/O operations
+ * Hook function to add to the hook module for monitoring open file/device calls
+ * on I/O operations
  *
  * @param irp I/O request package of hook module received
  * @return Result of operation

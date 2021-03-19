@@ -15,14 +15,16 @@
  * @param piubtn_lib_path Path to a library implementing the piubtn API
  * @param real_passthrough True to ignore the library and disable any emulation
  */
-void patch_piubtn_init(const char* piubtn_lib_path);
+void patch_piubtn_init(const char *piubtn_lib_path);
 
 /**
  * Get the input hook handler provided by the piubtn library.
  *
- * @return Input hook handler for main-loop patch module or NULL if none is used.
+ * @return Input hook handler for main-loop patch module or NULL if none is
+ * used.
  */
-const struct pumptools_input_hook_handler* patch_piubtn_get_input_hook_handler(void);
+const struct pumptools_input_hook_handler *
+patch_piubtn_get_input_hook_handler(void);
 
 /**
  * Shut down the patch module

@@ -12,7 +12,7 @@
  * @param key_data Pointer to loaded key data (attributes, key table)
  * @param len Length of the buffer
  */
-void sec_hasp_server_init(const uint8_t* key_data, size_t len);
+void sec_hasp_server_init(const uint8_t *key_data, size_t len);
 
 /**
  * Run the server. This call blocks until the server is shut down.

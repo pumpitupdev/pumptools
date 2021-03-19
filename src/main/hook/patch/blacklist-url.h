@@ -14,6 +14,6 @@ void patch_blacklist_url_init(void);
  *
  * @param url Url to block
  */
-void patch_blacklist_url_add(const char* url);
+void patch_blacklist_url_add(const char *url);
 
 #endif

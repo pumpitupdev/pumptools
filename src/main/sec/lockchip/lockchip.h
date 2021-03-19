@@ -13,7 +13,7 @@
  *
  * @param transform Pointer to a transform to use for the step calls
  */
-void sec_lockchip_init(const uint8_t* transform);
+void sec_lockchip_init(const uint8_t *transform);
 
 /**
  * Start lockchip emulation and set the initial state before calling step

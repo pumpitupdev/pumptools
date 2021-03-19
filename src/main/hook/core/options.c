@@ -27,24 +27,25 @@ const struct util_options_defs hook_core_options_defs = {
     // Just use something because this is not relevant/required here
     .usage_param = '\r',
     .defs = hook_core_options_def,
-    .ndefs = lengthof(hook_core_options_def)
-};
+    .ndefs = lengthof(hook_core_options_def)};
 
-void hook_core_options_init(int argc, char** argv, struct hook_core_options* options)
+void hook_core_options_init(
+    int argc, char **argv, struct hook_core_options *options)
 {
-    log_assert(argv);
-    log_assert(options);
+  log_assert(argv);
+  log_assert(options);
 
-    struct util_options_opts* options_opt;
+  struct util_options_opts *options_opt;
 
-    util_options_init(argc, argv);
-    options_opt = util_options_get(&hook_core_options_defs);
+  util_options_init(argc, argv);
+  options_opt = util_options_get(&hook_core_options_defs);
 
-    if (!options_opt) {
-        return;
-    }
+  if (!options_opt) {
+    return;
+  }
 
-    options->log.file = util_options_get_str(options_opt, HOOK_CORE_OPTIONS_STR_PATCH_UTIL_LOG_FILE);
-    options->log.level =
-        (enum util_log_level) util_options_get_int(options_opt, HOOK_CORE_OPTIONS_STR_PATCH_UTIL_LOG_LEVEL);
+  options->log.file = util_options_get_str(
+      options_opt, HOOK_CORE_OPTIONS_STR_PATCH_UTIL_LOG_FILE);
+  options->log.level = (enum util_log_level) util_options_get_int(
+      options_opt, HOOK_CORE_OPTIONS_STR_PATCH_UTIL_LOG_LEVEL);
 }

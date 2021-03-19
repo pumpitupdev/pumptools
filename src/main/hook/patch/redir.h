@@ -9,4 +9,4 @@
  */
 void patch_redir_init();
 
-#endif //PATCH_REDIR_H
+#endif // PATCH_REDIR_H

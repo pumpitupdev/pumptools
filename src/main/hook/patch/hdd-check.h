@@ -11,6 +11,6 @@
  * @param boot_area_buffer Buffer with boot area sections of a real drive
  * @param len Length of buffer provided
  */
-void patch_hdd_check_init(const uint8_t* boot_area_buffer, size_t len);
+void patch_hdd_check_init(const uint8_t *boot_area_buffer, size_t len);
 
 #endif

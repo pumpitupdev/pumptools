@@ -6,7 +6,7 @@
 
 void patch_usb_init_fix_init()
 {
-    cnh_usbhook_push_handler(&cnh_usb_init_fix);
+  cnh_usbhook_push_handler(&cnh_usb_init_fix);
 
-    log_info("Initialized");
+  log_info("Initialized");
 }

@@ -16,7 +16,7 @@
  * @param iface Interface to claim
  * @return On success, a handle to the opened device, NULL on failure
  */
-void* io_usb_open(uint16_t vid, uint16_t pid, uint16_t config, uint16_t iface);
+void *io_usb_open(uint16_t vid, uint16_t pid, uint16_t config, uint16_t iface);
 
 /**
  * Execute a control transfer
@@ -32,15 +32,21 @@ void* io_usb_open(uint16_t vid, uint16_t pid, uint16_t config, uint16_t iface);
  * @param timeout Timeout for the operation in ms
  * @return Number of bytes read/written or -1 on error
  */
-int32_t io_usb_control_transfer(void* handle, uint8_t request_type,
-    uint8_t request, uint16_t value, uint16_t index, uint8_t* data,
-    uint16_t len, uint32_t timeout);
+int32_t io_usb_control_transfer(
+    void *handle,
+    uint8_t request_type,
+    uint8_t request,
+    uint16_t value,
+    uint16_t index,
+    uint8_t *data,
+    uint16_t len,
+    uint32_t timeout);
 
 /**
  * Close a opened usb device
  *
  * @param handle Handle of the opened device
  */
-void io_usb_close(void* handle);
+void io_usb_close(void *handle);
 
 #endif

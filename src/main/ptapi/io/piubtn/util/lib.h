@@ -3,6 +3,7 @@
 
 #include "ptapi/io/piubtn.h"
 
-bool ptapi_io_piubtn_util_lib_load(const char* path, struct ptapi_io_piubtn_api* api);
+bool ptapi_io_piubtn_util_lib_load(
+    const char *path, struct ptapi_io_piubtn_api *api);
 
 #endif

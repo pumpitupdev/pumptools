@@ -10,6 +10,6 @@
  *
  * @param dev_name Sound device name to open instead of whatever pump decides
  */
-void patch_sound_init(const char* dev_name);
+void patch_sound_init(const char *dev_name);
 
 #endif

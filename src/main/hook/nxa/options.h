@@ -7,53 +7,54 @@
 #include "util/log.h"
 
 struct nxahook_options {
-    struct game {
-        const char* settings;
-    } game;
+  struct game {
+    const char *settings;
+  } game;
 
-    struct patch {
-        struct gfx {
-            bool windowed;
-        } gfx;
+  struct patch {
+    struct gfx {
+      bool windowed;
+    } gfx;
 
-        struct hook_mon {
-            bool file;
-            bool fs;
-            bool io;
-            bool open;
-            bool usb;
-        } hook_mon;
+    struct hook_mon {
+      bool file;
+      bool fs;
+      bool io;
+      bool open;
+      bool usb;
+    } hook_mon;
 
-        struct main_loop {
-            bool disable_built_in_inputs;
-            const char* x11_input_handler_api_lib;
-        } main_loop;
+    struct main_loop {
+      bool disable_built_in_inputs;
+      const char *x11_input_handler_api_lib;
+    } main_loop;
 
-        struct net {
-            const char* server;
-            uint32_t machine_id;
-        } net;
+    struct net {
+      const char *server;
+      uint32_t machine_id;
+    } net;
 
-        struct piuio {
-            const char* api_lib;
-            bool exit_test_serv;
-        } piuio;
+    struct piuio {
+      const char *api_lib;
+      bool exit_test_serv;
+    } piuio;
 
-        struct sound {
-            const char* device;
-        } sound;
+    struct sound {
+      const char *device;
+    } sound;
 
-        struct sigsegv {
-            bool halt_on_segv;
-        } sigsegv;
-    } patch;
+    struct sigsegv {
+      bool halt_on_segv;
+    } sigsegv;
+  } patch;
 
-    struct log {
-        const char* file;
-        enum util_log_level level;
-    } log;
+  struct log {
+    const char *file;
+    enum util_log_level level;
+  } log;
 };
 
-bool nxahook_options_init(int argc, char** argv, struct nxahook_options* options);
+bool nxahook_options_init(
+    int argc, char **argv, struct nxahook_options *options);
 
 #endif

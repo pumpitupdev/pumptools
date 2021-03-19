@@ -10,19 +10,24 @@
 #define X2HOOK_OPTIONS_STR_PATCH_HOOK_MON_IO "patch.hook_mon.io"
 #define X2HOOK_OPTIONS_STR_PATCH_HOOK_MON_OPEN "patch.hook_mon.open"
 #define X2HOOK_OPTIONS_STR_PATCH_HOOK_MON_USB "patch.hook_mon.usb"
-#define X2HOOK_OPTIONS_STR_PATCH_HOOK_MAIN_LOOP_DISABLE_BUILT_IN_INPUTS "patch.hook_main_loop.disable_built_in_inputs"
-#define X2HOOK_OPTIONS_STR_PATCH_HOOK_MAIN_LOOP_X11_INPUT_HANDLER "patch_hook_main_loop.x11_input_handler"
+#define X2HOOK_OPTIONS_STR_PATCH_HOOK_MAIN_LOOP_DISABLE_BUILT_IN_INPUTS \
+  "patch.hook_main_loop.disable_built_in_inputs"
+#define X2HOOK_OPTIONS_STR_PATCH_HOOK_MAIN_LOOP_X11_INPUT_HANDLER \
+  "patch_hook_main_loop.x11_input_handler"
 #define X2HOOK_OPTIONS_STR_PATCH_PIUIO_EMU_LIB "patch.piuio.emu_lib"
-#define X2HOOK_OPTIONS_STR_PATCH_PIUIO_EXIT_TEST_SERV "patch.piuio_exit.test_serv"
+#define X2HOOK_OPTIONS_STR_PATCH_PIUIO_EXIT_TEST_SERV \
+  "patch.piuio_exit.test_serv"
 #define X2HOOK_OPTIONS_STR_PATCH_SOUND_DEVICE "patch.sound.device"
-#define X2HOOK_OPTIONS_STR_PATCH_SIGSEGV_HALT_ON_SEGV "patch.sigsegv.halt_on_segv"
+#define X2HOOK_OPTIONS_STR_PATCH_SIGSEGV_HALT_ON_SEGV \
+  "patch.sigsegv.halt_on_segv"
 #define X2HOOK_OPTIONS_STR_PATCH_UTIL_LOG_FILE "util.log.file"
 #define X2HOOK_OPTIONS_STR_PATCH_UTIL_LOG_LEVEL "util.log.level"
 
 static const struct util_options_def x2hook_options_def[] = {
     {
         .name = X2HOOK_OPTIONS_STR_GAME_FORCE_UNLOCK,
-        .description = "Force unlock the game. Modifies the current and any new PIUEXCEED.INI settings file permanently",
+        .description = "Force unlock the game. Modifies the current and any "
+                       "new PIUEXCEED.INI settings file permanently",
         .param = 'z',
         .type = UTIL_OPTIONS_TYPE_BOOL,
         .default_value.b = false,
@@ -78,21 +83,24 @@ static const struct util_options_def x2hook_options_def[] = {
     },
     {
         .name = X2HOOK_OPTIONS_STR_PATCH_HOOK_MAIN_LOOP_DISABLE_BUILT_IN_INPUTS,
-        .description = "Disable the built in keyboard inputs for test (F1), service (F2) and clear (F3)",
+        .description = "Disable the built in keyboard inputs for test (F1), "
+                       "service (F2) and clear (F3)",
         .param = 'k',
         .type = UTIL_OPTIONS_TYPE_BOOL,
         .default_value.b = false,
     },
     {
         .name = X2HOOK_OPTIONS_STR_PATCH_HOOK_MAIN_LOOP_X11_INPUT_HANDLER,
-        .description = "Path to a library implementing the x11-input-handler api to capture X11 keyboard inputs",
+        .description = "Path to a library implementing the x11-input-handler "
+                       "api to capture X11 keyboard inputs",
         .param = 'q',
         .type = UTIL_OPTIONS_TYPE_STR,
         .default_value.str = NULL,
     },
     {
         .name = X2HOOK_OPTIONS_STR_PATCH_PIUIO_EMU_LIB,
-        .description = "Path to library implementing the piuio api for piuio emulation",
+        .description =
+            "Path to library implementing the piuio api for piuio emulation",
         .param = 'p',
         .type = UTIL_OPTIONS_TYPE_STR,
         .default_value.str = NULL,
@@ -143,41 +151,53 @@ static const struct util_options_defs x2hook_options_defs = {
     .ndefs = lengthof(x2hook_options_def)
 };
 
-bool x2hook_options_init(int argc, char** argv, struct x2hook_options* options)
+bool x2hook_options_init(int argc, char **argv, struct x2hook_options *options)
 {
-    log_assert(argv);
-    log_assert(options);
+  log_assert(argv);
+  log_assert(options);
 
-    struct util_options_opts* options_opt;
+  struct util_options_opts *options_opt;
 
-    util_options_init(argc, argv);
-    options_opt = util_options_get(&x2hook_options_defs);
+  util_options_init(argc, argv);
+  options_opt = util_options_get(&x2hook_options_defs);
 
-    if (!options_opt) {
-        return false;
-    }
+  if (!options_opt) {
+    return false;
+  }
 
-    options->game.force_unlock = util_options_get_bool(options_opt, X2HOOK_OPTIONS_STR_GAME_FORCE_UNLOCK);
-    options->game.settings = util_options_get_str(options_opt, X2HOOK_OPTIONS_STR_GAME_SETTINGS);
-    options->patch.gfx.windowed = util_options_get_bool(options_opt, X2HOOK_OPTIONS_STR_PATCH_GFX_WINDOWED);
-    options->patch.hook_mon.file = util_options_get_bool(options_opt, X2HOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE);
-    options->patch.hook_mon.fs = util_options_get_bool(options_opt, X2HOOK_OPTIONS_STR_PATCH_HOOK_MON_FS);
-    options->patch.hook_mon.io = util_options_get_bool(options_opt, X2HOOK_OPTIONS_STR_PATCH_HOOK_MON_IO);
-    options->patch.hook_mon.open = util_options_get_bool(options_opt, X2HOOK_OPTIONS_STR_PATCH_HOOK_MON_OPEN);
-    options->patch.hook_mon.usb = util_options_get_bool(options_opt, X2HOOK_OPTIONS_STR_PATCH_HOOK_MON_USB);
-    options->patch.main_loop.disable_built_in_inputs = util_options_get_bool(options_opt,
-        X2HOOK_OPTIONS_STR_PATCH_HOOK_MAIN_LOOP_DISABLE_BUILT_IN_INPUTS);
-    options->patch.main_loop.x11_input_handler_api_lib =
-        util_options_get_str(options_opt, X2HOOK_OPTIONS_STR_PATCH_HOOK_MAIN_LOOP_X11_INPUT_HANDLER);
-    options->patch.piuio.api_lib = util_options_get_str(options_opt, X2HOOK_OPTIONS_STR_PATCH_PIUIO_EMU_LIB);
-    options->patch.piuio.exit_test_serv =
-        util_options_get_bool(options_opt, X2HOOK_OPTIONS_STR_PATCH_PIUIO_EXIT_TEST_SERV);
-    options->patch.sound.device = util_options_get_str(options_opt, X2HOOK_OPTIONS_STR_PATCH_SOUND_DEVICE);
-    options->patch.sigsegv.halt_on_segv =
-        util_options_get_bool(options_opt, X2HOOK_OPTIONS_STR_PATCH_SIGSEGV_HALT_ON_SEGV);
-    options->log.file = util_options_get_str(options_opt, X2HOOK_OPTIONS_STR_PATCH_UTIL_LOG_FILE);
-    options->log.level =
-        (enum util_log_level) util_options_get_int(options_opt, X2HOOK_OPTIONS_STR_PATCH_UTIL_LOG_LEVEL);
+  options->game.force_unlock =
+      util_options_get_bool(options_opt, X2HOOK_OPTIONS_STR_GAME_FORCE_UNLOCK);
+  options->game.settings =
+      util_options_get_str(options_opt, X2HOOK_OPTIONS_STR_GAME_SETTINGS);
+  options->patch.gfx.windowed =
+      util_options_get_bool(options_opt, X2HOOK_OPTIONS_STR_PATCH_GFX_WINDOWED);
+  options->patch.hook_mon.file = util_options_get_bool(
+      options_opt, X2HOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE);
+  options->patch.hook_mon.fs =
+      util_options_get_bool(options_opt, X2HOOK_OPTIONS_STR_PATCH_HOOK_MON_FS);
+  options->patch.hook_mon.io =
+      util_options_get_bool(options_opt, X2HOOK_OPTIONS_STR_PATCH_HOOK_MON_IO);
+  options->patch.hook_mon.open = util_options_get_bool(
+      options_opt, X2HOOK_OPTIONS_STR_PATCH_HOOK_MON_OPEN);
+  options->patch.hook_mon.usb =
+      util_options_get_bool(options_opt, X2HOOK_OPTIONS_STR_PATCH_HOOK_MON_USB);
+  options->patch.main_loop.disable_built_in_inputs = util_options_get_bool(
+      options_opt,
+      X2HOOK_OPTIONS_STR_PATCH_HOOK_MAIN_LOOP_DISABLE_BUILT_IN_INPUTS);
+  options->patch.main_loop.x11_input_handler_api_lib = util_options_get_str(
+      options_opt, X2HOOK_OPTIONS_STR_PATCH_HOOK_MAIN_LOOP_X11_INPUT_HANDLER);
+  options->patch.piuio.api_lib =
+      util_options_get_str(options_opt, X2HOOK_OPTIONS_STR_PATCH_PIUIO_EMU_LIB);
+  options->patch.piuio.exit_test_serv = util_options_get_bool(
+      options_opt, X2HOOK_OPTIONS_STR_PATCH_PIUIO_EXIT_TEST_SERV);
+  options->patch.sound.device =
+      util_options_get_str(options_opt, X2HOOK_OPTIONS_STR_PATCH_SOUND_DEVICE);
+  options->patch.sigsegv.halt_on_segv = util_options_get_bool(
+      options_opt, X2HOOK_OPTIONS_STR_PATCH_SIGSEGV_HALT_ON_SEGV);
+  options->log.file =
+      util_options_get_str(options_opt, X2HOOK_OPTIONS_STR_PATCH_UTIL_LOG_FILE);
+  options->log.level = (enum util_log_level) util_options_get_int(
+      options_opt, X2HOOK_OPTIONS_STR_PATCH_UTIL_LOG_LEVEL);
 
-    return true;
+  return true;
 }

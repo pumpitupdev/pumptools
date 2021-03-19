@@ -6,17 +6,13 @@
 // Copy-pasted with minor tweaks from: https://github.com/littlstar/b64.c
 
 static const char b64_table[] = {
-  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H',
-  'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P',
-  'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X',
-  'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f',
-  'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n',
-  'o', 'p', 'q', 'r', 's', 't', 'u', 'v',
-  'w', 'x', 'y', 'z', '0', '1', '2', '3',
-  '4', '5', '6', '7', '8', '9', '+', '/'
-};
+    'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M',
+    'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+    'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm',
+    'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+    '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '+', '/'};
 
-uint8_t* util_base64_encode(const uint8_t* src, size_t len, size_t* out_len)
+uint8_t *util_base64_encode(const uint8_t *src, size_t len, size_t *out_len)
 {
   int i = 0;
   int j = 0;
@@ -75,7 +71,7 @@ uint8_t* util_base64_encode(const uint8_t* src, size_t len, size_t* out_len)
   return enc;
 }
 
-uint8_t* util_base64_decode(const uint8_t* src, size_t len, size_t* out_len)
+uint8_t *util_base64_decode(const uint8_t *src, size_t len, size_t *out_len)
 {
   int i = 0;
   int j = 0;
@@ -89,10 +85,10 @@ uint8_t* util_base64_decode(const uint8_t* src, size_t len, size_t* out_len)
 
   while (len--) {
     if ('=' == src[j]) {
-        break;
+      break;
     }
     if (!(isalnum(src[j]) || '+' == src[j] || '/' == src[j])) {
-        break;
+      break;
     }
 
     tmp[i++] = src[j++];
@@ -113,7 +109,7 @@ uint8_t* util_base64_decode(const uint8_t* src, size_t len, size_t* out_len)
 
       dec = (unsigned char *) util_xrealloc(dec, size + 3);
 
-      if (dec != NULL){
+      if (dec != NULL) {
         for (i = 0; i < 3; ++i) {
           dec[size++] = buf[i];
         }
@@ -131,21 +127,21 @@ uint8_t* util_base64_decode(const uint8_t* src, size_t len, size_t* out_len)
     }
 
     for (j = 0; j < 4; ++j) {
-        for (l = 0; l < 64; ++l) {
-          if (tmp[j] == b64_table[l]) {
-            tmp[j] = l;
-            break;
-          }
+      for (l = 0; l < 64; ++l) {
+        if (tmp[j] == b64_table[l]) {
+          tmp[j] = l;
+          break;
         }
+      }
     }
 
     buf[0] = (tmp[0] << 2) + ((tmp[1] & 0x30) >> 4);
     buf[1] = ((tmp[1] & 0xf) << 4) + ((tmp[2] & 0x3c) >> 2);
     buf[2] = ((tmp[2] & 0x3) << 6) + tmp[3];
 
-    dec = (unsigned char *)util_xrealloc(dec, size + (i - 1));
+    dec = (unsigned char *) util_xrealloc(dec, size + (i - 1));
 
-    if (dec != NULL){
+    if (dec != NULL) {
       for (j = 0; (j < i - 1); ++j) {
         dec[size++] = buf[j];
       }
@@ -154,9 +150,9 @@ uint8_t* util_base64_decode(const uint8_t* src, size_t len, size_t* out_len)
     }
   }
 
-  dec = (unsigned char *)util_xrealloc(dec, size + 1);
+  dec = (unsigned char *) util_xrealloc(dec, size + 1);
 
-  if (dec != NULL){
+  if (dec != NULL) {
     dec[size] = '\0';
   } else {
     return NULL;

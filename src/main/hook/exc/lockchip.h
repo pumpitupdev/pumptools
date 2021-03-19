@@ -14,6 +14,6 @@
  *
  * @param patch_table Patch table with memory addresses
  */
-void exchook_lockchip_init(const struct exchook_mempatch_table* patch_table);
+void exchook_lockchip_init(const struct exchook_mempatch_table *patch_table);
 
 #endif

@@ -14,14 +14,19 @@
  * Virtual device endpoint
  */
 struct cnh_usb_emu_virtdev_ep {
-    uint16_t pid;
-    uint16_t vid;
-    bool (*enumerate)(bool real_exists);
-    enum cnh_result (*open)(void);
-    enum cnh_result (*reset)(void);
-    enum cnh_result (*control_msg)(int request_type, int request, int value, int index, struct cnh_iobuf* buffer,
-        int timeout);
-    void (*close)(void);
+  uint16_t pid;
+  uint16_t vid;
+  bool (*enumerate)(bool real_exists);
+  enum cnh_result (*open)(void);
+  enum cnh_result (*reset)(void);
+  enum cnh_result (*control_msg)(
+      int request_type,
+      int request,
+      int value,
+      int index,
+      struct cnh_iobuf *buffer,
+      int timeout);
+  void (*close)(void);
 };
 
 /**
@@ -29,7 +34,7 @@ struct cnh_usb_emu_virtdev_ep {
  *
  * @param virtdevep Virtual device endpoint to add
  */
-void cnh_usb_emu_add_virtdevep(const struct cnh_usb_emu_virtdev_ep* virtdevep);
+void cnh_usb_emu_add_virtdevep(const struct cnh_usb_emu_virtdev_ep *virtdevep);
 
 /**
  * Hook function to add to the hook module for emulating usb devices

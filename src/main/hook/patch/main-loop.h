@@ -36,24 +36,31 @@
 #ifndef PATCH_MAIN_LOOP_H
 #define PATCH_MAIN_LOOP_H
 
-#include <stdbool.h>
 #include <X11/Xutil.h>
+#include <stdbool.h>
 
 /**
  * Initialize the patch module
  *
- * @param fix_sigalarm_main_loop True to enable the sigalarm thread fix (doc see above)
- * @param disable_built_in_inputs Disable the built in keyboard inputs for test (F1), service (F2) and clear (F3)
- * @param disable_mk3_linux_port_inputs Disable the built-in keyboard inputs on the MK3 linux ports
+ * @param fix_sigalarm_main_loop True to enable the sigalarm thread fix (doc see
+ * above)
+ * @param disable_built_in_inputs Disable the built in keyboard inputs for test
+ * (F1), service (F2) and clear (F3)
+ * @param disable_mk3_linux_port_inputs Disable the built-in keyboard inputs on
+ * the MK3 linux ports
  */
-void patch_main_loop_init(bool fix_sigalarm_main_loop, bool disable_built_in_inputs,
+void patch_main_loop_init(
+    bool fix_sigalarm_main_loop,
+    bool disable_built_in_inputs,
     bool disable_mk3_linux_port_inputs);
 
 /**
- * Register a handler (multiple possible) to receive X11 input events, e.g. key pressed, released
+ * Register a handler (multiple possible) to receive X11 input events, e.g. key
+ * pressed, released
  *
- * @param lib_with_handler_impl Path to a library implementing the x11-input-handler API
+ * @param lib_with_handler_impl Path to a library implementing the
+ * x11-input-handler API
  */
-void patch_main_loop_add_x11_input_handler(const char* lib_with_handler_impl);
+void patch_main_loop_add_x11_input_handler(const char *lib_with_handler_impl);
 
 #endif

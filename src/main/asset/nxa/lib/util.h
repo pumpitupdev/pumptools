@@ -7,15 +7,19 @@
 #include "usb-save.h"
 
 // load from file and decrypt, returns decrypted struct
-struct asset_nxa_usb_rank* asset_nxa_usb_rank_load_from_file(const char* path, bool encrypted);
+struct asset_nxa_usb_rank *
+asset_nxa_usb_rank_load_from_file(const char *path, bool encrypted);
 
 // takes decrypted rank data, encrypts it and writes it to file
-bool asset_nxa_usb_rank_save_to_file(const char* path, const struct asset_nxa_usb_rank* rank, bool encrypt);
+bool asset_nxa_usb_rank_save_to_file(
+    const char *path, const struct asset_nxa_usb_rank *rank, bool encrypt);
 
 // load from file and decrypt, returns decrypted struct
-struct asset_nxa_usb_save* asset_nxa_usb_save_load_from_file(const char* path, bool encrypted);
+struct asset_nxa_usb_save *
+asset_nxa_usb_save_load_from_file(const char *path, bool encrypted);
 
 // takes decrypted save data, encrypts it and writes it to file
-bool asset_nxa_usb_save_save_to_file(const char* path, const struct asset_nxa_usb_save* save, bool encrypt);
+bool asset_nxa_usb_save_save_to_file(
+    const char *path, const struct asset_nxa_usb_save *save, bool encrypt);
 
 #endif

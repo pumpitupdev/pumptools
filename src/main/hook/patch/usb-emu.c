@@ -6,7 +6,7 @@
 
 void patch_usb_emu_init()
 {
-    cnh_usbhook_push_handler(&cnh_usb_emu);
+  cnh_usbhook_push_handler(&cnh_usb_emu);
 
-    log_info("Initialized");
+  log_info("Initialized");
 }

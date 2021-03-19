@@ -7,7 +7,8 @@
 #include "capnhook/hook/fshook.h"
 
 /**
- * Hook function to add to the hook module for monitoring file system related calls
+ * Hook function to add to the hook module for monitoring file system related
+ * calls
  *
  * @param irp I/O request package of hook module received
  * @return Result of operation

@@ -10,6 +10,6 @@
  * @param key_data Pointer to loaded key data (dog attributes, key table)
  * @param len Length of the buffer
  */
-void patch_microdog34_init(const uint8_t* key_data, size_t len);
+void patch_microdog34_init(const uint8_t *key_data, size_t len);
 
 #endif

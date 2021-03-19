@@ -48,15 +48,16 @@ static const struct exchook_mempatch_table _exchook_mempatch_table[] = {
     },
 };
 
-const struct exchook_mempatch_table* exchook_mempatch_get_table(const char* version)
+const struct exchook_mempatch_table *
+exchook_mempatch_get_table(const char *version)
 {
-    size_t entries = lengthof(_exchook_mempatch_table);
+  size_t entries = lengthof(_exchook_mempatch_table);
 
-    for (uint32_t i = 0; i < entries; i++) {
-        if (!strcmp(_exchook_mempatch_table[i].version, version)) {
-            return &_exchook_mempatch_table[i];
-        }
+  for (uint32_t i = 0; i < entries; i++) {
+    if (!strcmp(_exchook_mempatch_table[i].version, version)) {
+      return &_exchook_mempatch_table[i];
     }
+  }
 
-    return NULL;
+  return NULL;
 }

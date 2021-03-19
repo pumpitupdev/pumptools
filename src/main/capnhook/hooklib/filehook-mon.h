@@ -1,5 +1,6 @@
 /**
- * Hook implementation to monitor file related calls, e.g. fopen, fread, fwrite etc.
+ * Hook implementation to monitor file related calls, e.g. fopen, fread, fwrite
+ * etc.
  */
 #ifndef CAPNHOOK_FILEHOOK_MON_H
 #define CAPNHOOK_FILEHOOK_MON_H

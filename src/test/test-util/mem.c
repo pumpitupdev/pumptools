@@ -7,37 +7,37 @@
 #include "util/log.h"
 #include "util/mem.h"
 
-static void* _test_util_mem_xmalloc(size_t nbytes)
+static void *_test_util_mem_xmalloc(size_t nbytes)
 {
-    void* ptr;
+  void *ptr;
 
-    ptr = test_malloc(nbytes);
+  ptr = test_malloc(nbytes);
 
-    log_debug("malloc(%d): %p", nbytes, ptr);
+  log_debug("malloc(%d): %p", nbytes, ptr);
 
-    return ptr;
+  return ptr;
 }
 
-static void* _test_util_mem_xrealloc(void* mem, size_t nbytes)
+static void *_test_util_mem_xrealloc(void *mem, size_t nbytes)
 {
-    void* ptr;
+  void *ptr;
 
-    ptr = test_realloc(mem, nbytes);
+  ptr = test_realloc(mem, nbytes);
 
-    log_debug("realloc(%p %d): %p", mem, nbytes, ptr);
+  log_debug("realloc(%p %d): %p", mem, nbytes, ptr);
 
-    return ptr;
+  return ptr;
 }
 
-static void _test_util_mem_xfree(void** mem)
+static void _test_util_mem_xfree(void **mem)
 {
-    if (*mem != NULL) {
-        log_debug("free(%p %p)", mem, *mem);
-        test_free(*mem);
-        *mem = NULL;
-    } else {
-        log_warn("free(%p NULL)", mem);
-    }
+  if (*mem != NULL) {
+    log_debug("free(%p %p)", mem, *mem);
+    test_free(*mem);
+    *mem = NULL;
+  } else {
+    log_warn("free(%p NULL)", mem);
+  }
 }
 
 static const struct util_mem_interface _test_util_mem_interface_test = {
@@ -48,5 +48,5 @@ static const struct util_mem_interface _test_util_mem_interface_test = {
 
 void test_util_mem_install_mem_interface()
 {
-    util_mem_init(&_test_util_mem_interface_test);
+  util_mem_init(&_test_util_mem_interface_test);
 }

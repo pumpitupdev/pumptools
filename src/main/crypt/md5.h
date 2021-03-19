@@ -11,6 +11,6 @@
  * @param in Input buffer to hash
  * @param nbytes Number of bytes of input buffer to process
  */
-void crypt_md5_hash(uint8_t* out, const uint8_t* in, size_t nbytes);
+void crypt_md5_hash(uint8_t *out, const uint8_t *in, size_t nbytes);
 
 #endif
