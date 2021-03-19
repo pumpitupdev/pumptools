@@ -196,6 +196,10 @@ static void nx2hook_patch_gfx_init(struct nx2hook_options *options)
   log_assert(options);
 
   patch_gfx_init();
+
+  if (options->patch.gfx.scaling_mode != PATCH_GFX_SCALE_MODE_INVALID) {
+    patch_gfx_scale(options->patch.gfx.scaling_mode);
+  }
 }
 
 static void nx2hook_patch_main_loop_init(struct nx2hook_options *options)
