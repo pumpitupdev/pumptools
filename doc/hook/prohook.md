@@ -9,6 +9,8 @@ All known versions supported if no-dongle patched at this time.
 Make sure to read the different methods of dependency resolution available in the [main hook readme file](../hook.md),
 first.
 
+Note: Game is 32-bit, so you need to install the 32-bit versions of the dependencies!
+
 The following **direct** dependencies (cmd: `readelf -d piu`) are required:
 * libXtst.so.6
 * libXrandr.so.2
@@ -33,6 +35,9 @@ As for method 1, when using Ubuntu, the dependencies can be found in the followi
 * libusb-0.1-4
 * libasound2
 * ffmpeg
+
+Further indirect dependencies are needed but should be taken care of automatically when using a package manager to
+install the direct dependencies.
 
 ## Data setup
 A clean set of data won't work here. You need the decrypted data zip files and a patched executable that uses plain zip

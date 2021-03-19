@@ -9,6 +9,8 @@ All known versions supported.
 Make sure to read the different methods of dependency resolution available in the [main hook readme file](../hook.md),
 first.
 
+Note: Game is 32-bit, so you need to install the 32-bit versions of the dependencies!
+
 The following **direct** dependencies (cmd: `readelf -d piu`) are required:
 * librt.so.1
 * liblua50.so.5.0
@@ -33,6 +35,9 @@ As for method 1, when using Ubuntu, the dependencies can be found in the followi
 * zlib1g
 * libusb-0.1-4
 * libasound2
+
+Further indirect dependencies are needed but should be taken care of automatically when using a package manager to
+install the direct dependencies.
 
 ## Data setup
 In additional to the [general information applying to **all** hooks](../hook.md#data-setup), this game requires all

@@ -23,6 +23,11 @@ Check each of the dedicated hook readmes which games and versions are supported.
 Pumptool's hook libraries aim for having no dependencies other than what is already required by the
 different games to run.
 
+Since all games available so far are compiled as 32-bit binaries, naturally, it requires you to install
+the 32-bit versions of the dependencies (if you are not running a 32-bit distributed).
+Note the `:i386` postfix for packages in the command further below. This is required if you are on a 64-bit
+distribution.
+
 However, there are some exceptions that require additional libraries in order to allow the following
 features to work correctly:
 * Hook libraries, e.g. `nx2hook` that support network features, e.g. usb profiles with pumpnet
