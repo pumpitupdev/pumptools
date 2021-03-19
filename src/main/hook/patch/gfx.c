@@ -27,8 +27,6 @@ typedef Display *(*XOpenDisplay_t)(const char *display_name);
 typedef XVisualInfo *(*glXChooseVisual_t)(
     Display *dpy, int screen, int *attribList);
 
-static bool patch_gfx_force_window = false;
-
 static bool patch_gfx_initialized;
 static XCreateWindow_t patch_gfx_real_XCreateWindow;
 static XOpenDisplay_t patch_gfx_real_XOpenDisplay;
@@ -82,11 +80,6 @@ Window XCreateWindow(
       /* enables usage of non nvidia cards and newer nvidia models */
       valuemask = 0x280A;
     }
-  }
-
-  if (patch_gfx_force_window) {
-    log_info("Forcing window mode");
-    attributes->override_redirect = 0;
   }
 
   return patch_gfx_real_XCreateWindow(
@@ -163,9 +156,4 @@ void patch_gfx_init()
 {
   patch_gfx_initialized = true;
   log_info("Initialized");
-}
-
-void patch_gfx_force_window_mode()
-{
-  patch_gfx_force_window = true;
 }
