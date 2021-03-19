@@ -14,6 +14,10 @@
 
 #include "util/log.h"
 
+// Enable this to get a detailed "call trace" of reads/writes and updates
+// for debugging purpose
+// #define PATCH_PIUIO_CALL_TRACE
+
 static bool _patch_piuio_enumerate(bool real_exists);
 static enum cnh_result _patch_piuio_open(void);
 static enum cnh_result _patch_piuio_reset(void);
@@ -21,8 +25,9 @@ static enum cnh_result _patch_piuio_control_msg(int request_type, int request, i
         struct cnh_iobuf* buffer, int timeout);
 static void _patch_piuio_close(void);
 
-static enum cnh_result _patch_piuio_process_inputs(struct cnh_iobuf* buffer);
-static enum cnh_result _patch_piuio_process_outputs(struct cnh_iobuf* buffer);
+static void _patch_piuio_read_inputs_to_buffer(struct cnh_iobuf* buffer);
+static void _patch_piuio_read_outputs_from_buffer(struct cnh_iobuf* buffer);
+static enum ptapi_io_piuio_sensor_group _patch_piuio_get_sensor_group_from_buffer(struct cnh_iobuf* buffer);
 
 static const struct cnh_usb_emu_virtdev_ep _patch_piuio_virtdev = {
     .pid = PIUIO_DRV_PID,
@@ -101,20 +106,73 @@ static enum cnh_result _patch_piuio_reset(void)
 static enum cnh_result _patch_piuio_control_msg(int request_type, int request, int value, int index,
         struct cnh_iobuf* buffer, int timeout)
 {
+    /**
+     * Expected call pattern for a full game state update on a single frame (when done synchronously)
+     *
+     * CTRL_OUT: light data + sensor 0
+     * CTRL_IN: input data of sensor 0
+     * CTRL_OUT: light data + sensor 1
+     * CTRL_IN: input data of sensor 1
+     * CTRL_OUT: light data + sensor 2
+     * CTRL_IN: input data of sensor 2
+     * CTRL_OUT: light data + sensor 3
+     * CTRL_IN: input data of sensor 3
+     *
+     * Reduce call overhead to pumptools's piuio API for recv and send polling any potential implementation
+     */
     if (request_type == PIUIO_DRV_USB_CTRL_TYPE_IN && request == PIUIO_DRV_USB_CTRL_REQUEST) {
         if (buffer->nbytes != PIUIO_DRV_BUFFER_SIZE) {
             log_error("Invalid buffer size for ctrl in: %d", buffer->nbytes);
             return CNH_RESULT_INVALID_PARAMETER;
         }
 
-        return _patch_piuio_process_inputs(buffer);
+#ifdef PATCH_PIUIO_CALL_TRACE
+        log_debug("Read");
+#endif
+
+        // Only read buffered inputs, no need to trigger another update since
+        // this is taken of by the cycle start
+
+        _patch_piuio_read_inputs_to_buffer(buffer);
+
+        return CNH_RESULT_SUCCESS;
     } else if (request_type == PIUIO_DRV_USB_CTRL_TYPE_OUT && request == PIUIO_DRV_USB_CTRL_REQUEST) {
         if (buffer->nbytes != PIUIO_DRV_BUFFER_SIZE) {
             log_error("Invalid buffer size for ctrl out: %d", buffer->nbytes);
             return CNH_RESULT_INVALID_PARAMETER;
         }
 
-        return _patch_piuio_process_outputs(buffer);
+        _patch_piuio_read_outputs_from_buffer(buffer);
+
+        // Sync properly with sensor cycling by application
+        // Note: Naturally, the update code below will break if sensors are not cycled
+        // as expected
+        _patch_piuio_sensor_group = _patch_piuio_get_sensor_group_from_buffer(buffer);
+
+#ifdef PATCH_PIUIO_CALL_TRACE
+        log_debug("Write: %d", _patch_piuio_sensor_group);
+#endif
+
+        // Trigger exactly ONE full update cycle on the API implementation on
+        // every first call of the whole update cycle
+
+        if (_patch_piuio_sensor_group == 0) {
+#ifdef PATCH_PIUIO_CALL_TRACE
+            log_debug("Update API");
+#endif
+
+            if (!_patch_piuio_api.send()) {
+                log_error("Sending outputs on api piuio %s failed", _patch_piuio_api.ident());
+                return CNH_RESULT_OTHER_ERROR;
+            }
+
+            if (!_patch_piuio_api.recv()) {
+                log_error("Receiving inputs on api piuio %s failed", _patch_piuio_api.ident());
+                return CNH_RESULT_OTHER_ERROR;
+            }
+        }
+
+        return CNH_RESULT_SUCCESS;
     } else if (request_type == 0 && request == 0) {
         // ITG 2/PIU Pro kernel hack, can be handled by piuio-khack module
         // Safety net for visibility if the module is missing
@@ -134,16 +192,11 @@ static void _patch_piuio_close(void)
     _patch_piuio_api.close();
 }
 
-static enum cnh_result _patch_piuio_process_inputs(struct cnh_iobuf* buffer)
+static void _patch_piuio_read_inputs_to_buffer(struct cnh_iobuf* buffer)
 {
     struct ptapi_io_piuio_pad_inputs p1_pad_in;
     struct ptapi_io_piuio_pad_inputs p2_pad_in;
     struct ptapi_io_piuio_sys_inputs sys_in;
-
-    if (!_patch_piuio_api.recv()) {
-        log_error("Receiving inputs on api piuio %s failed", _patch_piuio_api.ident());
-        return CNH_RESULT_OTHER_ERROR;
-    }
 
     memset(&p1_pad_in, 0, sizeof(struct ptapi_io_piuio_pad_inputs));
     memset(&p2_pad_in, 0, sizeof(struct ptapi_io_piuio_pad_inputs));
@@ -201,71 +254,32 @@ static enum cnh_result _patch_piuio_process_inputs(struct cnh_iobuf* buffer)
     /* Player 1 */
     buffer->bytes[0] = 0;
 
-    if (p1_pad_in.lu) {
-        buffer->bytes[0] |= (1 << 0);
-    }
-
-    if (p1_pad_in.ru) {
-        buffer->bytes[0] |= (1 << 1);
-    }
-
-    if (p1_pad_in.cn) {
-        buffer->bytes[0] |= (1 << 2);
-    }
-
-    if (p1_pad_in.ld) {
-        buffer->bytes[0] |= (1 << 3);
-    }
-
-    if (p1_pad_in.rd) {
-        buffer->bytes[0] |= (1 << 4);
-    }
+    buffer->bytes[0] |= ((p1_pad_in.lu ? 1 : 0) << 0);
+    buffer->bytes[0] |= ((p1_pad_in.ru ? 1 : 0) << 1);
+    buffer->bytes[0] |= ((p1_pad_in.cn ? 1 : 0) << 2);
+    buffer->bytes[0] |= ((p1_pad_in.ld ? 1 : 0) << 3);
+    buffer->bytes[0] |= ((p1_pad_in.rd ? 1 : 0) << 4);
 
     buffer->bytes[0] ^= 0xFF;
 
+    /* Player 2 */
     buffer->bytes[2] = 0;
 
-    /* Player 2 */
-    if (p2_pad_in.lu) {
-        buffer->bytes[2] |= (1 << 0);
-    }
-
-    if (p2_pad_in.ru) {
-        buffer->bytes[2] |= (1 << 1);
-    }
-
-    if (p2_pad_in.cn) {
-        buffer->bytes[2] |= (1 << 2);
-    }
-
-    if (p2_pad_in.ld) {
-        buffer->bytes[2] |= (1 << 3);
-    }
-
-    if (p2_pad_in.rd) {
-        buffer->bytes[2] |= (1 << 4);
-    }
+    buffer->bytes[2] |= ((p1_pad_in.lu ? 1 : 0) << 0);
+    buffer->bytes[2] |= ((p1_pad_in.ru ? 1 : 0) << 1);
+    buffer->bytes[2] |= ((p1_pad_in.cn ? 1 : 0) << 2);
+    buffer->bytes[2] |= ((p1_pad_in.ld ? 1 : 0) << 3);
+    buffer->bytes[2] |= ((p1_pad_in.rd ? 1 : 0) << 4);
 
     buffer->bytes[2] ^= 0xFF;
 
+    /* Sys */
     buffer->bytes[1] = 0;
 
-    /* Sys */
-    if (sys_in.test) {
-        buffer->bytes[1] |= (1 << 1);
-    }
-
-    if (sys_in.service) {
-        buffer->bytes[1] |= (1 << 6);
-    }
-
-    if (sys_in.clear) {
-        buffer->bytes[1] |= (1 << 7);
-    }
-
-    if (sys_in.coin) {
-        buffer->bytes[1] |= (1 << 2);
-    }
+    buffer->bytes[1] |= ((sys_in.test ? 1 : 0) << 1);
+    buffer->bytes[1] |= ((sys_in.service ? 1 : 0) << 6);
+    buffer->bytes[1] |= ((sys_in.clear ? 1 : 0) << 7);
+    buffer->bytes[1] |= ((sys_in.coin ? 1 : 0) << 2);
 
     buffer->bytes[1] ^= 0xFF;
 
@@ -278,19 +292,13 @@ static enum cnh_result _patch_piuio_process_inputs(struct cnh_iobuf* buffer)
     }
 
     buffer->pos = PIUIO_DRV_BUFFER_SIZE;
-
-    return CNH_RESULT_SUCCESS;
 }
 
-static enum cnh_result _patch_piuio_process_outputs(struct cnh_iobuf* buffer)
+static void _patch_piuio_read_outputs_from_buffer(struct cnh_iobuf* buffer)
 {
     struct ptapi_io_piuio_pad_outputs p1_pad_out;
     struct ptapi_io_piuio_pad_outputs p2_pad_out;
     struct ptapi_io_piuio_cab_outputs cab_out;
-
-    memset(&p1_pad_out, 0, sizeof(struct ptapi_io_piuio_pad_outputs));
-    memset(&p2_pad_out, 0, sizeof(struct ptapi_io_piuio_pad_outputs));
-    memset(&cab_out, 0, sizeof(struct ptapi_io_piuio_cab_outputs));
 
     /*
 	   byte 0:
@@ -336,84 +344,30 @@ static enum cnh_result _patch_piuio_process_outputs(struct cnh_iobuf* buffer)
 	   bytes 4 - 7 dummy
     */
 
-    _patch_piuio_sensor_group = (enum ptapi_io_piuio_sensor_group) (buffer->bytes[0] & 0x03);
+    p1_pad_out.lu = (buffer->bytes[0] & (1 << 2)) > 0;
+    p1_pad_out.ru = (buffer->bytes[0] & (1 << 3)) > 0;
+    p1_pad_out.cn = (buffer->bytes[0] & (1 << 4)) > 0;
+    p1_pad_out.ld = (buffer->bytes[0] & (1 << 5)) > 0;
+    p1_pad_out.rd = (buffer->bytes[0] & (1 << 6)) > 0;
 
-    /* Player 1 */
+    p2_pad_out.lu = (buffer->bytes[2] & (1 << 2)) > 0;
+    p2_pad_out.ru = (buffer->bytes[2] & (1 << 3)) > 0;
+    p2_pad_out.cn = (buffer->bytes[2] & (1 << 4)) > 0;
+    p2_pad_out.ld = (buffer->bytes[2] & (1 << 5)) > 0;
+    p2_pad_out.rd = (buffer->bytes[2] & (1 << 6)) > 0;
 
-    if (buffer->bytes[0] & (1 << 2)) {
-        p1_pad_out.lu = true;
-    }
-
-    if (buffer->bytes[0] & (1 << 3)) {
-        p1_pad_out.ru = true;
-    }
-
-    if (buffer->bytes[0] & (1 << 4)) {
-        p1_pad_out.cn = true;
-    }
-
-    if (buffer->bytes[0] & (1 << 5)) {
-        p1_pad_out.ld = true;
-    }
-
-    if (buffer->bytes[0] & (1 << 6)) {
-        p1_pad_out.rd = true;
-    }
-
-    /* Player 2 */
-
-    if (buffer->bytes[2] & (1 << 2)) {
-        p2_pad_out.lu = true;
-    }
-
-    if (buffer->bytes[2] & (1 << 3)) {
-        p2_pad_out.ru = true;
-    }
-
-    if (buffer->bytes[2] & (1 << 4)) {
-        p2_pad_out.cn = true;
-    }
-
-    if (buffer->bytes[2] & (1 << 5)) {
-        p2_pad_out.ld = true;
-    }
-
-    if (buffer->bytes[2] & (1 << 6)) {
-        p2_pad_out.rd = true;
-    }
-
-    /* Cabinet */
-
-    if (buffer->bytes[1] & (1 << 2)) {
-        cab_out.bass = true;
-    }
-
-    if (buffer->bytes[2] & (1 << 7)) {
-        cab_out.halo_r2 = true;
-    }
-
-    if (buffer->bytes[3] & (1 << 0)) {
-        cab_out.halo_r1 = true;
-    }
-
-    if (buffer->bytes[3] & (1 << 1)) {
-        cab_out.halo_l2 = true;
-    }
-
-    if (buffer->bytes[3] & (1 << 2)) {
-        cab_out.halo_l1 = true;
-    }
+    cab_out.bass = (buffer->bytes[1] & (1 << 2)) > 0;
+    cab_out.halo_r2 = (buffer->bytes[2] & (1 << 7)) > 0;
+    cab_out.halo_r1 = (buffer->bytes[3] & (1 << 0)) > 0;
+    cab_out.halo_l2 = (buffer->bytes[3] & (1 << 1)) > 0;
+    cab_out.halo_l1 = (buffer->bytes[3] & (1 << 2)) > 0;
 
     _patch_piuio_api.set_output_pad(0, &p1_pad_out);
     _patch_piuio_api.set_output_pad(1, &p2_pad_out);
     _patch_piuio_api.set_output_cab(&cab_out);
+}
 
-    if (!_patch_piuio_api.send()) {
-        log_error("Sending outputs on api piuio %s failed", _patch_piuio_api.ident());
-        return CNH_RESULT_OTHER_ERROR;
-    }
-
-    buffer->pos = PIUIO_DRV_BUFFER_SIZE;
-
-    return CNH_RESULT_SUCCESS;
+static enum ptapi_io_piuio_sensor_group _patch_piuio_get_sensor_group_from_buffer(struct cnh_iobuf* buffer)
+{
+    return (enum ptapi_io_piuio_sensor_group) (buffer->bytes[0] & 0x03);
 }
