@@ -228,3 +228,31 @@ aplay -q /usr/share/sounds/alsa/Front_Center.wav
 
 If after a fresh boot the sound plays after the second attempt, your setup suffers from this issue.
 Simply putting the above command once in a boot script will make sure the sound device is activated.
+
+### How do I enable fullscreen/window mode?
+It depends on the game. All MK3 linux ports have a window/fullscreen option that actually works. For games of the PRO
+series, you have to [tweak game specific configuration files](prohook.md#windowfullscreen-mode). All other classic PIU
+games depend on how you have your current Linux environment/X-server set, up. On a desktop environment, these games will
+always start in window mode.
+
+In general, there is no actual full-screen option on Linux like you have on Windows with DirectX. Fullscreen on Linux
+means that you switch resolution of whatever X session you have currently running and fill the screen with the view
+of your application.
+
+The best you can do to go fullscreen on desktop is exactly the above. This can be achieved like follows:
+
+```shell script
+sudo xrandr --output HDMI-0 --mode 640x480
+sudo ./piueb run
+# Or whatever is your default resolution on your monitor
+sudo xrandr --output HDMI-0 --mode 1024x768
+```
+
+Otherwise, it is recommended to setup a dedicated x-session using `startx`, e.g. `startx ./piueb run` and just have
+only the game run in that session. A good reference for this might be the various scripts included in
+[pumpos](https://dev.s-ul.net/hackitup/pumpos/-/tree/master/dist/piu/base/pumpos/data/00_bootstrap).
+
+If you have a multi-monitor setup, things are getting quite complicated. Therefore, we are not covering this in here.
+
+Also note that if you want the game to render at a higher resolution than its defined one, e.g. 640x480, this is not
+possible right now. The output you get from the frame buffer will always be its native resolution.
