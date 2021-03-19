@@ -21,6 +21,7 @@ set(SOURCE_FILES
         ${SRC}/piubtn.c
         ${SRC}/piuio.c
         ${SRC}/piuio-exit.c
+        ${SRC}/piuio-khack.c
         ${SRC}/ram-wipe.c
         ${SRC}/redir.c
         ${SRC}/sigsegv.c
