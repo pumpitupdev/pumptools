@@ -3,7 +3,6 @@
 #include "util/options.h"
 
 #define F2HOOK_OPTIONS_STR_GAME_SETTINGS "game.settings"
-#define F2HOOK_OPTIONS_STR_PATCH_GFX_WINDOWED "patch.gfx.windowed"
 #define F2HOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE "patch.hook_mon.file"
 #define F2HOOK_OPTIONS_STR_PATCH_HOOK_MON_FS "patch.hook_mon.fs"
 #define F2HOOK_OPTIONS_STR_PATCH_HOOK_MON_IO "patch.hook_mon.io"
@@ -32,13 +31,6 @@ const struct util_options_def f2hook_options_def[] = {
         .param = 's',
         .type = UTIL_OPTIONS_TYPE_STR,
         .default_value.str = "./save",
-    },
-    {
-        .name = F2HOOK_OPTIONS_STR_PATCH_GFX_WINDOWED,
-        .description = "Force game into window mode",
-        .param = 'w',
-        .type = UTIL_OPTIONS_TYPE_BOOL,
-        .default_value.b = false,
     },
     {
         .name = F2HOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE,
@@ -176,8 +168,6 @@ bool f2hook_options_init(int argc, char **argv, struct f2hook_options *options)
 
   options->game.settings =
       util_options_get_str(options_opt, F2HOOK_OPTIONS_STR_GAME_SETTINGS);
-  options->patch.gfx.windowed =
-      util_options_get_bool(options_opt, F2HOOK_OPTIONS_STR_PATCH_GFX_WINDOWED);
   options->patch.hook_mon.file = util_options_get_bool(
       options_opt, F2HOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE);
   options->patch.hook_mon.fs =
