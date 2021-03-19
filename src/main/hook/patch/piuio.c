@@ -284,11 +284,11 @@ static void _patch_piuio_read_inputs_to_buffer(struct cnh_iobuf *buffer)
   /* Player 2 */
   buffer->bytes[2] = 0;
 
-  buffer->bytes[2] |= ((p1_pad_in.lu ? 1 : 0) << 0);
-  buffer->bytes[2] |= ((p1_pad_in.ru ? 1 : 0) << 1);
-  buffer->bytes[2] |= ((p1_pad_in.cn ? 1 : 0) << 2);
-  buffer->bytes[2] |= ((p1_pad_in.ld ? 1 : 0) << 3);
-  buffer->bytes[2] |= ((p1_pad_in.rd ? 1 : 0) << 4);
+  buffer->bytes[2] |= ((p2_pad_in.lu ? 1 : 0) << 0);
+  buffer->bytes[2] |= ((p2_pad_in.ru ? 1 : 0) << 1);
+  buffer->bytes[2] |= ((p2_pad_in.cn ? 1 : 0) << 2);
+  buffer->bytes[2] |= ((p2_pad_in.ld ? 1 : 0) << 3);
+  buffer->bytes[2] |= ((p2_pad_in.rd ? 1 : 0) << 4);
 
   buffer->bytes[2] ^= 0xFF;
 
