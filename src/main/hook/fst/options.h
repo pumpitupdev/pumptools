@@ -12,10 +12,6 @@ struct fsthook_options {
   } game;
 
   struct patch {
-    struct gfx {
-      bool windowed;
-    } gfx;
-
     struct hook_mon {
       bool file;
       bool fs;
