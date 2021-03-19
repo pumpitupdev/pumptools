@@ -279,7 +279,3 @@ $(builddir)/pumptools-public.zip: \
 		$(builddir)/libc-version
 	$(V)echo ... $@
 	$(V)zip -j $@ $^
-
-################################################
-
-package: $(builddir)/pumptools.zip $(builddir)/pumptools-public.zip
