@@ -4,6 +4,7 @@
 #include <errno.h>
 #include <pthread.h>
 #include <stdatomic.h>
+#include <stdbool.h>
 #include <string.h>
 #include <usb.h>
 
@@ -34,6 +35,7 @@ typedef int (*cnh_usbhook_usb_control_msg_t)(usb_dev_handle* dev, int requesttyp
 /* ------------------------------------------------------------------------------------------------------------------ */
 
 static void _cnh_usbhook_init(void);
+static enum cnh_result _cnh_usbhook_invoke_next_reset_advance(struct cnh_usbhook_irp *irp, bool reset_next_handler_advance);
 
 static enum cnh_result _cnh_usbhook_invoke_real(struct cnh_usbhook_irp* irp);
 static enum cnh_result _cnh_usbhook_invoke_real_init(struct cnh_usbhook_irp* irp);
@@ -114,33 +116,12 @@ enum cnh_result cnh_usbhook_push_handler(cnh_usbhook_fn_t fn)
 
 enum cnh_result cnh_usbhook_invoke_next(struct cnh_usbhook_irp *irp)
 {
-    cnh_usbhook_fn_t handler;
-    enum cnh_result result;
+    return _cnh_usbhook_invoke_next_reset_advance(irp, false);
+}
 
-    assert(irp != NULL);
-    assert(_cnh_usbhook_initted > 0);
-
-    pthread_mutex_lock(&_cnh_usbhook_lock);
-
-    assert(irp->next_handler <= _cnh_usbhook_nhandlers);
-
-    if (irp->next_handler < _cnh_usbhook_nhandlers) {
-        handler = _cnh_usbhook_handlers[irp->next_handler];
-        irp->next_handler++;
-    } else {
-        handler = _cnh_usbhook_invoke_real;
-        irp->next_handler = (size_t) -1;
-    }
-
-    pthread_mutex_unlock(&_cnh_usbhook_lock);
-
-    result = handler(irp);
-
-    if (result != CNH_RESULT_SUCCESS) {
-        irp->next_handler = (size_t) -1;
-    }
-
-    return result;
+enum cnh_result cnh_usbhook_invoke_next_reset_advance(struct cnh_usbhook_irp *irp)
+{
+    return _cnh_usbhook_invoke_next_reset_advance(irp, true);
 }
 
 /* ------------------------------------------------------------------------------------------------------------------ */
@@ -459,6 +440,44 @@ static void _cnh_usbhook_init(void)
 
     atomic_store(&_cnh_usbhook_initted, 1);
     atomic_store(&_cnh_usbhook_init_in_progress, 0);
+}
+
+static enum cnh_result _cnh_usbhook_invoke_next_reset_advance(struct cnh_usbhook_irp *irp, bool reset_next_handler_advance)
+{
+    cnh_usbhook_fn_t handler;
+    enum cnh_result result;
+    size_t cur_next_handler;
+
+    assert(irp != NULL);
+    assert(_cnh_usbhook_initted > 0);
+
+    cur_next_handler = irp->next_handler;
+
+    pthread_mutex_lock(&_cnh_usbhook_lock);
+
+    assert(irp->next_handler <= _cnh_usbhook_nhandlers);
+
+    if (irp->next_handler < _cnh_usbhook_nhandlers) {
+        handler = _cnh_usbhook_handlers[irp->next_handler];
+        irp->next_handler++;
+    } else {
+        handler = _cnh_usbhook_invoke_real;
+        irp->next_handler = (size_t) -1;
+    }
+
+    pthread_mutex_unlock(&_cnh_usbhook_lock);
+
+    result = handler(irp);
+
+    if (result != CNH_RESULT_SUCCESS) {
+        irp->next_handler = (size_t) -1;
+    }
+
+    if (reset_next_handler_advance) {
+        irp->next_handler = cur_next_handler;
+    }
+
+    return result;
 }
 
 static enum cnh_result _cnh_usbhook_invoke_real(struct cnh_usbhook_irp* irp)

@@ -67,9 +67,29 @@ enum cnh_result cnh_usbhook_push_handler(cnh_usbhook_fn_t fn);
  * Call this from your hook handler if you want to pass on execution to further
  * hooked calls reaching the original function at the end of the hook chain.
  *
+ * Note: This will advance the irp state in the handler chain. It is not
+ * possible to re-use that irp for multiple/different invocations.
+ *
  * @param irp I/O request package to dispatch
  * @return Result of the following function dispatching the request package
  */
 enum cnh_result cnh_usbhook_invoke_next(struct cnh_usbhook_irp *irp);
+
+/**
+ * Same as cnh_usbhook_invoke_next but allows you to define if the you want
+ * to reset the next handler of the irp to the initial one once the call
+ * returns. This still returns the results as expected from the invocation
+ * chain.
+ *
+ * However, the irp state is modified and NOT rolled back. Depending on the
+ * call, it might contain state change and data to be returned. If you need
+ * to invoke an irp multiple times, you as the caller need to take care of
+ * buffering any states and recover it accordingly for successive calls on the
+ * same irp.
+ *
+ * @param irp I/O request package to dispatch
+ * @return Result of the following function dispatching the request package
+ */
+enum cnh_result cnh_usbhook_invoke_next_reset_advance(struct cnh_usbhook_irp *irp);
 
 #endif
