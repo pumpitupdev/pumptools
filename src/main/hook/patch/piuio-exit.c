@@ -26,20 +26,22 @@ static enum cnh_result patch_piuio_exit_usbhook(struct cnh_usbhook_irp *irp)
     switch (irp->op) {
         case CNH_USBHOOK_IRP_OP_OPEN:
         {
-            if (_patch_piuio_exit_usb_handle) {
-                log_warn("Already detected PIUIO previously, ignore re-detection?");
-                result = cnh_usbhook_invoke_next(irp);
-                break;
-            }
-
             if (irp->open_usb_dev->descriptor.idVendor == PIUIO_DRV_VID &&
                     irp->open_usb_dev->descriptor.idProduct == PIUIO_DRV_PID) {
-                log_info("Detected PIUIO");
 
-                result = cnh_usbhook_invoke_next(irp);
+                if (_patch_piuio_exit_usb_handle) {
+                    log_warn("Already detected PIUIO previously, ignore re-detection?");
 
-                if (result == CNH_RESULT_SUCCESS) {
-                    _patch_piuio_exit_usb_handle = irp->handle;
+                    irp->handle = _patch_piuio_exit_usb_handle;
+                    result = CNH_RESULT_SUCCESS;
+                } else {
+                    log_info("Detected PIUIO");
+
+                    result = cnh_usbhook_invoke_next(irp);
+
+                    if (result == CNH_RESULT_SUCCESS) {
+                        _patch_piuio_exit_usb_handle = irp->handle;
+                    }
                 }
             } else {
                 result = cnh_usbhook_invoke_next(irp);
