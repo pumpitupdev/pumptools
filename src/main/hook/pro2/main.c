@@ -13,6 +13,7 @@
 #include "hook/patch/hook-mon.h"
 #include "hook/patch/piuio.h"
 #include "hook/patch/piuio-exit.h"
+#include "hook/patch/piuio-khack.h"
 #include "hook/patch/redir.h"
 #include "hook/patch/usb-emu.h"
 #include "hook/patch/usb-init-fix.h"
@@ -159,13 +160,26 @@ static void pro2hook_patch_piuio_init(struct pro2hook_options* options)
 {
     log_assert(options);
 
-    /* Hook before IO emulation */
-    if (options->patch.piuio.exit_test_serv) {
-        patch_piuio_exit_init();
-    }
+    // The order of layering the hooks is important here because of deps
+    // 1. Fix low level libusb thing with init
+    // 2. Introduce the shim layer to allow adding fakedevs required for forther software emulation
+    // 3. Turn the ITG 2 piuio kernel hack calls into normal piuio ctrl transfer calls
+    // 4. Exit module to allow exiting the game with test + service
+    // 5. Software emulation layer for piuio
+    //
+    // For example, the kernel hack layer takes care of removing that, so software
+    // emulation code doesn't have to bother with that edge case. Furthermore, it allows you
+    // to use the game with real hardware without any additional software emulation layers
+    // that have to detour to real hardware again
 
     patch_usb_init_fix_init();
     patch_usb_emu_init();
+    patch_piuio_khack_init();
+
+    /* Hook before PIUIO emulation */
+    if (options->patch.piuio.exit_test_serv) {
+        patch_piuio_exit_init();
+    }
 
     if (options->patch.piuio.api_lib) {
         char* abs_path_iolib = util_fs_get_abs_path(options->patch.piuio.api_lib);
