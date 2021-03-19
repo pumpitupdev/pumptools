@@ -3,7 +3,6 @@
 #include "util/options.h"
 
 #define FEXHOOK_OPTIONS_STR_GAME_SETTINGS "game.settings"
-#define FEXHOOK_OPTIONS_STR_PATCH_GFX_WINDOWED "patch.gfx.windowed"
 #define FEXHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE "patch.hook_mon.file"
 #define FEXHOOK_OPTIONS_STR_PATCH_HOOK_MON_FS "patch.hook_mon.fs"
 #define FEXHOOK_OPTIONS_STR_PATCH_HOOK_MON_IO "patch.hook_mon.io"
@@ -32,13 +31,6 @@ const struct util_options_def fexhook_options_def[] = {
         .param = 's',
         .type = UTIL_OPTIONS_TYPE_STR,
         .default_value.str = "./save",
-    },
-    {
-        .name = FEXHOOK_OPTIONS_STR_PATCH_GFX_WINDOWED,
-        .description = "Force game into window mode",
-        .param = 'w',
-        .type = UTIL_OPTIONS_TYPE_BOOL,
-        .default_value.b = false,
     },
     {
         .name = FEXHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE,
@@ -178,8 +170,6 @@ bool fexhook_options_init(
 
   options->game.settings =
       util_options_get_str(options_opt, FEXHOOK_OPTIONS_STR_GAME_SETTINGS);
-  options->patch.gfx.windowed = util_options_get_bool(
-      options_opt, FEXHOOK_OPTIONS_STR_PATCH_GFX_WINDOWED);
   options->patch.hook_mon.file = util_options_get_bool(
       options_opt, FEXHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE);
   options->patch.hook_mon.fs =

@@ -137,10 +137,6 @@ static void fexhook_patch_gfx_init(struct fexhook_options *options)
   log_assert(options);
 
   patch_gfx_init();
-
-  if (options->patch.gfx.windowed) {
-    patch_gfx_force_window_mode();
-  }
 }
 
 static void fexhook_patch_main_loop_init(struct fexhook_options *options)
