@@ -129,10 +129,6 @@ static void exchook_patch_gfx_init(struct exchook_options *options)
   log_assert(options);
 
   patch_gfx_init();
-
-  if (options->patch.gfx.windowed) {
-    patch_gfx_force_window_mode();
-  }
 }
 
 static void exchook_patch_main_loop_init(struct exchook_options *options)

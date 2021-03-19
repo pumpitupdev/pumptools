@@ -4,7 +4,6 @@
 
 #define EXCHOOK_OPTIONS_STR_GAME_SETTINGS "game.settings"
 #define EXCHOOK_OPTIONS_STR_GAME_VERSION "game.version"
-#define EXCHOOK_OPTIONS_STR_PATCH_GFX_WINDOWED "patch.gfx.windowed"
 #define EXCHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE "patch.hook_mon.file"
 #define EXCHOOK_OPTIONS_STR_PATCH_HOOK_MON_FS "patch.hook_mon.fs"
 #define EXCHOOK_OPTIONS_STR_PATCH_HOOK_MON_IO "patch.hook_mon.io"
@@ -40,13 +39,6 @@ static const struct util_options_def exchook_options_def[] = {
         .param = 'v',
         .type = UTIL_OPTIONS_TYPE_STR,
         .default_value.str = "20040408",
-    },
-    {
-        .name = EXCHOOK_OPTIONS_STR_PATCH_GFX_WINDOWED,
-        .description = "Force game into window mode",
-        .param = 'w',
-        .type = UTIL_OPTIONS_TYPE_BOOL,
-        .default_value.b = false,
     },
     {
         .name = EXCHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE,
@@ -173,8 +165,6 @@ bool exchook_options_init(
       util_options_get_str(options_opt, EXCHOOK_OPTIONS_STR_GAME_SETTINGS);
   options->game.version =
       util_options_get_str(options_opt, EXCHOOK_OPTIONS_STR_GAME_VERSION);
-  options->patch.gfx.windowed = util_options_get_bool(
-      options_opt, EXCHOOK_OPTIONS_STR_PATCH_GFX_WINDOWED);
   options->patch.hook_mon.file = util_options_get_bool(
       options_opt, EXCHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE);
   options->patch.hook_mon.fs =
