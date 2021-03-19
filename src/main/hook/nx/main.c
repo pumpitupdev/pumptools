@@ -161,10 +161,6 @@ static void nxhook_patch_gfx_init(struct nxhook_options *options)
   log_assert(options);
 
   patch_gfx_init();
-
-  if (options->patch.gfx.windowed) {
-    patch_gfx_force_window_mode();
-  }
 }
 
 static void nxhook_patch_game_init(struct nxhook_options *options)
