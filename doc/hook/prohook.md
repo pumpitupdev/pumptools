@@ -101,10 +101,9 @@ The game supports 4:3 and 16:9 aspect ratios. To enable 16:9 mode, ensure that a
 next to the data zip files inside the `game` directory. For 4:3 mode, simply delete the `FX` file if it exists.
 
 ## ITG2 PIUIO kernel module hack
-If you don't have the original kernel module installed and you are running a real PIUIO, you have to hook the
-`ptapi-io-piuio-real.so` lib which implements the piuio api. The "emulation" part which simply calls back to a real
-piuio driver takes care of handling the kernel hack path then. If you run on a real IO without hooking that module,
-you won't get any inputs or outputs.
+If you don't have the original kernel module installed and you are running a real PIUIO, pumptools/the hook got you
+covered. It takes care of emulating the kernel module transparently. Therefore, you can run the game with the hook
+without requiring the piuio emulation layer, e.g. using `ptapi-io-piuio-real`.
 
 ## The game is crashing very early
 The log might show something about "ptrace failing" and not being able to "load libformat". However, the actual problem
