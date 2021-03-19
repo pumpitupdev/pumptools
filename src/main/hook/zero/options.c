@@ -4,7 +4,6 @@
 
 #define ZEROHOOK_OPTIONS_STR_GAME_FORCE_UNLOCK "game.force_unlock"
 #define ZEROHOOK_OPTIONS_STR_GAME_SETTINGS "game.settings"
-#define ZEROHOOK_OPTIONS_STR_PATCH_GFX_WINDOWED "patch.gfx.windowed"
 #define ZEROHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE "patch.hook_mon.file"
 #define ZEROHOOK_OPTIONS_STR_PATCH_HOOK_MON_FS "patch.hook_mon.fs"
 #define ZEROHOOK_OPTIONS_STR_PATCH_HOOK_MON_IO "patch.hook_mon.io"
@@ -38,13 +37,6 @@ static const struct util_options_def zerohook_options_def[] = {
         .param = 's',
         .type = UTIL_OPTIONS_TYPE_STR,
         .default_value.str = "./save",
-    },
-    {
-        .name = ZEROHOOK_OPTIONS_STR_PATCH_GFX_WINDOWED,
-        .description = "Force game into window mode",
-        .param = 'w',
-        .type = UTIL_OPTIONS_TYPE_BOOL,
-        .default_value.b = false,
     },
     {
         .name = ZEROHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE,
@@ -171,8 +163,6 @@ bool zerohook_options_init(
       options_opt, ZEROHOOK_OPTIONS_STR_GAME_FORCE_UNLOCK);
   options->game.settings =
       util_options_get_str(options_opt, ZEROHOOK_OPTIONS_STR_GAME_SETTINGS);
-  options->patch.gfx.windowed = util_options_get_bool(
-      options_opt, ZEROHOOK_OPTIONS_STR_PATCH_GFX_WINDOWED);
   options->patch.hook_mon.file = util_options_get_bool(
       options_opt, ZEROHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE);
   options->patch.hook_mon.fs = util_options_get_bool(
