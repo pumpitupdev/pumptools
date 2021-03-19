@@ -23,7 +23,6 @@ static void _patch_piuio_close(void);
 
 static enum cnh_result _patch_piuio_process_inputs(struct cnh_iobuf* buffer);
 static enum cnh_result _patch_piuio_process_outputs(struct cnh_iobuf* buffer);
-static enum cnh_result _patch_piuio_process_itg_kernel_module_hack(struct cnh_iobuf* buffer);
 
 static const struct cnh_usb_emu_virtdev_ep _patch_piuio_virtdev = {
     .pid = PIUIO_DRV_PID,
@@ -117,13 +116,11 @@ static enum cnh_result _patch_piuio_control_msg(int request_type, int request, i
 
         return _patch_piuio_process_outputs(buffer);
     } else if (request_type == 0 && request == 0) {
-        /* ITG 2/PIU Pro kernel hack */
-        if (buffer->nbytes != PIUIO_DRV_BUFFER_SIZE * 4) {
-            log_error("Invalid buffer size for kernel hack: %d", buffer->nbytes);
-            return CNH_RESULT_INVALID_PARAMETER;
-        }
+        // ITG 2/PIU Pro kernel hack, can be handled by piuio-khack module
+        // Safety net for visibility if the module is missing
+        log_error("Unhandled PIUIO kernel hack request detected, cannot dispatch");
 
-        return _patch_piuio_process_itg_kernel_module_hack(buffer);
+        return CNH_RESULT_INVALID_PARAMETER;
     } else {
         log_error("Invalid usb control request to PIUIO: 0x%02X", request);
         return CNH_RESULT_INVALID_PARAMETER;
@@ -417,156 +414,6 @@ static enum cnh_result _patch_piuio_process_outputs(struct cnh_iobuf* buffer)
     }
 
     buffer->pos = PIUIO_DRV_BUFFER_SIZE;
-
-    return CNH_RESULT_SUCCESS;
-}
-
-static enum cnh_result _patch_piuio_process_itg_kernel_module_hack(struct cnh_iobuf* buffer)
-{
-    /* Instead of calling four times, one call for each sensor set, a special
-       kernel module is loaded which traps the following call:
-       usb_control_msg(dev_handle, 0, 0, 0, 0, buffer, 32, 10011);
-       All four sensor sets are polled in a single context switch and returned
-       as one big buffer instead of four smalle ones (8 bytes each).
-       Pump Pro relies on this, so we have to support it here */
-
-    struct ptapi_io_piuio_pad_inputs p1_pad_in[4];
-    struct ptapi_io_piuio_pad_inputs p2_pad_in[4];
-    struct ptapi_io_piuio_sys_inputs sys_in;
-
-    /* The output duplicated 4 times (4 * 8) in the buffer. Write it once */
-    _patch_piuio_process_outputs(buffer);
-
-    if (!_patch_piuio_api.recv()) {
-        log_error("Receiving inputs on api piuio %s failed", _patch_piuio_api.ident());
-        return CNH_RESULT_OTHER_ERROR;
-    }
-
-    memset(buffer->bytes, 0, PIUIO_DRV_BUFFER_SIZE * 4);
-
-    memset(&sys_in, 0, sizeof(struct ptapi_io_piuio_sys_inputs));
-
-    for (uint8_t i = 0; i < 4; i++) {
-        memset(&p1_pad_in[i], 0, sizeof(struct ptapi_io_piuio_pad_inputs));
-        memset(&p2_pad_in[i], 0, sizeof(struct ptapi_io_piuio_pad_inputs));
-
-        _patch_piuio_api.get_input_pad(0, (enum ptapi_io_piuio_sensor_group) i, &p1_pad_in[i]);
-        _patch_piuio_api.get_input_pad(1, (enum ptapi_io_piuio_sensor_group) i, &p2_pad_in[i]);
-    }
-
-    _patch_piuio_api.get_input_sys(&sys_in);
-
-    /*
-       byte 0:
-	   bit 0: sensor p1: LU
-	   bit 1: sensor p1: RU
-	   bit 2: sensor p1: CN
-	   bit 3: sensor p1: LD
-	   bit 4: sensor p1: RD
-	   bit 5:
-	   bit 6:
-	   bit 7:
-
-	   byte 1:
-	   bit 0:
-	   bit 1: test
-	   bit 2: coin 1
-	   bit 3:
-	   bit 4:
-	   bit 5:
-	   bit 6: service
-	   bit 7: clear
-
-	   byte 2:
-	   bit 0: sensor p2: LU
-	   bit 1: sensor p2: RU
-	   bit 2: sensor p2: CN
-	   bit 3: sensor p2: LD
-	   bit 4: sensor p2: RD
-	   bit 5:
-	   bit 6:
-	   bit 7:
-
-	   byte 3:
-	   bit 0:
-	   bit 1:
-	   bit 2: coin 2
-	   bit 3:
-	   bit 4:
-	   bit 5:
-	   bit 6:
-	   bit 7:
-
-	   bytes 4 - 7 dummy
-    */
-
-    for (uint8_t i = 0; i < 4; i++) {
-        /* Player 1 */
-        if (p1_pad_in[i].lu) {
-            buffer->bytes[PIUIO_DRV_BUFFER_SIZE * i + 0] |= (1 << 0);
-        }
-
-        if (p1_pad_in[i].ru) {
-            buffer->bytes[PIUIO_DRV_BUFFER_SIZE * i + 0] |= (1 << 1);
-        }
-
-        if (p1_pad_in[i].cn) {
-            buffer->bytes[PIUIO_DRV_BUFFER_SIZE * i + 0] |= (1 << 2);
-        }
-
-        if (p1_pad_in[i].ld) {
-            buffer->bytes[PIUIO_DRV_BUFFER_SIZE * i + 0] |= (1 << 3);
-        }
-
-        if (p1_pad_in[i].rd) {
-            buffer->bytes[PIUIO_DRV_BUFFER_SIZE * i + 0] |= (1 << 4);
-        }
-
-        /* Player 2 */
-        if (p2_pad_in[i].lu) {
-            buffer->bytes[PIUIO_DRV_BUFFER_SIZE * i + 2] |= (1 << 0);
-        }
-
-        if (p2_pad_in[i].ru) {
-            buffer->bytes[PIUIO_DRV_BUFFER_SIZE * i + 2] |= (1 << 1);
-        }
-
-        if (p2_pad_in[i].cn) {
-            buffer->bytes[PIUIO_DRV_BUFFER_SIZE * i + 2] |= (1 << 2);
-        }
-
-        if (p2_pad_in[i].ld) {
-            buffer->bytes[PIUIO_DRV_BUFFER_SIZE * i + 2] |= (1 << 3);
-        }
-
-        if (p2_pad_in[i].rd) {
-            buffer->bytes[PIUIO_DRV_BUFFER_SIZE * i + 2] |= (1 << 4);
-        }
-
-        /* Sys */
-        if (sys_in.test) {
-            buffer->bytes[PIUIO_DRV_BUFFER_SIZE * i + 1] |= (1 << 1);
-        }
-
-        if (sys_in.service) {
-            buffer->bytes[PIUIO_DRV_BUFFER_SIZE * i + 1] |= (1 << 6);
-        }
-
-        if (sys_in.clear) {
-            buffer->bytes[PIUIO_DRV_BUFFER_SIZE * i + 1] |= (1 << 7);
-        }
-
-        if (sys_in.coin) {
-            buffer->bytes[PIUIO_DRV_BUFFER_SIZE * i + 1] |= (1 << 2);
-        }
-    }
-
-    /* xor inputs because pullup active */
-    for (int i = 0; i < PIUIO_DRV_BUFFER_SIZE * 4; i++) {
-        buffer->bytes[i] ^= 0xFF;
-    }
-
-    buffer->nbytes = PIUIO_DRV_BUFFER_SIZE * 4;
 
     return CNH_RESULT_SUCCESS;
 }
