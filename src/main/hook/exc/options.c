@@ -4,6 +4,7 @@
 
 #define EXCHOOK_OPTIONS_STR_GAME_SETTINGS "game.settings"
 #define EXCHOOK_OPTIONS_STR_GAME_VERSION "game.version"
+#define EXCHOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE "gfx.scaling_mode"
 #define EXCHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE "patch.hook_mon.file"
 #define EXCHOOK_OPTIONS_STR_PATCH_HOOK_MON_FS "patch.hook_mon.fs"
 #define EXCHOOK_OPTIONS_STR_PATCH_HOOK_MON_IO "patch.hook_mon.io"
@@ -39,6 +40,13 @@ static const struct util_options_def exchook_options_def[] = {
         .param = 'v',
         .type = UTIL_OPTIONS_TYPE_STR,
         .default_value.str = "20040408",
+    },
+    {
+        .name = EXCHOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE,
+        .description = "Set a scaling mode for the rendered output. Available modes: 0 = disabled, 1 = SD 480 to pillarbox HD 720, 2 = SD 480 to pillarbox HD 1080, 3 = SD 480 to SD 960, 4 = HD 720 to HD 1080",
+        .param = 'z',
+        .type = UTIL_OPTIONS_TYPE_INT,
+        .default_value.i = 0,
     },
     {
         .name = EXCHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE,
@@ -165,6 +173,8 @@ bool exchook_options_init(
       util_options_get_str(options_opt, EXCHOOK_OPTIONS_STR_GAME_SETTINGS);
   options->game.version =
       util_options_get_str(options_opt, EXCHOOK_OPTIONS_STR_GAME_VERSION);
+  options->patch.gfx.scaling_mode = util_options_get_int(
+      options_opt, EXCHOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE);
   options->patch.hook_mon.file = util_options_get_bool(
       options_opt, EXCHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE);
   options->patch.hook_mon.fs =

@@ -3,6 +3,7 @@
 #include "util/options.h"
 
 #define NXAHOOK_OPTIONS_STR_GAME_SETTINGS "game.settings"
+#define NXAHOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE "gfx.scaling_mode"
 #define NXAHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE "patch.hook_mon.file"
 #define NXAHOOK_OPTIONS_STR_PATCH_HOOK_MON_FS "patch.hook_mon.fs"
 #define NXAHOOK_OPTIONS_STR_PATCH_HOOK_MON_IO "patch.hook_mon.io"
@@ -31,6 +32,13 @@ const struct util_options_def nxahook_options_def[] = {
         .param = 's',
         .type = UTIL_OPTIONS_TYPE_STR,
         .default_value.str = "./save",
+    },
+    {
+        .name = NXAHOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE,
+        .description = "Set a scaling mode for the rendered output. Available modes: 0 = disabled, 1 = SD 480 to pillarbox HD 720, 2 = SD 480 to pillarbox HD 1080, 3 = SD 480 to SD 960, 4 = HD 720 to HD 1080",
+        .param = 'z',
+        .type = UTIL_OPTIONS_TYPE_INT,
+        .default_value.i = 0,
     },
     {
         .name = NXAHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE,

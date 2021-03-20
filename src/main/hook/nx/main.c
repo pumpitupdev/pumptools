@@ -161,6 +161,10 @@ static void nxhook_patch_gfx_init(struct nxhook_options *options)
   log_assert(options);
 
   patch_gfx_init();
+
+  if (options->patch.gfx.scaling_mode != PATCH_GFX_SCALE_MODE_INVALID) {
+    patch_gfx_scale(options->patch.gfx.scaling_mode);
+  }
 }
 
 static void nxhook_patch_game_init(struct nxhook_options *options)

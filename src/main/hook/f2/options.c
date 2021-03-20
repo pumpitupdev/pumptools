@@ -3,6 +3,7 @@
 #include "util/options.h"
 
 #define F2HOOK_OPTIONS_STR_GAME_SETTINGS "game.settings"
+#define F2HOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE "gfx.scaling_mode"
 #define F2HOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE "patch.hook_mon.file"
 #define F2HOOK_OPTIONS_STR_PATCH_HOOK_MON_FS "patch.hook_mon.fs"
 #define F2HOOK_OPTIONS_STR_PATCH_HOOK_MON_IO "patch.hook_mon.io"
@@ -31,6 +32,13 @@ const struct util_options_def f2hook_options_def[] = {
         .param = 's',
         .type = UTIL_OPTIONS_TYPE_STR,
         .default_value.str = "./save",
+    },
+    {
+        .name = F2HOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE,
+        .description = "Set a scaling mode for the rendered output. Available modes: 0 = disabled, 1 = SD 480 to pillarbox HD 720, 2 = SD 480 to pillarbox HD 1080, 3 = SD 480 to SD 960, 4 = HD 720 to HD 1080",
+        .param = 'z',
+        .type = UTIL_OPTIONS_TYPE_INT,
+        .default_value.i = 0,
     },
     {
         .name = F2HOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE,
@@ -168,6 +176,8 @@ bool f2hook_options_init(int argc, char **argv, struct f2hook_options *options)
 
   options->game.settings =
       util_options_get_str(options_opt, F2HOOK_OPTIONS_STR_GAME_SETTINGS);
+  options->patch.gfx.scaling_mode = util_options_get_int(
+      options_opt, F2HOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE);
   options->patch.hook_mon.file = util_options_get_bool(
       options_opt, F2HOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE);
   options->patch.hook_mon.fs =

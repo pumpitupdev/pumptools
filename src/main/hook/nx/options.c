@@ -4,6 +4,7 @@
 
 #define NXHOOK_OPTIONS_STR_GAME_FORCE_UNLOCK "game.force_unlock"
 #define NXHOOK_OPTIONS_STR_GAME_SETTINGS "game.settings"
+#define NXHOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE "gfx.scaling_mode"
 #define NXHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE "patch.hook_mon.file"
 #define NXHOOK_OPTIONS_STR_PATCH_HOOK_MON_FS "patch.hook_mon.fs"
 #define NXHOOK_OPTIONS_STR_PATCH_HOOK_MON_IO "patch.hook_mon.io"
@@ -30,6 +31,13 @@ static const struct util_options_def nxhook_options_def[] = {
         .param = 'z',
         .type = UTIL_OPTIONS_TYPE_BOOL,
         .default_value.b = false,
+    },
+    {
+        .name = NXHOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE,
+        .description = "Set a scaling mode for the rendered output. Available modes: 0 = disabled, 1 = SD 480 to pillarbox HD 720, 2 = SD 480 to pillarbox HD 1080, 3 = SD 480 to SD 960, 4 = HD 720 to HD 1080",
+        .param = 'z',
+        .type = UTIL_OPTIONS_TYPE_INT,
+        .default_value.i = 0,
     },
     {
         .name = NXHOOK_OPTIONS_STR_GAME_SETTINGS,
@@ -159,6 +167,8 @@ bool nxhook_options_init(int argc, char **argv, struct nxhook_options *options)
 
   options->game.force_unlock =
       util_options_get_bool(options_opt, NXHOOK_OPTIONS_STR_GAME_FORCE_UNLOCK);
+  options->patch.gfx.scaling_mode = util_options_get_int(
+      options_opt, NXHOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE);
   options->game.settings =
       util_options_get_str(options_opt, NXHOOK_OPTIONS_STR_GAME_SETTINGS);
   options->patch.hook_mon.file = util_options_get_bool(

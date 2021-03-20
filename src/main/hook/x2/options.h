@@ -13,6 +13,10 @@ struct x2hook_options {
   } game;
 
   struct patch {
+    struct gfx {
+      uint8_t scaling_mode;
+    } gfx;
+
     struct hook_mon {
       bool file;
       bool fs;
