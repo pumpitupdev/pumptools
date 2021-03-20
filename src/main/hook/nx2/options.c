@@ -3,7 +3,7 @@
 #include "util/options.h"
 
 #define NX2HOOK_OPTIONS_STR_GAME_SETTINGS "game.settings"
-#define NX2HOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE "gfx.scaling_mode"
+#define NX2HOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE "patch.gfx.scaling_mode"
 #define NX2HOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE "patch.hook_mon.file"
 #define NX2HOOK_OPTIONS_STR_PATCH_HOOK_MON_FS "patch.hook_mon.fs"
 #define NX2HOOK_OPTIONS_STR_PATCH_HOOK_MON_IO "patch.hook_mon.io"
