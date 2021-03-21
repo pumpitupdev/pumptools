@@ -32,8 +32,10 @@ Documentation about hardware related stuff, e.g. cabinets, PCBs etc
     * VGA 640x480 native resolution
 
 ### DX
+* [Cabinet manual](manual/dx/cabinet.pdf)
 * Deluxe version cabinet
 * Monitor
+    * [Manual](manual/dx/monitor.pdf)
     * 52" rear projection
     * 4:3 aspect ratio
     * VGA 640x480 native resolution
@@ -41,11 +43,13 @@ Documentation about hardware related stuff, e.g. cabinets, PCBs etc
 * Shipped with [MK 1](#mk-1) and [MK 3](#mk-3) PCBs
 
 ### GX
+* [Cabinet manual](manual/gx/cabinet-curved-screen.pdf)
 * Monitor
     * 34" CRT
     * Came in two variants
         * Curved surface initial release
         * Kortek KT-3414DF: Flat surface starting Zero
+            * [Monitor schematic](manual/gx/monitor-schematic.pdf)
     * 4:3 aspect ratio   
     * VGA 640x480 native resolution
     * Further resolutions supported: CGA and EGA (might require monitor board modification) and SVGA
@@ -54,7 +58,11 @@ Documentation about hardware related stuff, e.g. cabinets, PCBs etc
     * Flat monitor surface: [Zero](../game/17-zero.md)
 
 ### FX
+* Cabinet manual
+    * [NX](manual/fx/cabinet-nx.pdf)
+    * [PRO](manual/fx/cabinet-pro.pdf)
 * Monitor
+    * [Manual](manual/fx/monitor.pdf)
     * 42" plasma
     * WSVGA 1024x768 native resolution
     * 16:9 aspect ratio
@@ -63,12 +71,14 @@ Documentation about hardware related stuff, e.g. cabinets, PCBs etc
 * First game version to ship in this cabinet type: [NX](../game/18-nx.md)
 
 ### Jump
+* [Cabinet manual](manual/jump/cabinet.pdf)
 * Cabinet specially made for the game Pump It Up Jump!
 * Shipped with [MK 9](#mk-9) PCBs
 
 ### SX2
 * "Refreshed" version of the [SX](#sx) type cabinet. Though it resembles more the [GX](#gx) cabinet with a smaller monitor
 * Monitor
+    * [Manual](manual/sx2/monitor.pdf)
     * KT-2914DF
     * 29" CRT
     * Flat surface
@@ -78,6 +88,7 @@ Documentation about hardware related stuff, e.g. cabinets, PCBs etc
 * First game version to ship with this type: [NX2](../game/20-nx2.md)
 
 ### CX
+* [Cabinet manual](manual/cx/cabinet.pdf)
 * Monitor
     * 42" LCD
     * 16:9 aspect ratio
@@ -86,6 +97,7 @@ Documentation about hardware related stuff, e.g. cabinets, PCBs etc
 * First game version to ship in this cabinet type: [Fiesta](../game/23-fst.md)
 
 ### TX
+* [Cabinet manual](manual/tx/cabinet.pdf)
 * Monitor
     * 50" LCD
     * 16:9 aspect ratio
@@ -94,6 +106,7 @@ Documentation about hardware related stuff, e.g. cabinets, PCBs etc
 * First game version to ship in this cabinet type: [Fiesta](../game/23-fst.md)
 
 ### LX
+* [Cabinet manual](manual/lx/cabinet.pdf)
 * Monitor
     * 55" LCD
     * 16:9 aspect ratio
