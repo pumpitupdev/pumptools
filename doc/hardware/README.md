@@ -10,7 +10,7 @@ Documentation about hardware related stuff, e.g. cabinets, PCBs etc
 ## Cabinet Types
 
 ### SD
-* First generation cabinets
+* First generation cabinets released with 1st and 2nd (2nd was released shortly after 1st already)
 * Similar look to original DDR cabinets
 * Monitor
     * 29" CRT
@@ -30,12 +30,13 @@ Documentation about hardware related stuff, e.g. cabinets, PCBs etc
     * 4:3 aspect ratio
     * Curved surface
     * VGA 640x480 native resolution
+* First game version to ship in this cabinet type: [Premiere 1](../game/08-prem1.md) and [Prex 1](../game/09-prex1.md)
 
 ### DX
 * [Cabinet manual](manual/dx/cabinet.pdf)
 * Deluxe version cabinet
 * Monitor
-    * [Manual](manual/dx/monitor.pdf)
+    * Samsung (?) APT51, [manual](manual/dx/monitor.pdf)
     * 52" rear projection
     * 4:3 aspect ratio
     * VGA 640x480 native resolution
@@ -56,6 +57,11 @@ Documentation about hardware related stuff, e.g. cabinets, PCBs etc
 * First game version to ship with this type
     * Curved monitor surface: [Exceed](../game/15-exc.md)
     * Flat monitor surface: [Zero](../game/17-zero.md)
+
+### Mini
+* Official
+* Small bar-top style cabinet with push buttons to play the game with your hands
+* Games that shipped with this type: [Exceed](../game/15-exc.md), [Exceed 2](../game/16-exc2.md), [NX](../game/18-nx.md)
 
 ### FX
 * Cabinet manual
@@ -142,6 +148,7 @@ Anything newer might not have worked because of the above assumption that additi
 * PIUIO interface connected via ISA Bus
 * Hardware audio decoder chip for MP3 audio
 * CAT702 ZN security "Lock chip" for copy-protection
+* EEPROM to store game settings
 
 #### System Configuration using DOS PC-Doctor
 System configuration dump with DOS PC-Doctor. The HDD listed in the information below is part of the system that was
@@ -231,8 +238,13 @@ PC-DOCTOR DOS 3.0 Copyr 2004 PC-Doctor, Inc. 16:15 9/25/2000
 * Same IO as MK3 connected to the ISA bus
 * CPU: Intel Celeron 1 GHZ
 * RAM: 128 MB
-* GPU: Nvidia NV11 Chipset
-* CDROM based for Prem3/Prex3, HDD based for Exceed and newer
+* GPU: on-board Riva TNT 2, 32 MB
+* Chipset: Nvidia NV11
+* Disk media
+    * CDROM based for Prem3/Prex3
+    * DVD based for Exceed beta
+    * HDD based for Exceed (release) and newer
+* EEPROM to store game settings and high scores. Size increased (doubled?) comapred to [MK 3](#mk-3)
 
 #### Compatible Games
 * [Premiere 3](../game/13-prem3.md)/[Prex 3](../game/14-prex3.md) (OS: Windows XP Embedded)
@@ -279,6 +291,7 @@ PC-DOCTOR DOS 3.0 Copyr 2004 PC-Doctor, Inc. 16:15 9/25/2000
 * [FiestaEX](../game/24-fex.md) (requires RAM upgrade to at least 512 MB)
 * [Fiesta 2](../game/26-f2.md) (requires RAM upgrade to at least 512 MB)
 * [Prime](../game/27-pri.md) (requires RAM upgrade to at least 512 MB, SD mode only)
+* [Prime 2](../game/28-pri2.md) (supposed to run somewhat with Revision 2 but not 1)
 
 ### MK 9
 
@@ -286,21 +299,36 @@ PC-DOCTOR DOS 3.0 Copyr 2004 PC-Doctor, Inc. 16:15 9/25/2000
 * Still USB PIUIO based IO interface
 
 #### Revision 1
-* Motherboard: GIGABYTE GA-945GZM-s2
-* GPU: GeForce 7200GF, 512 MB
+* Motherboard: Gigabyte GA-945GCM-S2L
+* GPU: GeForce 7200GS
+* Bundled with [NX2](../game/20-nx2.md) 1.54 and higher
+* [NX2](../game/20-nx2.md) and lwoer doesn't work with this revision
+* Shipped as upgrades and when buying a [FX cabinet](#tx) at that time
 
 #### Revision 2
-* Motherboard: Gigabyte GA-945GCM-S2L
-* GPU: GeForce 8400GS
+* Motherboard: Asrock G41M-S3
+* GPU: GeForce 9300GS
+* CPU: Intel Celeron 430
+* RAM: 1 GB
+* Hardware shipped with [Pump it Up Jump cabinets](#jump)
 
 #### Revision 3
-* Motherboard: Asrock G41M-S3
-* GPU: GeForce 9300GS or Nvidia GT210
+* Motherboard: Gigabyte G31M
+* GPU: Nvidia GeForce 8400GS
+* Bundled with Fiesta when buying a [TX cabinet](#tx) at that time
+* GPU last compatible card with Fiesta OS
+
+#### Revision 4
+* Motherboard: Gigabyte G41M
+* GPU: Nvidia GeForce GT210
+* Bundled with Fiesta 2 when buying a [CX cabinet](#cx) at that time
+* GPU last compatible card with Fiesta 2 OS
 
 #### Compatible Games
 * [PRO](../game/19-pro.md)
 * [NX2](../game/20-nx2.md)
 * [NXA](../game/21-nxa.md)
+* Jump
 * [PRO 2](../game/22-pro2.md)
 * [Fiesta](../game/23-fst.md)
 * [FiestaEX](../game/24-fex.md)
@@ -310,4 +338,7 @@ PC-DOCTOR DOS 3.0 Copyr 2004 PC-Doctor, Inc. 16:15 9/25/2000
 * [XX](../game/29-xx.md)
 
 ### MK X
-TBD
+* New PIUIO, entirely external board outside of PCB connected to USB
+
+#### Compatible Games
+* [XX](../game/29-xx.md)
