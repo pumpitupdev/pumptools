@@ -1,5 +1,14 @@
 # Release history
 ## 1.10
+* Refactor pumptools's usb device hooking backend
+* Fix issues with piuio kernel hack in PRO/PRO 2
+* Fix high CPU load issue due to 4x polling load on piuio API 
+* Add architecture documentation about usb device handling
+* Remove non-working window option from Exceed to Prime
+* Add documentation clarifying window/full-screen handling on Linux
+* NX2 game doc: Add all unlock codes for World Max
+* Add experimental option for gfx scaling, see hook documentation
+* Add hardware documentation: cabinet, PCB and manuals
 
 ## 1.09
 * Include pro and pro2 hooks into actual public release
