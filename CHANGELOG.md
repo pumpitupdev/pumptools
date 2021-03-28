@@ -1,4 +1,6 @@
 # Release history
+## 1.11
+
 ## 1.10
 * Refactor pumptools's usb device hooking backend
 * Fix issues with piuio kernel hack in PRO/PRO 2
