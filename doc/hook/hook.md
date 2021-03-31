@@ -61,6 +61,10 @@ disk to run the games on dedicated hardware for cabinets.
 ## Quick start: how to run (official release)
 The following steps apply to any game of the "officially" supported release data.
 
+!!!
+AVOID USING `lib-ld.zip` PERIOD. THIS IS A FALLBACK OPTION IF `lib-local.zip` DOES NOT WORK!!!
+!!!
+
 1. Install the required dependencies which can vary per game. Check the section "required dependencies" in the dedicated
 readme files of each hook.
 1. Unpack `game.zip` and `lib-local.zip` to a folder of your choice.
@@ -217,6 +221,43 @@ To route the audio to the device of your choice, e.g. device `0`, add the number
 patch.sound.device=hw:0
 ```
 
+Alternative:
+```shell script
+aplay -l
+```
+
+Example output:
+
+```text
+**** List of PLAYBACK Hardware Devices ****
+card 0: Generic [HD-Audio Generic], device 3: HDMI 0 [HDMI 0]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 0: Generic [HD-Audio Generic], device 7: HDMI 1 [HDMI 1]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 0: Generic [HD-Audio Generic], device 8: HDMI 2 [HDMI 2]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 0: Generic [HD-Audio Generic], device 9: HDMI 3 [HDMI 3]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 2: Generic_1 [HD-Audio Generic], device 0: ALC887-VD Analog [ALC887-VD Analog]
+  Subdevices: 0/1
+  Subdevice #0: subdevice #0
+card 2: Generic_1 [HD-Audio Generic], device 1: ALC887-VD Digital [ALC887-VD Digital]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+```
+
+If you want to route the audio output to `card 0: Generic [HD-Audio Generic], device 3: HDMI`, set the following in
+the `hook.conf` file:
+
+```text
+patch.sound.device=hw:CARD=Generic,DEV=3
+```
+
+
 ### The game plays/renders too fast
 The game relies on vsync to lock to the target framerate of 60 FPS. Ensure vsync is turned on in your GPU settings.
 
@@ -269,3 +310,15 @@ display resolution while keeping the aspect ratio (pillarbox).
 
 Note: This does not change the enhance the image quality. It just uses the GPU to interpolate the lower resolution
 output and stretches it to the target surface area.
+
+### The game crashes with a snd_pcm_open error
+If the game crashes with the following error:
+
+```text
+[E][2021/3/28-19:38:49:778][patch-sound][sound.c:55] snd_pcm_open failed: No such file or directory
+piu: pcm_params.c:2354: snd_pcm_hw_refine: Assertion `pcm && params' failed.
+Aborted (core dumped)
+```
+
+Verify that you have set the `patch.sound.device=` property in the `hook.conf`. Also refer to
+[this section](#how-do-i-figure-out-which-sound-device-to-select) how to configure your audio device.
