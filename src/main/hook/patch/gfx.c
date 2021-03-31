@@ -30,21 +30,11 @@ typedef Window (*XCreateWindow_t)(
 typedef Display *(*XOpenDisplay_t)(const char *display_name);
 typedef XVisualInfo *(*glXChooseVisual_t)(
     Display *dpy, int screen, int *attribList);
-typedef void (*glViewport_t)(GLint x, GLint y, GLsizei width, GLsizei height);
 
 static bool patch_gfx_initialized;
 static XCreateWindow_t patch_gfx_real_XCreateWindow;
 static XOpenDisplay_t patch_gfx_real_XOpenDisplay;
 static glXChooseVisual_t patch_gfx_real_GlXChooseVisual;
-static glViewport_t patch_gfx_real_glViewport;
-
-static bool _patch_gfx_scaling_enabled;
-static uint16_t _patch_gfx_screen_width;
-static uint16_t _patch_gfx_screen_height;
-static uint16_t _patch_gfx_viewport_width;
-static uint16_t _patch_gfx_viewport_height;
-static uint16_t _patch_gfx_viewport_pos_x;
-static uint16_t _patch_gfx_viewport_pos_y;
 
 static char *patch_gfx_attrib_list_to_str(int *attrib_list)
 {
@@ -94,11 +84,6 @@ Window XCreateWindow(
       /* enables usage of non nvidia cards and newer nvidia models */
       valuemask = 0x280A;
     }
-  }
-
-  if (_patch_gfx_scaling_enabled) {
-    width = _patch_gfx_screen_width;
-    height = _patch_gfx_screen_height;
   }
 
   return patch_gfx_real_XCreateWindow(
@@ -171,29 +156,8 @@ XVisualInfo *glXChooseVisual(Display *dpy, int screen, int *attribList)
   return res;
 }
 
-void glViewport(GLint x, GLint y, GLsizei width, GLsizei height)
-{
-  if (!patch_gfx_real_glViewport) {
-    void* handle = cnh_lib_load("libGL.so");
-
-    patch_gfx_real_glViewport =
-        (glViewport_t) cnh_lib_get_func_addr_handle(handle, "glViewport");
-  }
-
-  // 0/0 at the bottom left
-  if (_patch_gfx_scaling_enabled) {
-    x = _patch_gfx_viewport_pos_x;
-    y = _patch_gfx_viewport_pos_y;
-    width = _patch_gfx_viewport_width;
-    height = _patch_gfx_viewport_height;
-  }
-
-  patch_gfx_real_glViewport(x, y, width, height);
-}
-
 void patch_gfx_init()
 {
-  _patch_gfx_scaling_enabled = false;
   patch_gfx_initialized = true;
   log_info("Initialized");
 }
@@ -201,50 +165,5 @@ void patch_gfx_init()
 // Note, consider improving scaling, see http://www.david-amador.com/2013/04/opengl-2d-independent-resolution-rendering/
 void patch_gfx_scale(enum patch_gfx_scale_mode scale_mode)
 {
-  switch (scale_mode) {
-    case PATCH_GFX_SCALE_MODE_SD_480_TO_PILLARBOX_HD_720:
-      _patch_gfx_screen_width = 1280;
-      _patch_gfx_screen_height = 720;
-      _patch_gfx_viewport_width = 960;
-      _patch_gfx_viewport_height = 720;
-      _patch_gfx_viewport_pos_x = 160;
-      _patch_gfx_viewport_pos_y = 0;
-      break;
-
-    case PATCH_GFX_SCALE_MODE_SD_480_TO_PILLARBOX_HD_1080:
-      _patch_gfx_screen_width = 1920;
-      _patch_gfx_screen_height = 1080;
-      _patch_gfx_viewport_width = 1440;
-      _patch_gfx_viewport_height = 1080;
-      _patch_gfx_viewport_pos_x = 240;
-      _patch_gfx_viewport_pos_y = 0;
-      break;
-
-    case PATCH_GFX_SCALE_MODE_SD_480_TO_SD_960:
-      _patch_gfx_screen_width = 1280;
-      _patch_gfx_screen_height = 960;
-      _patch_gfx_viewport_width = 1280;
-      _patch_gfx_viewport_height = 960;
-      _patch_gfx_viewport_pos_x = 0;
-      _patch_gfx_viewport_pos_y = 0;
-      break;
-
-    case PATCH_GFX_SCALE_MODE_HD_720_TO_HD_1080:
-      _patch_gfx_screen_width = 1920;
-      _patch_gfx_screen_height = 1080;
-      _patch_gfx_viewport_width = 1920;
-      _patch_gfx_viewport_height = 1080;
-      _patch_gfx_viewport_pos_x = 0;
-      _patch_gfx_viewport_pos_y = 0;
-      break;
-
-    case PATCH_GFX_SCALE_MODE_INVALID:
-    default:
-      log_error("Invalid scale mode: %d. Scaling disabled", scale_mode);
-      return;
-  }
-
-  log_info("Scaling enabled, mode: %d", scale_mode);
-
-  _patch_gfx_scaling_enabled = true;
+  log_error("GFX scaling enabled but will not work. Temporarily removed due to issues with loading libGL.so");
 }
