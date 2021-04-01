@@ -1,5 +1,6 @@
 # Release history
 ## 1.11
+* Hotfix: Remove experimental option for gfx scaling temporarily
 
 ## 1.10
 * Refactor pumptools's usb device hooking backend
