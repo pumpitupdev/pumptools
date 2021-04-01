@@ -34,6 +34,7 @@ static const struct util_options_def mk3hook_options_def[] = {
         .description = "Path to game settings (SETTINGS) folder",
         .param = 's',
         .type = UTIL_OPTIONS_TYPE_STR,
+        .is_secret_data = false,
         .default_value.str = "./save",
     },
     {
@@ -41,6 +42,7 @@ static const struct util_options_def mk3hook_options_def[] = {
         .description = "Sync offset in ms",
         .param = 'y',
         .type = UTIL_OPTIONS_TYPE_INT,
+        .is_secret_data = false,
         .default_value.i = 115,
     },
     {
@@ -48,6 +50,7 @@ static const struct util_options_def mk3hook_options_def[] = {
         .description = "Sync multiplier",
         .param = 'v',
         .type = UTIL_OPTIONS_TYPE_DOUBLE,
+        .is_secret_data = false,
         .default_value.d = 4.16666666666666696272613990004,
     },
     {
@@ -55,6 +58,7 @@ static const struct util_options_def mk3hook_options_def[] = {
         .description = "Volume of music playback",
         .param = 'm',
         .type = UTIL_OPTIONS_TYPE_DOUBLE,
+        .is_secret_data = false,
         .default_value.d = 1.0,
     },
     {
@@ -62,6 +66,7 @@ static const struct util_options_def mk3hook_options_def[] = {
         .description = "Volume of sound effects playback",
         .param = 'c',
         .type = UTIL_OPTIONS_TYPE_DOUBLE,
+        .is_secret_data = false,
         .default_value.d = 1.0,
     },
     {
@@ -72,6 +77,7 @@ static const struct util_options_def mk3hook_options_def[] = {
                        "the game throws errors about not finding files",
         .param = 'x',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.b = false,
     },
     {
@@ -79,6 +85,7 @@ static const struct util_options_def mk3hook_options_def[] = {
         .description = "Force game into window mode",
         .param = 'w',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.b = false,
     },
     {
@@ -86,6 +93,7 @@ static const struct util_options_def mk3hook_options_def[] = {
         .description = "Enable file call monitoring",
         .param = 'f',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.b = false,
     },
     {
@@ -93,6 +101,7 @@ static const struct util_options_def mk3hook_options_def[] = {
         .description = "Enable file system related call monitoring",
         .param = 'g',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.b = false,
     },
     {
@@ -100,6 +109,7 @@ static const struct util_options_def mk3hook_options_def[] = {
         .description = "Enable IO syscall monitoring",
         .param = 'i',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.b = false,
     },
     {
@@ -107,6 +117,7 @@ static const struct util_options_def mk3hook_options_def[] = {
         .description = "Enable any file/IO open call monitoring",
         .param = 'j',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.b = false,
     },
     {
@@ -114,6 +125,7 @@ static const struct util_options_def mk3hook_options_def[] = {
         .description = "Enable libusb call monitoring",
         .param = 'u',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.b = false,
     },
     {
@@ -123,6 +135,7 @@ static const struct util_options_def mk3hook_options_def[] = {
                        "service (F2) and clear (F3)",
         .param = 'k',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.b = false,
     },
     {
@@ -131,6 +144,7 @@ static const struct util_options_def mk3hook_options_def[] = {
                        "api to capture X11 keyboard inputs",
         .param = 'q',
         .type = UTIL_OPTIONS_TYPE_STR,
+        .is_secret_data = false,
         .default_value.str = NULL,
     },
     {
@@ -139,6 +153,7 @@ static const struct util_options_def mk3hook_options_def[] = {
             "Path to library implementing the piuio api for piuio emulation",
         .param = 'p',
         .type = UTIL_OPTIONS_TYPE_STR,
+        .is_secret_data = false,
         .default_value.str = NULL,
     },
     {
@@ -146,6 +161,7 @@ static const struct util_options_def mk3hook_options_def[] = {
         .description = "Enable game exit on Test + Service",
         .param = 'e',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.b = false,
     },
     {
@@ -153,6 +169,7 @@ static const struct util_options_def mk3hook_options_def[] = {
         .description = "Select the sound device to open on snd_pcm_open",
         .param = 'a',
         .type = UTIL_OPTIONS_TYPE_STR,
+        .is_secret_data = false,
         .default_value.str = NULL,
     },
     {
@@ -162,6 +179,7 @@ static const struct util_options_def mk3hook_options_def[] = {
                        "the standard fmodex.so",
         .param = 'r',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.b = false,
     },
     {
@@ -169,6 +187,7 @@ static const struct util_options_def mk3hook_options_def[] = {
         .description = "Halt on sigsegv to attach a debugger to the process",
         .param = 'd',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.str = false,
     },
     {
@@ -176,6 +195,7 @@ static const struct util_options_def mk3hook_options_def[] = {
         .description = "Print the log output to the specified file",
         .param = 'o',
         .type = UTIL_OPTIONS_TYPE_STR,
+        .is_secret_data = false,
         .default_value.str = "pumptools.log",
     },
     {
@@ -183,6 +203,7 @@ static const struct util_options_def mk3hook_options_def[] = {
         .description = "Set the log level (0-4)",
         .param = 'l',
         .type = UTIL_OPTIONS_TYPE_INT,
+        .is_secret_data = false,
         .default_value.i = LOG_LEVEL_DEBUG,
     },
 };

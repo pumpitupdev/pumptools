@@ -25,6 +25,7 @@ struct util_options_def {
   const char *description;
   const char param;
   enum util_options_type type;
+  bool is_secret_data;
   union {
     int i;
     double d;

@@ -550,8 +550,6 @@ static bool util_options_init_from_file(
       pos_line_dup = util_str_dup(pos_lines);
       pos_key_val = strtok_r(pos_line_dup, "=", &ctx_key_val);
 
-      log_debug("Line: %s", pos_lines);
-
       if (pos_key_val != NULL) {
         key = pos_key_val;
         val = &pos_key_val[strlen(key) + 1];
@@ -562,8 +560,6 @@ static bool util_options_init_from_file(
         free(data);
         return false;
       }
-
-      log_debug("Key: %s, Value: %s", key, val);
 
       /* search for key */
       for (uint32_t j = 0; j < options->entries; j++) {
@@ -652,7 +648,7 @@ static bool util_options_init_from_file(
               options->defs->defs[j].param,
               options->defs->defs[j].name,
               options->defs->defs[j].type,
-              val ? val : "NULL");
+              val ? (options->defs->defs[j].is_secret_data ? "[REDACTED-SECRET]" : val) : "NULL");
 
           options->values[j].avail = true;
           break;

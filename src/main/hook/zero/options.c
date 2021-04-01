@@ -30,6 +30,7 @@ static const struct util_options_def zerohook_options_def[] = {
                        "new PIUZERO.INI settings file permanently",
         .param = 'z',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.b = false,
     },
     {
@@ -37,6 +38,7 @@ static const struct util_options_def zerohook_options_def[] = {
         .description = "Path to game settings (SETTINGS) folder",
         .param = 's',
         .type = UTIL_OPTIONS_TYPE_STR,
+        .is_secret_data = false,
         .default_value.str = "./save",
     },
     {
@@ -44,6 +46,7 @@ static const struct util_options_def zerohook_options_def[] = {
         .description = "Set a scaling mode for the rendered output. Available modes: 0 = disabled, 1 = SD 480 to pillarbox HD 720, 2 = SD 480 to pillarbox HD 1080, 3 = SD 480 to SD 960, 4 = HD 720 to HD 1080",
         .param = 'z',
         .type = UTIL_OPTIONS_TYPE_INT,
+        .is_secret_data = false,
         .default_value.i = 0,
     },
     {
@@ -51,6 +54,7 @@ static const struct util_options_def zerohook_options_def[] = {
         .description = "Enable file call monitoring",
         .param = 'f',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.b = false,
     },
     {
@@ -58,6 +62,7 @@ static const struct util_options_def zerohook_options_def[] = {
         .description = "Enable file system related call monitoring",
         .param = 'g',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.b = false,
     },
     {
@@ -65,6 +70,7 @@ static const struct util_options_def zerohook_options_def[] = {
         .description = "Enable IO syscall monitoring",
         .param = 'i',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.b = false,
     },
     {
@@ -72,6 +78,7 @@ static const struct util_options_def zerohook_options_def[] = {
         .description = "Enable any file/IO open call monitoring",
         .param = 'j',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.b = false,
     },
     {
@@ -79,6 +86,7 @@ static const struct util_options_def zerohook_options_def[] = {
         .description = "Enable libusb call monitoring",
         .param = 'u',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.b = false,
     },
     {
@@ -88,6 +96,7 @@ static const struct util_options_def zerohook_options_def[] = {
                        "service (F2) and clear (F3)",
         .param = 'k',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.b = false,
     },
     {
@@ -96,6 +105,7 @@ static const struct util_options_def zerohook_options_def[] = {
                        "api to capture X11 keyboard inputs",
         .param = 'q',
         .type = UTIL_OPTIONS_TYPE_STR,
+        .is_secret_data = false,
         .default_value.str = NULL,
     },
     {
@@ -104,6 +114,7 @@ static const struct util_options_def zerohook_options_def[] = {
             "Path to library implementing the piuio api for piuio emulation",
         .param = 'p',
         .type = UTIL_OPTIONS_TYPE_STR,
+        .is_secret_data = false,
         .default_value.str = NULL,
     },
     {
@@ -111,6 +122,7 @@ static const struct util_options_def zerohook_options_def[] = {
         .description = "Enable game exit on Test + Service",
         .param = 'e',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.b = false,
     },
     {
@@ -118,6 +130,7 @@ static const struct util_options_def zerohook_options_def[] = {
         .description = "Select the sound device to open on snd_pcm_open",
         .param = 'a',
         .type = UTIL_OPTIONS_TYPE_STR,
+        .is_secret_data = false,
         .default_value.str = "dmix",
     },
     {
@@ -125,6 +138,7 @@ static const struct util_options_def zerohook_options_def[] = {
         .description = "Halt on sigsegv to attach a debugger to the process",
         .param = 'd',
         .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
         .default_value.str = false,
     },
     {
@@ -132,6 +146,7 @@ static const struct util_options_def zerohook_options_def[] = {
         .description = "Print the log output to the specified file",
         .param = 'o',
         .type = UTIL_OPTIONS_TYPE_STR,
+        .is_secret_data = false,
         .default_value.str = "pumptools.log",
     },
     {
@@ -139,6 +154,7 @@ static const struct util_options_def zerohook_options_def[] = {
         .description = "Set the log level (0-4)",
         .param = 'l',
         .type = UTIL_OPTIONS_TYPE_INT,
+        .is_secret_data = false,
         .default_value.i = LOG_LEVEL_DEBUG,
     },
 };
