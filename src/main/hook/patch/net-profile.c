@@ -438,11 +438,9 @@ static bool _patch_net_profile_download_profile_file(
   player_ref_id = virtual_file->player_ref_id;
 
   log_info(
-      "Profile file player %d, file_type %d, refId %llX downloading from "
-      "server...",
+      "Profile file player %d, file_type %d downloading from server...",
       player,
-      file_type,
-      player_ref_id);
+      file_type);
 
   if (!pumpnet_lib_get(
           file_type,
@@ -450,18 +448,16 @@ static bool _patch_net_profile_download_profile_file(
           virtual_file->buffer,
           virtual_file->file_info->file_size)) {
     log_error(
-        "Downloading file player %d, file_type %d, refId %llX failed",
+        "Downloading file player %d, file_type %d, failed",
         player,
-        file_type,
-        player_ref_id);
+        file_type);
     return false;
   }
 
   log_info(
-      "Downloading file player %d, file_type %d, refId %llX successful",
+      "Downloading file player %d, file_type %d, successful",
       player,
-      file_type,
-      player_ref_id);
+      file_type);
   return true;
 }
 
@@ -510,10 +506,9 @@ static bool _patch_net_profile_upload_profile_file(
   player_ref_id = virtual_file->player_ref_id;
 
   log_info(
-      "Profile file player %d, file_type %d, refId %llX uploading to server...",
+      "Profile file player %d, file_type %d, uploading to server...",
       player,
-      file_type,
-      player_ref_id);
+      file_type);
 
   if (!pumpnet_lib_put(
           file_type,
@@ -521,18 +516,16 @@ static bool _patch_net_profile_upload_profile_file(
           virtual_file->buffer,
           virtual_file->file_info->file_size)) {
     log_error(
-        "Uploading file player %d, file_type %d, refId %llX failed",
+        "Uploading file player %d, file_type %d, failed",
         player,
-        file_type,
-        player_ref_id);
+        file_type);
     return false;
   }
 
   log_info(
-      "Uploading file player %d, file_type %d, refId %llX successful",
+      "Uploading file player %d, file_type %d, successful",
       player,
-      file_type,
-      player_ref_id);
+      file_type);
   return true;
 }
 
@@ -630,10 +623,9 @@ void patch_net_profile_init(
   pthread_mutex_init(&_patch_net_profile_mutex, NULL);
 
   log_info(
-      "Initialized: game %d, server %s, machine id %llX",
+      "Initialized: game %d, server %s",
       game,
-      pumpnet_server_addr,
-      machine_id);
+      pumpnet_server_addr);
 }
 
 void patch_net_profile_shutdown()

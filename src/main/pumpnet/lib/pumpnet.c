@@ -131,7 +131,7 @@ _pumpnet_lib_get_rank(uint64_t player_ref_id, void *buffer, size_t size)
   resp_size = sizeof(struct pumpnet_lib_get_rank_resp) + size;
   resp = util_xmalloc(resp_size);
 
-  log_info("[%llX][%llX] Get rank", trace_id, player_ref_id);
+  log_info("[%llX] Get rank", trace_id);
 
   if (!_pumpnet_lib_get_put(
           trace_id,
@@ -181,7 +181,7 @@ _pumpnet_lib_get_save(uint64_t player_ref_id, void *buffer, size_t size)
   resp_size = sizeof(struct pumpnet_lib_get_save_resp) + size;
   resp = util_xmalloc(resp_size);
 
-  log_info("[%llX][%llX] Get save", trace_id, player_ref_id);
+  log_info("[%llX] Get save", trace_id);
 
   if (!_pumpnet_lib_get_put(
           trace_id,
@@ -233,7 +233,7 @@ _pumpnet_lib_put_rank(uint64_t player_ref_id, const void *buffer, size_t size)
   req->size = size;
   memcpy(req->data, buffer, size);
 
-  log_info("[%llX][%llX] Put rank", trace_id, player_ref_id);
+  log_info("[%llX] Put rank", trace_id);
 
   if (!_pumpnet_lib_get_put(
           trace_id,
@@ -273,7 +273,7 @@ _pumpnet_lib_put_save(uint64_t player_ref_id, const void *buffer, size_t size)
   req->size = size;
   memcpy(req->data, buffer, size);
 
-  log_info("[%llX][%llX] Put save", trace_id, player_ref_id);
+  log_info("[%llX] Put save", trace_id);
 
   if (!_pumpnet_lib_get_put(
           trace_id,
