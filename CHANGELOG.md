@@ -1,4 +1,6 @@
 # Release history
+## 1.12
+
 ## 1.11
 * Hotfix: Remove experimental option for gfx scaling temporarily
 

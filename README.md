@@ -1,7 +1,7 @@
 # Pumptools: The ultimate toolset to run all Linux based PIU games on any* kernel and distribution
 [![pipeline status](https://dev.s-ul.eu/hackitup/pumptools/badges/master/pipeline.svg)](https://dev.s-ul.eu/hackitup/pumptools/commits/master)
 
-Version: 1.11
+Version: 1.12
 
 [Release history](CHANGELOG.md)
 
