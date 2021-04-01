@@ -143,6 +143,23 @@ This can happen if the game cannot reach the server or on some other errors that
 game retries for up to ten times currently to reach the server or complete an outstanding operation. This is also
 reflected in the logs with warning messages telling you the game is retrying.
 
+### When using pumpnet, the game reports "Nonfunctional USB drive"
+Check the `pumptools.log` file for entries about requests to pumpnet, for example:
+
+```text
+[I][2021/4/1-16:32:0:325][pumpnet][pumpnet.c:184] [1234567890123456][1234567890123456] Get save
+[M][2021/4/1-16:32:0:326][http][http.c:245] [1234567890123456][https://pumpnet/pumpnet/usbprofile/v1/nx2/save] GET 24 30784
+[M][2021/4/1-16:32:1:404][http][http.c:258] [1234567890123456][https://pumpnet/pumpnet/usbprofile/v1/nx2/save] GET: 403 (0 32)
+[E][2021/4/1-16:32:1:408][http][http.c:310] [1234567890123456][https://pumpnet/pumpnet/usbprofile/v1/nx2/save][0] Invalid recv data size: 0 != 30784
+[E][2021/4/1-16:32:1:408][pumpnet][pumpnet.c:99] [1234567890123456][get][https://pumpnet/pumpnet/usbprofile/v1/nx2/save] Failed
+[E][2021/4/1-16:32:1:409][patch-net-profile][net-profile.c:456] Downloading file player 0, file_type 0, refId 1234567890123456 failed
+```
+
+Check the response code of the requests, e.g. `GET: 403 (0 32)` here. `403` means "forbidden" which is translated to the
+"Nonfunctional USB drive" message in the game. 403s are reported if you are using an invalid or non-registered machine
+ID. Check if your machine ID is correctly set in the `hook.conf` file, see the [setup section](#pumpnet-setup).
+Otherwise, contact an administrator of pumpnet.
+
 ### Curl requests fail: Problem with the SSL CA cert
 When you get the following error message:
 ```text
@@ -163,3 +180,8 @@ Make sure that you have the files `ca-bundle-crt.pem`, `client-crt.pem` and `cli
 from the network you are trying to connect to placed in a directory. The path to the **directory** needs to be set in 
 the hook configuration file by setting the key `patch.net_profile.cert_dir_path`, e.g. 
 `patch.net_profile.cert_dir_path=./cert` if the files are placed next to the `piu` exec in the folder `cert`.
+
+### Do USB 3 ports also work?
+No guarantee but various tests have shown that they can work. If you are having issues when assigning the ports in
+the operator menu or detecting your USB thumb drive on the USB profile screen, try mapping different physical ports
+on your machine and also try USB 2 and 3 ports (the latter if available).
