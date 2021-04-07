@@ -5,6 +5,8 @@
 
 #include "asset/nx2/lib/usb-rank.h"
 #include "asset/nx2/lib/usb-save.h"
+#include "asset/nxa/lib/usb-rank.h"
+#include "asset/nxa/lib/usb-save.h"
 
 #include "pumpnet/lib/pumpnet.h"
 
@@ -28,6 +30,9 @@ static size_t _get_size_save_file(enum asset_game_version game_version)
     case ASSET_GAME_VERSION_NX2:
       return ASSET_NX2_USB_SAVE_SIZE;
 
+    case ASSET_GAME_VERSION_NXA:
+      return ASSET_NXA_USB_SAVE_SIZE;
+
     default:
       log_die_illegal_state();
       return 0;
@@ -39,6 +44,9 @@ static size_t _get_size_rank_file(enum asset_game_version game_version)
   switch (game_version) {
     case ASSET_GAME_VERSION_NX2:
       return ASSET_NX2_USB_RANK_SIZE;
+
+    case ASSET_GAME_VERSION_NXA:
+      return ASSET_NXA_USB_RANK_SIZE;
 
     default:
       log_die_illegal_state();
