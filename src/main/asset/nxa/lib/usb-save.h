@@ -4,6 +4,8 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#define ASSET_NXA_USB_SAVE_SIZE 90868
+
 enum asset_nxa_usb_save_limits {
   ASSET_NXA_USB_SAVE_SERIAL_ID_MAX = 64,
   ASSET_NXA_USB_SAVE_PLAYER_ID_MAX = 12,
