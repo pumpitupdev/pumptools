@@ -31,7 +31,9 @@ struct nxahook_options {
 
     struct net {
       const char *server;
-      uint32_t machine_id;
+      uint64_t machine_id;
+      bool verbose_log_output;
+      const char *cert_dir_path;
     } net;
 
     struct piuio {

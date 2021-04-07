@@ -5,6 +5,8 @@
 
 #include "asset/nx2/lib/usb-rank.h"
 #include "asset/nx2/lib/usb-save.h"
+#include "asset/nxa/lib/usb-rank.h"
+#include "asset/nxa/lib/usb-save.h"
 
 #include "capnhook/hook/filehook.h"
 
@@ -77,25 +79,44 @@ static bool _patch_net_profile_close_pumpnet_profile_file(
 
 static const struct profile_virtual_mnt_point_info
     _patch_net_profile_virtual_mnt_point_infos[] = {
+        {.player =
+             {{.file_info =
+                   {{.player = 0,
+                     .file_type = PUMPNET_LIB_FILE_TYPE_SAVE,
+                     .file_path = "/mnt/0/nx2save.bin",
+                     .file_size = ASSET_NX2_USB_SAVE_SIZE},
+                    {.player = 0,
+                     .file_type = PUMPNET_LIB_FILE_TYPE_RANK,
+                     .file_path = "/mnt/0/nx2rank.bin",
+                     .file_size = ASSET_NX2_USB_RANK_SIZE}}},
+              {.file_info =
+                   {{.player = 1,
+                     .file_type = PUMPNET_LIB_FILE_TYPE_SAVE,
+                     .file_path = "/mnt/1/nx2save.bin",
+                     .file_size = ASSET_NX2_USB_SAVE_SIZE},
+                    {.player = 1,
+                     .file_type = PUMPNET_LIB_FILE_TYPE_RANK,
+                     .file_path = "/mnt/1/nx2rank.bin",
+                     .file_size = ASSET_NX2_USB_RANK_SIZE}}}}},
         {.player = {
              {.file_info =
                   {{.player = 0,
                     .file_type = PUMPNET_LIB_FILE_TYPE_SAVE,
-                    .file_path = "/mnt/0/nx2save.bin",
-                    .file_size = ASSET_NX2_USB_SAVE_SIZE},
+                    .file_path = "/mnt/0/nxasave.bin",
+                    .file_size = ASSET_NXA_USB_SAVE_SIZE},
                    {.player = 0,
                     .file_type = PUMPNET_LIB_FILE_TYPE_RANK,
-                    .file_path = "/mnt/0/nx2rank.bin",
-                    .file_size = ASSET_NX2_USB_RANK_SIZE}}},
+                    .file_path = "/mnt/0/nxarank.bin",
+                    .file_size = ASSET_NXA_USB_RANK_SIZE}}},
              {.file_info =
                   {{.player = 1,
                     .file_type = PUMPNET_LIB_FILE_TYPE_SAVE,
-                    .file_path = "/mnt/1/nx2save.bin",
-                    .file_size = ASSET_NX2_USB_SAVE_SIZE},
+                    .file_path = "/mnt/1/nxasave.bin",
+                    .file_size = ASSET_NXA_USB_SAVE_SIZE},
                    {.player = 1,
                     .file_type = PUMPNET_LIB_FILE_TYPE_RANK,
-                    .file_path = "/mnt/1/nx2rank.bin",
-                    .file_size = ASSET_NX2_USB_RANK_SIZE}}},
+                    .file_path = "/mnt/1/nxarank.bin",
+                    .file_size = ASSET_NXA_USB_RANK_SIZE}}},
          }}};
 
 static const struct profile_virtual_mnt_point_info
@@ -566,10 +587,10 @@ void patch_net_profile_init(
       idx = 0;
       break;
 
-      //        case PUMPNET_LIB_GAME_NXA:
-      //            idx = 1;
-      //            break;
-      //
+    case ASSET_GAME_VERSION_NXA:
+      idx = 1;
+      break;
+
       //        case PUMPNET_LIB_GAME_FST:
       //            idx = 2;
       //            break;
@@ -581,7 +602,6 @@ void patch_net_profile_init(
       //        case PUMPNET_LIB_GAME_F2:
       //            idx = 4;
       //            break;
-    case ASSET_GAME_VERSION_NXA:
     case ASSET_GAME_VERSION_FIESTA:
     case ASSET_GAME_VERSION_FIESTA_EX:
     case ASSET_GAME_VERSION_FIESTA_2:

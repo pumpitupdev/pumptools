@@ -16,6 +16,7 @@
 #include "hook/patch/main-loop.h"
 #include "hook/patch/microdog40.h"
 #include "hook/patch/mounts.h"
+#include "hook/patch/net-profile.h"
 #include "hook/patch/piuio-exit.h"
 #include "hook/patch/piuio.h"
 #include "hook/patch/redir.h"
@@ -280,6 +281,18 @@ static void nxahook_patch_profile()
   nxahook_profile_gen_init();
 }
 
+static void nxahook_patch_pumpnet(struct nxahook_options *options)
+{
+  if (options->patch.net.server && options->patch.net.machine_id != 0) {
+    patch_net_profile_init(
+        ASSET_GAME_VERSION_NXA,
+        options->patch.net.server,
+        options->patch.net.machine_id,
+        options->patch.net.cert_dir_path,
+        options->patch.net.verbose_log_output);
+  }
+}
+
 void nxahook_constructor(void)
 {
   /* Nothing here */
@@ -309,6 +322,11 @@ void nxahook_trap_before_main(int argc, char **argv)
   nxahook_patch_dongle_init();
   nxahook_patch_hdd_check_init();
   nxahook_patch_piuio_init(&options);
+  // Init order of pumpnet and auto profile generating important: pumpnet hook,
+  // if active, needs to be applied before the auto gen profile hook. Otherwise,
+  // the game detects that no profile is available and auto generates one even
+  // it should take the pumpnet route to grab a profile from a remote server
+  nxahook_patch_pumpnet(&options);
   nxahook_patch_profile();
 
   free(game_data_path);
@@ -318,6 +336,7 @@ void nxahook_trap_before_main(int argc, char **argv)
 
 void nxahook_trap_after_main(void)
 {
+  patch_net_profile_shutdown();
   patch_piuio_shutdown();
 }
 
