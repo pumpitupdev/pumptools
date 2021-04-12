@@ -266,6 +266,7 @@ $(builddir)/pumptools-public.zip: \
 		$(zipdir)/mk3hook.zip \
 		$(zipdir)/nxhook.zip \
 		$(zipdir)/nx2hook.zip \
+		$(zipdir)/nxahook.zip \
 		$(zipdir)/piubtn.zip \
 		$(zipdir)/piuio.zip \
 		$(zipdir)/pro2hook.zip \
