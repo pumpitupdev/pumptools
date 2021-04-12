@@ -191,7 +191,9 @@ static void pro2hook_patch_piuio_init(struct pro2hook_options *options)
   if (options->patch.piuio.api_lib) {
     char *abs_path_iolib = util_fs_get_abs_path(options->patch.piuio.api_lib);
 
-    patch_piuio_init(abs_path_iolib);
+    // piuio thread is relying on hardware load. If this doesn't really exist,
+    // e.g. device software emulation, the thread will consume A LOT of CPU
+    patch_piuio_init(abs_path_iolib, 1);
     free(abs_path_iolib);
   }
 }
@@ -201,7 +203,9 @@ static void pro2hook_patch_piubtn_init(struct pro2hook_options *options)
   if (options->patch.piubtn.api_lib) {
     char *abs_path_btnlib = util_fs_get_abs_path(options->patch.piubtn.api_lib);
 
-    patch_piubtn_init(abs_path_btnlib);
+    // piubtn thread is relying on hardware load. If this doesn't really exist,
+    // e.g. device software emulation, the thread will consume A LOT of CPU
+    patch_piubtn_init(abs_path_btnlib, 1);
     free(abs_path_btnlib);
   }
 }
