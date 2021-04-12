@@ -60,7 +60,13 @@ asset files and folders from cramfs need to be copied to the `game` directory. `
 The `config` (or `CONFIG`) folder and its contents must be available in **UPPER** _AND_ **lowercase**. The `BrainQuest`
 folder name must be kept like this and its contents must be **lowercase**.
 
+## Pumpnet setup
+Identical to what's already outlined in the document dedicated to [NX2](nx2hook.md).
+
 ## Troubleshooting and FAQ
 Make sure to also check the
 [troubleshooting and FAQ section of the main hook readme](../hook.md#troubleshooting-and-faq). This covers various
 things that apply to **all** hooks. The following sub-sections apply mainly to this hook.
+
+Regarding any pumpnet (or USB profiles) related issues, please refer to items from the troubleshooting and FAQ section
+of [NX2](nx2hook.md).
