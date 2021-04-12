@@ -45,11 +45,18 @@ static const struct cnh_usb_emu_virtdev_ep _patch_piuio_virtdev = {
     .close = _patch_piuio_close,
 };
 
+static uint32_t _patch_piuio_poll_delay_ms;
 static struct ptapi_io_piuio_api _patch_piuio_api;
 static enum ptapi_io_piuio_sensor_group _patch_piuio_sensor_group;
 
-void patch_piuio_init(const char *piuio_lib_path)
+void patch_piuio_init(const char *piuio_lib_path, uint32_t poll_delay_ms)
 {
+  _patch_piuio_poll_delay_ms = poll_delay_ms;
+
+  if (_patch_piuio_poll_delay_ms > 0) {
+    log_debug("Enabled poll delay ms: %d", poll_delay_ms);
+  }
+
   if (!piuio_lib_path) {
     log_die("No piuio emulation library path specified");
   }
@@ -116,6 +123,10 @@ static enum cnh_result _patch_piuio_control_msg(
     struct cnh_iobuf *buffer,
     int timeout)
 {
+  if (_patch_piuio_poll_delay_ms > 0) {
+    usleep(_patch_piuio_poll_delay_ms * 1000);
+  }
+
   /**
    * Expected call pattern for a full game state update on a single frame (when
    * done synchronously)

@@ -37,6 +37,8 @@ static ptapi_io_piubtn_send_t _patch_piubtn_ptapi_io_piubtn_send;
 static ptapi_io_piubtn_get_input_t _patch_piubtn_ptapi_io_piubtn_get_input;
 static ptapi_io_piubtn_set_output_t _patch_piubtn_ptapi_io_piubtn_set_output;
 
+static uint32_t _patch_piubtn_poll_delay_ms;
+
 static const struct cnh_usb_emu_virtdev_ep _patch_piubtn_virtdev = {
     .pid = PIUBTN_DRV_PID,
     .vid = PIUBTN_DRV_VID,
@@ -49,8 +51,14 @@ static const struct cnh_usb_emu_virtdev_ep _patch_piubtn_virtdev = {
 
 static void *_patch_piubtn_api_lib_handle;
 
-void patch_piubtn_init(const char *piubtn_lib_path)
+void patch_piubtn_init(const char *piubtn_lib_path, uint32_t poll_delay_ms)
 {
+  _patch_piubtn_poll_delay_ms = poll_delay_ms;
+
+  if (_patch_piubtn_poll_delay_ms > 0) {
+    log_debug("Enabled poll delay ms: %d", poll_delay_ms);
+  }
+
   if (!piubtn_lib_path) {
     log_die("No piubtn emulation library path specified");
   }
@@ -140,6 +148,10 @@ static enum cnh_result _patch_piubtn_control_msg(
     struct cnh_iobuf *buffer,
     int timeout)
 {
+  if (_patch_piubtn_poll_delay_ms > 0) {
+    usleep(_patch_piubtn_poll_delay_ms * 1000);
+  }
+
   if (request_type == PIUBTN_DRV_USB_CTRL_TYPE_IN &&
       request == PIUBTN_DRV_USB_CTRL_REQUEST) {
     if (buffer->nbytes != PIUBTN_DRV_BUFFER_SIZE) {

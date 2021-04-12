@@ -13,9 +13,12 @@
  * Initialize the patch module
  *
  * @param piubtn_lib_path Path to a library implementing the piubtn API
- * @param real_passthrough True to ignore the library and disable any emulation
+ * @param poll_delay_ms If the polling thread relies on the hardware
+ *  load for timing, CPU load increases massively if the caller is not taking
+ *  care of sleeping properly. Injects an artificial delay to emulate that and
+ *  control the CPU load.
  */
-void patch_piubtn_init(const char *piubtn_lib_path);
+void patch_piubtn_init(const char *piubtn_lib_path, uint32_t poll_delay_ms);
 
 /**
  * Get the input hook handler provided by the piubtn library.
