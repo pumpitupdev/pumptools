@@ -219,7 +219,7 @@ static void zerohook_patch_piuio_init(struct zerohook_options *options)
   if (options->patch.piuio.api_lib) {
     char *abs_path_iolib = util_fs_get_abs_path(options->patch.piuio.api_lib);
 
-    patch_piuio_init(abs_path_iolib);
+    patch_piuio_init(abs_path_iolib, 0);
     free(abs_path_iolib);
   }
 }
