@@ -12,7 +12,6 @@ Linux. This also includes the only exclusive MK5 hardware based game Exceed and 
 Currently, the public release contains all source code required to run all games listed
 [here](#games-and-latest-versions-supported). The following games however are currently not working due to missing
 dongle key tables and raw hdd areas (dummy files exist to allow full compilation of the project):
-* NXA
 * Fiesta
 * FiestaEX
 * Fiesta 2
@@ -58,9 +57,9 @@ available per game version)
 * [Pro](doc/hook/prohook.md): R5 nodongle
 * [NX2](doc/hook/nx2hook.md): 154
 * [Pro2](doc/hook/pro2hook.md): R5 nodongle
+* [NXA](doc/hook/nxahook.md): 110
 
 Not available, yet:
-* [NXA](doc/hook/nxahook.md): 110
 * [Fiesta](doc/hook/fsthook.md): 120
 * [FiestaEX](doc/hook/fexhook.md): 151
 * [Fiesta 2](doc/hook/f2hook.md): 161
