@@ -1,5 +1,32 @@
-# Release history
-## 1.12
+# Changelog
+
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+Note: Entries prior 1.12 will not be updated accordingly.
+
+## [Unreleased]
+
+## [1.12] - 2019-04-12
+
+### Added
+
+* Doc: Update USB port and pumpnet troubleshooting (nx2/nxa)
+* Option to not redact refID and machineID in logs. Default is redact them. Because
+people always forget to remove that part from the logs and snippets.
+* NXA support
+* NXA pumpnet support
+
+### Changed
+
+* Pro1/2: Fix high CPU load due to IO threads threshing. Introduce a 1 ms artificial
+delay on every ctrl call (emulate hardware load)
+
+### Removed
+
+N/A
 
 ## 1.11
 * Hotfix: Remove experimental option for gfx scaling temporarily
