@@ -478,6 +478,23 @@ static bool _patch_net_profile_download_profile_file(
       "Downloading file player %d, file_type %d, successful",
       player,
       file_type);
+
+  FILE* out;
+  if (file_type == PUMPNET_LIB_FILE_TYPE_SAVE) {
+    out = fopen("/tmp/save_dump.bin", "w+");
+  } else {
+    out = fopen("/tmp/rank_dump.bin", "w+");
+  }
+
+  if (!out) {
+     log_error("Cannot open file for dumping");
+     return true;
+  }
+
+  fwrite(virtual_file->buffer, virtual_file->file_info->file_size, 1, out);
+
+  fclose(out);
+
   return true;
 }
 
