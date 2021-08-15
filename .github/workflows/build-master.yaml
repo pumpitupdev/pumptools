@@ -1,0 +1,40 @@
+# Regarding build steps, this is a copy of the Dockerfile and should be kept in-sync
+name: "Build pumptools"
+
+on:
+  push:
+    branches:
+      - master
+jobs:
+  build:
+    runs-on: "ubuntu-20.04"
+    steps:
+      - name: "Checkout repository"
+        uses: "actions/checkout@v2"
+
+      # Building bootstrapped using docker containers
+      - name: "Install prerequisites"
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y runc containerd docker.io
+      
+      - name: "Build"
+        run: |
+          make build-docker
+
+      # Do some unpacking of the dist zip. Artifact upload repackages stuff
+      - name: "Prepare artifact package"
+        run: |
+          mkdir artifact
+          cd artifact
+          unzip ../build/docker/pumptools-public.zip
+          cd ..
+
+      - name: "Upload artifact"
+        uses: "actions/upload-artifact@v2"
+        with:
+          name: pumptools-${{ github.sha }}
+          retention-days: 30
+          if-no-files-found: "error"
+          path: |
+            artifact/**
