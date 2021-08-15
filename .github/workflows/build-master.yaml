@@ -4,17 +4,7 @@ name: "Build pumptools"
 on:
   push:
     branches:
-      - ci-github
-  release:
-    types:
-      - created
-  workflow_dispatch: # allows you to trigger manually
-
-# TODO check github actions doc to evaluate if we need this or if this is even a good idea
-# concurrency:
-#   group: ${{ github.workflow }}-${{ github.ref }}
-#   cancel-in-progress: true
-
+      - master
 jobs:
   build:
     runs-on: "ubuntu-20.04"
@@ -44,29 +34,7 @@ jobs:
         uses: "actions/upload-artifact@v2"
         with:
           name: pumptools-${{ github.sha }}
-          # TODO change this back to 30
-          retention-days: 1
+          retention-days: 30
           if-no-files-found: "error"
           path: |
             artifact/**
-
-  publish-release:
-    needs: "build"
-    runs-on: "ubuntu-20.04"
-    steps:
-      # This already extracts the contents of the artifact
-      - name: "Download artifact"
-        uses: "actions/download-artifact@v2"
-        with:
-          name: pumptools-${{ github.sha }}
-
-      - name: "Publish release"
-        uses: "marvinpinto/action-automatic-releases@v1.2.1"
-        with:
-          repo_token: "${{ secrets.GITHUB_TOKEN }}"
-          automatic_release_tag: "latest"
-          draft: false
-          prerelease: true
-          title: master ${{ github.sha }}
-          files: |
-            **
