@@ -1,0 +1,62 @@
+# Regarding build steps, this is a copy of the Dockerfile and should be kept in-sync
+name: "Build pumptools"
+
+on:
+  push:
+    branches:
+      - "ci-github"
+  release:
+    types:
+      - "created"
+
+jobs:
+  build:
+    runs-on: "ubuntu-16.04"
+    steps:
+      - uses: "actions/checkout@v2"
+      - name: "Install prerequisites"
+        run: |
+          dpkg --add-architecture i386
+          apt-get update
+          apt-get install -y \
+            g++-multilib
+            gcc-multilib
+            zip \
+            cmake \
+            make \
+            git \
+            libc6-dev-i386 \
+            libusb-1.0-0-dev:i386 \
+            libusb-dev:i386 \
+            libasound2-dev:i386 \
+            libconfig++-dev:i386 \
+            libx11-dev:i386 \
+            libcurl4-gnutls-dev:i386 \
+            libglu1-mesa-dev:i386
+      - name: "Build"
+        run: "make -C $GITHUB_WORKSPACE build"
+      - name: "Package distribution files"
+        run: "make -C $GITHUB_WORKSPACE package"
+      - name: "Upload artifacts"
+        uses: "actions/upload-artifact@v2"
+        with:
+          name: "pumptools"
+          retention-days: 30
+          path: |
+            $GITHUB_WORKSPACE/build/pumptools.zip
+
+  # publish-release:
+  #   runs-on: "ubuntu-16.04"
+  #   steps:
+  #     - uses: "actions/download-artifact@v2"
+  #       with:
+  #         name: "pumptools"
+  #     - uses: "marvinpinto/action-automatic-releases@v1.2.1"
+  #       with:
+  #         repo_token: "${{ secrets.GITHUB_TOKEN }}"
+  #         automatic_release_tag: "latest"
+  #         prerelease: true
+  #         title: "Development Build"
+  #         files: |
+  #           LICENSE.txt
+  #           *.jar
