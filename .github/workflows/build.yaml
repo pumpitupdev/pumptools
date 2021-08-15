@@ -53,6 +53,7 @@ jobs:
             artifact/**
 
   publish-release:
+    needs: "build"
     runs-on: "ubuntu-20.04"
     steps:
       - name: "Download artifact"
