@@ -36,26 +36,42 @@ jobs:
         run: |
           make build-docker
 
-      - name: "Upload artifacts"
+      # Do some unpacking of the dist zip. Artifact upload repackages stuff
+      - name: "Prepare artifact package"
+        run: |
+          mkdir artifact
+          cd artifact
+          unzip build/docker/pumptools-public.zip
+          cd ..
+
+      - name: "Upload artifact"
         uses: "actions/upload-artifact@v2"
         with:
-          name: "pumptools"
+          name: "pumptools-${{ github.ref }}"
           retention-days: 30
           path: |
-            build/docker/pumptools-public.zip
+            artifact/**
 
-  # publish-release:
-  #   runs-on: "ubuntu-20.04"
-  #   steps:
-  #     - uses: "actions/download-artifact@v2"
-  #       with:
-  #         name: "pumptools"
-  #     - uses: "marvinpinto/action-automatic-releases@v1.2.1"
-  #       with:
-  #         repo_token: "${{ secrets.GITHUB_TOKEN }}"
-  #         automatic_release_tag: "latest"
-  #         prerelease: true
-  #         title: "Development Build"
-  #         files: |
-  #           LICENSE.txt
-  #           *.jar
+  publish-release:
+    runs-on: "ubuntu-20.04"
+    steps:
+      - name: "Download artifact"
+        uses: "actions/download-artifact@v2"
+        with:
+          name: "pumptools-${{ github.ref }}"
+
+      - name: "Extract artifact"
+        run: |
+          mkdir artifact
+          cd artifact
+          unzip ../pumptools-${{ github.ref }}.zip
+          cd ..
+
+      - uses: "marvinpinto/action-automatic-releases@v1.2.1"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "master ${{ github.ref }}"
+          files: |
+            artifact/**
