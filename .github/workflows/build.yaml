@@ -44,7 +44,8 @@ jobs:
         uses: "actions/upload-artifact@v2"
         with:
           name: pumptools-${{ github.sha }}
-          retention-days: 30
+          # TODO change this back to 30
+          retention-days: 1
           if-no-files-found: "error"
           path: |
             artifact/**
@@ -59,17 +60,13 @@ jobs:
         with:
           name: pumptools-${{ github.sha }}
 
-      - name: "show dir"
-        run: |
-          pwd
-          ls -la
-
       - name: "Publish release"
         uses: "marvinpinto/action-automatic-releases@v1.2.1"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
+          draft: false
           prerelease: true
           title: master ${{ github.sha }}
           files: |
-            artifact/**
+            **
