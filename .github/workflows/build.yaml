@@ -22,11 +22,7 @@ jobs:
       - name: "Checkout repository"
         uses: "actions/checkout@v2"
 
-      - name: "Show workspace"
-        run: |
-          pwd
-          ls -lah
-
+      # Building bootstrapped using docker containers
       - name: "Install prerequisites"
         run: |
           sudo apt-get update
@@ -41,7 +37,7 @@ jobs:
         run: |
           mkdir artifact
           cd artifact
-          unzip build/docker/pumptools-public.zip
+          unzip ../build/docker/pumptools-public.zip
           cd ..
 
       - name: "Upload artifact"
@@ -68,7 +64,8 @@ jobs:
           unzip ../pumptools-${{ github.ref }}.zip
           cd ..
 
-      - uses: "marvinpinto/action-automatic-releases@v1.2.1"
+      - name: "Publish release"
+        uses: "marvinpinto/action-automatic-releases@v1.2.1"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
