@@ -28,7 +28,7 @@ jobs:
           ls -lah
 
       - name: "Install docker"
-        run: sudo apt-get update && sudo apt-get install docker.io
+        run: sudo apt-get update && sudo apt-get install -y docker.io
       
       - name: "Build"
         run: make build-docker
