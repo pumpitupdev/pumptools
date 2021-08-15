@@ -1,52 +1,56 @@
 # Regarding build steps, this is a copy of the Dockerfile and should be kept in-sync
-name: "Build pumptools"
+name: Build pumptools
 
 on:
   push:
     branches:
-      - "ci-github"
+      - ci-github
   release:
     types:
-      - "created"
+      - created
 
 jobs:
   build:
-    runs-on: "ubuntu-16.04"
+    runs-on: ubuntu-20.04
     steps:
-      - uses: "actions/checkout@v2"
-      - name: "Install prerequisites"
-        run: |
-          dpkg --add-architecture i386
-          apt-get update
-          apt-get install -y \
-            g++-multilib
-            gcc-multilib
-            zip \
-            cmake \
-            make \
-            git \
-            libc6-dev-i386 \
-            libusb-1.0-0-dev:i386 \
-            libusb-dev:i386 \
-            libasound2-dev:i386 \
-            libconfig++-dev:i386 \
-            libx11-dev:i386 \
-            libcurl4-gnutls-dev:i386 \
-            libglu1-mesa-dev:i386
-      - name: "Build"
-        run: "make -C $GITHUB_WORKSPACE build"
-      - name: "Package distribution files"
-        run: "make -C $GITHUB_WORKSPACE package"
-      - name: "Upload artifacts"
-        uses: "actions/upload-artifact@v2"
-        with:
-          name: "pumptools"
-          retention-days: 30
-          path: |
-            $GITHUB_WORKSPACE/build/pumptools.zip
+      - uses: actions/checkout@v2
+      - name: Install docker
+        run: apt-get update && apt-get install docker-ce docker-ce-cli containerd.io
+      - name: Build
+        run: make build-docker
+#       - name: "Install prerequisites"
+#         run: |
+#           dpkg --add-architecture i386
+#           apt-get update
+#           apt-get install -y \
+#             g++-multilib
+#             gcc-multilib
+#             zip \
+#             cmake \
+#             make \
+#             git \
+#             libc6-dev-i386 \
+#             libusb-1.0-0-dev:i386 \
+#             libusb-dev:i386 \
+#             libasound2-dev:i386 \
+#             libconfig++-dev:i386 \
+#             libx11-dev:i386 \
+#             libcurl4-gnutls-dev:i386 \
+#             libglu1-mesa-dev:i386
+#       - name: "Build"
+#         run: "make -C $GITHUB_WORKSPACE build"
+#       - name: "Package distribution files"
+#         run: "make -C $GITHUB_WORKSPACE package"
+#       - name: "Upload artifacts"
+#         uses: "actions/upload-artifact@v2"
+#         with:
+#           name: "pumptools"
+#           retention-days: 30
+#           path: |
+#             $GITHUB_WORKSPACE/build/pumptools.zip
 
   # publish-release:
-  #   runs-on: "ubuntu-16.04"
+  #   runs-on: "ubuntu-20.04"
   #   steps:
   #     - uses: "actions/download-artifact@v2"
   #       with:
