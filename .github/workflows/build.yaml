@@ -53,17 +53,16 @@ jobs:
     needs: "build"
     runs-on: "ubuntu-20.04"
     steps:
+      # This already extracts the contents of the artifact
       - name: "Download artifact"
         uses: "actions/download-artifact@v2"
         with:
           name: pumptools-${{ github.sha }}
 
-      - name: "Extract artifact"
+      - name: "show dir"
         run: |
-          mkdir artifact
-          cd artifact
-          unzip ../pumptools-${{ github.sha }}.zip
-          cd ..
+          pwd
+          ls -la
 
       - name: "Publish release"
         uses: "marvinpinto/action-automatic-releases@v1.2.1"
