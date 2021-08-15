@@ -42,7 +42,7 @@ jobs:
           name: "pumptools"
           retention-days: 30
           path: |
-            $GITHUB_WORKSPACE/build/docker/pumptools-public.zip
+            build/docker/pumptools-public.zip
 
   # publish-release:
   #   runs-on: "ubuntu-20.04"
