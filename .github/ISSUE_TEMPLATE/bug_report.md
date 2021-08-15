@@ -7,7 +7,9 @@ assignees: ''
 
 ---
 
-# Description
+# Bug report
+
+## Description
 
 <!---
 REDACT SENSITIVE USER DATA FROM CONFIG, LOG FILES OR SCREENSHOTS !!!
@@ -19,15 +21,15 @@ REDACT SENSITIVE USER DATA FROM CONFIG, LOG FILES OR SCREENSHOTS !!!
 - Include screenshots/videos
 -->
 
-# Affected games and versions
+## Affected games and versions
 
 <!--- Add one or multiple game versions as a bullet list -->
 
-# Pumptools versions tested
+## Pumptools versions tested
 
 <!--- Add one or multiple versions as a bullet list -->
 
-# OS and hardware specs
+## OS and hardware specs
 
 * OS: <!--- Provide the version of Windows you used with whatever update/build identifier -->
 * CPU: <!--- Insert, e.g. Core i7 2600k 3.20ghz -->
