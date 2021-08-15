@@ -43,8 +43,9 @@ jobs:
       - name: "Upload artifact"
         uses: "actions/upload-artifact@v2"
         with:
-          name: "pumptools-${{ github.ref }}"
+          name: pumptools-${{ github.sha }}
           retention-days: 30
+          if-no-files-found: "error"
           path: |
             artifact/**
 
@@ -55,13 +56,13 @@ jobs:
       - name: "Download artifact"
         uses: "actions/download-artifact@v2"
         with:
-          name: "pumptools-${{ github.ref }}"
+          name: pumptools-${{ github.sha }}
 
       - name: "Extract artifact"
         run: |
           mkdir artifact
           cd artifact
-          unzip ../pumptools-${{ github.ref }}.zip
+          unzip ../pumptools-${{ github.sha }}.zip
           cd ..
 
       - name: "Publish release"
@@ -70,6 +71,6 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "latest"
           prerelease: true
-          title: "master ${{ github.ref }}"
+          title: master ${{ github.sha }}
           files: |
             artifact/**
