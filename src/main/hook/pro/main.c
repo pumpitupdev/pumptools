@@ -173,12 +173,11 @@ static void prohook_patch_piuio_init(struct prohook_options *options)
 
   patch_usb_init_fix_init();
   patch_piuio_khack_init();
-  patch_usb_emu_init();
-
   /* Hook before PIUIO emulation */
   if (options->patch.piuio.exit_test_serv) {
     patch_piuio_exit_init();
   }
+  patch_usb_emu_init();
 
   if (options->patch.piuio.api_lib) {
     char *abs_path_iolib = util_fs_get_abs_path(options->patch.piuio.api_lib);
