@@ -147,6 +147,7 @@ $(zipdir)/piuio.zip: \
 		$(builddir)/bin/ptapi-io-piuio-keyboard-conf \
 		$(builddir)/bin/ptapi-io-piuio-null.so \
 		$(builddir)/bin/ptapi-io-piuio-real.so \
+                $(builddir)/bin/ptapi-io-piuio-lxio.so \
 		$(builddir)/bin/ptapi-io-piuio-test \
 		dist/api/ptapi-io-piuio-stub.c \
 		| $(zipdir)/
