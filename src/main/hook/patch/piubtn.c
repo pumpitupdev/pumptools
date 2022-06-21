@@ -268,50 +268,50 @@ static enum cnh_result _patch_piubtn_process_outputs(struct cnh_iobuf *buffer)
 
   /*
    byte 0:
-   bit 0: p1 start (green)
-   bit 1: p1 right
-   bit 2: p1 left
-   bit 3: p1 back (red)
-   bit 4: p2 start (green)
-   bit 5: p2 right
-   bit 6: p2 left
-   bit 7: p2 back (red)
+   bit 0: p2 start (green)
+   bit 1: p2 right
+   bit 2: p2 left
+   bit 3: p2 back (red)
+   bit 4: p1 start (green)
+   bit 5: p1 right
+   bit 6: p1 left
+   bit 7: p1 back (red)
   */
-
-  /* Player 1 */
-
-  if (buffer->bytes[0] & (1 << 0)) {
-    p1.start = true;
-  }
-
-  if (buffer->bytes[0] & (1 << 1)) {
-    p1.back = true;
-  }
-
-  if (buffer->bytes[0] & (1 << 2)) {
-    p1.left = true;
-  }
-
-  if (buffer->bytes[0] & (1 << 3)) {
-    p1.right = true;
-  }
 
   /* Player 2 */
 
-  if (buffer->bytes[0] & (1 << 4)) {
+  if (buffer->bytes[0] & (1 << 0)) {
     p2.start = true;
   }
 
-  if (buffer->bytes[0] & (1 << 5)) {
+  if (buffer->bytes[0] & (1 << 1)) {
     p2.right = true;
   }
 
-  if (buffer->bytes[0] & (1 << 6)) {
+  if (buffer->bytes[0] & (1 << 2)) {
     p2.left = true;
   }
 
-  if (buffer->bytes[0] & (1 << 7)) {
+  if (buffer->bytes[0] & (1 << 3)) {
     p2.back = true;
+  }
+
+  /* Player 1 */
+
+  if (buffer->bytes[0] & (1 << 4)) {
+    p1.start = true;
+  }
+
+  if (buffer->bytes[0] & (1 << 5)) {
+    p1.right = true;
+  }
+
+  if (buffer->bytes[0] & (1 << 6)) {
+    p1.left = true;
+  }
+
+  if (buffer->bytes[0] & (1 << 7)) {
+    p1.back = true;
   }
 
   _patch_piubtn_ptapi_io_piubtn_set_output(0, &p1);
