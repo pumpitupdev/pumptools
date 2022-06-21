@@ -99,20 +99,6 @@ void *io_usb_open(uint16_t vid, uint16_t pid, uint16_t config, uint16_t iface)
     return NULL;
   }
 
-  ret = libusb_set_configuration(dev, config);
-
-  if (ret != LIBUSB_SUCCESS) {
-    libusb_close(dev);
-    libusb_exit(ctx);
-
-    log_error(
-        "(%04X:%04X) Setting configuration failed",
-        vid,
-        pid,
-        libusb_error_name(ret));
-    return NULL;
-  }
-
   /* check if the device is attached to the kernel, detach it first then */
   if (libusb_kernel_driver_active(dev, iface) == 1) {
     ret = libusb_detach_kernel_driver(dev, iface);
@@ -128,6 +114,20 @@ void *io_usb_open(uint16_t vid, uint16_t pid, uint16_t config, uint16_t iface)
           libusb_error_name(ret));
       return NULL;
     }
+  }
+
+  ret = libusb_set_configuration(dev, config);
+
+  if (ret != LIBUSB_SUCCESS) {
+    libusb_close(dev);
+    libusb_exit(ctx);
+
+    log_error(
+        "(%04X:%04X) Setting configuration failed",
+        vid,
+        pid,
+        libusb_error_name(ret));
+    return NULL;
   }
 
   ret = libusb_claim_interface(dev, iface);
@@ -179,6 +179,31 @@ int32_t io_usb_control_transfer(
   }
 
   return ret;
+}
+
+int32_t io_usb_interrupt_transfer(
+    void *handle,
+    int ep,
+    uint8_t *data,
+    uint16_t len,
+    uint32_t timeout)
+{
+  struct usb_io_ctx *dev = (struct usb_io_ctx *) handle;
+  int32_t ret, transferred;
+
+  ret =
+      libusb_interrupt_transfer(
+        dev->dev, ep, data, len, &transferred, timeout);
+
+  if (transferred != len) {
+    log_error(
+        "Interrupt transfer, addr %02x, handle %p failed: %s",
+        handle,
+        ep,
+        libusb_error_name(ret));
+  }
+
+  return transferred;
 }
 
 void io_usb_close(void *handle)
