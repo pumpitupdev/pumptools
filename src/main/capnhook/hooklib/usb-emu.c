@@ -502,7 +502,7 @@ _cnh_usb_emu_get_virtdev_by_handle(usb_dev_handle *handle)
   for (size_t i = 0; i < _cnh_usb_emu_nvirtdevs; i++) {
     tmp = &_cnh_usb_emu_virtdevs[i];
 
-    if (tmp == handle->virtdev) {
+    if (&tmp->usb_dev_handle == handle) {
       virtdev = tmp;
       break;
     }
