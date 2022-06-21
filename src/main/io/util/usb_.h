@@ -43,6 +43,23 @@ int32_t io_usb_control_transfer(
     uint32_t timeout);
 
 /**
+ * Execute an interrupt transfer request.
+ *
+ * @param handle Handle of an opened usb device
+ * @param ep Endpoint address to communicate with.
+ * @param data Pointer to an allocated buffer (depending on the vendor
+ *             specific request type, this can be a read or write buffer)
+ * @param len Length of the data to write/read
+ * @param timeout Timeout for the operation in ms
+ * @return Number of bytes read/written or -1 on error
+ */
+int32_t io_usb_interrupt_transfer(
+    void *handle, 
+    int ep, 
+    uint8_t *data,
+    uint16_t len, 
+    uint32_t timeout);
+/**
  * Close a opened usb device
  *
  * @param handle Handle of the opened device
