@@ -31,7 +31,8 @@ documentation also referenced from here:
 * [pumptools api](doc/api/api.md)
 * [pumptools development](doc/development/development.md)
 * [pumptools's architecture](doc/development/architecture.md)
-* [general game related stuff like pad codes, unlocks etc](doc/game/game.md)
+* [general game related stuff like pad codes, unlocks etc](https://github.com/pumpitupdev/piu-game-docs)
+* [hardware: boards, cabinets, etc](https://github.com/Shizmob/arcade-docs)
 * [game hook libraries](doc/hook/hook.md)
 
 ## Hook libraries
