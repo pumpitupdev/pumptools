@@ -190,29 +190,6 @@ $(zipdir)/security.zip: \
 $(zipdir)/doc.zip: \
 		doc/api/io/piuio.md \
 		doc/api/io/x11-input-hook.md \
-		doc/game/image \
-		doc/game/01-1st.md \
-		doc/game/02-2nd.md \
-		doc/game/03-3rd.md \
-		doc/game/04-3se.md \
-		doc/game/05-tc.md \
-		doc/game/06-pc.md \
-		doc/game/07-extra.md \
-		doc/game/08-prem1.md \
-		doc/game/09-prex1.md \
-		doc/game/10-reb.md \
-		doc/game/11-prem2.md \
-		doc/game/12-prex2.md \
-		doc/game/13-prem3.md \
-		doc/game/14-prex3.md \
-		doc/game/15-exc.md \
-		doc/game/16-exc2.md \
-		doc/game/17-zero.md \
-		doc/game/18-nx.md \
-		doc/game/19-pro.md \
-		doc/game/20-nx2.md \
-		doc/game/22-pro2.md \
-		doc/game/game.md \
 		doc/hook/exchook.md \
 		doc/hook/hook.md \
 		doc/hook/mk3hook.md \
