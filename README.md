@@ -76,7 +76,8 @@ Not available, yet:
 ### Prepare your operating system
 
 Before you start installing and configuring anything of pumptools, read [this readme](doc/hook/os.md) on how to prepare
-your operating system and environment.
+your operating system and environment. Please also note that not every Linux distribution and different versions were
+tested and verified working.
 
 ### Get and prepare game data
 
