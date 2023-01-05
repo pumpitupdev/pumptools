@@ -25,9 +25,18 @@ Alpine Linux
 * Kernel-wise, the latest kernels and everything that's not pre 2.6 should work. Due to various hook sub-modules, many
 quirks in different games have been fixed to run all games on the latest upstream kernel versions of Linux.
 
-Recommendation: Use a 64-bit Linux distribution of your choice. You can also use a 32-bit distribution as this is the
-arch these games were built for but it does not come with any benefits. Prepare yourself to upgrade to 64-bit once any
-of the newer games (finally) moves to that target architecture.
+Use a 64-bit Linux distribution of your choice (note compatibility notes below). You can also use a 32-bit distribution
+as this is the arch these games were built for but it does not come with any benefits. Prepare yourself to upgrade to
+64-bit once any of the newer games (finally) moves to that target architecture.
+
+### Tested, working and recommended Linux distributions
+
+* Ubuntu 18.04 LTS
+* Ubuntu 20.04 LTS
+
+### Distributions known to have issues
+
+* Ubuntu 22.04 LTS
 
 ## Dependencies
 Each game and hook comes with a list of dependencies you might have to install. This depends on which type of dependency
