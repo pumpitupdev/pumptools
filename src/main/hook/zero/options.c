@@ -43,7 +43,10 @@ static const struct util_options_def zerohook_options_def[] = {
     },
     {
         .name = ZEROHOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE,
-        .description = "Set a scaling mode for the rendered output. Available modes: 0 = disabled, 1 = SD 480 to pillarbox HD 720, 2 = SD 480 to pillarbox HD 1080, 3 = SD 480 to SD 960, 4 = HD 720 to HD 1080",
+        .description =
+            "Set a scaling mode for the rendered output. Available modes: 0 = "
+            "disabled, 1 = SD 480 to pillarbox HD 720, 2 = SD 480 to pillarbox "
+            "HD 1080, 3 = SD 480 to SD 960, 4 = HD 720 to HD 1080",
         .param = 'z',
         .type = UTIL_OPTIONS_TYPE_INT,
         .is_secret_data = false,

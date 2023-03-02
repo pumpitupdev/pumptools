@@ -1,8 +1,8 @@
 #define LOG_MODULE "patch-gfx"
 
+#include <GL/gl.h>
 #include <X11/Xutil.h>
 #include <stdbool.h>
-#include <GL/gl.h>
 
 // OpenGL 3.x+
 #include <GL/glx.h>
@@ -165,8 +165,11 @@ void patch_gfx_init()
   log_info("Initialized");
 }
 
-// Note, consider improving scaling, see http://www.david-amador.com/2013/04/opengl-2d-independent-resolution-rendering/
+// Note, consider improving scaling, see
+// http://www.david-amador.com/2013/04/opengl-2d-independent-resolution-rendering/
 void patch_gfx_scale(enum patch_gfx_scale_mode scale_mode)
 {
-  log_error("GFX scaling enabled but will not work. Temporarily removed due to issues with loading libGL.so");
+  log_error(
+      "GFX scaling enabled but will not work. Temporarily removed due to "
+      "issues with loading libGL.so");
 }

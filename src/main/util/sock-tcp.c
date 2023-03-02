@@ -63,8 +63,8 @@ bool util_sock_tcp_is_connectable3(
 
   FD_ZERO(&fdset);
   FD_SET(handle, &fdset);
-  tv.tv_sec = (__time_t)(timeout_ms / 1000);
-  tv.tv_usec = (__suseconds_t)((timeout_ms % 1000) * 1000);
+  tv.tv_sec = (__time_t) (timeout_ms / 1000);
+  tv.tv_usec = (__suseconds_t) ((timeout_ms % 1000) * 1000);
 
   if (select(handle + 1, NULL, &fdset, NULL, &tv) == 1) {
     int so_error;
@@ -142,8 +142,8 @@ ssize_t
 util_sock_tcp_send(int handle, void *buffer, size_t size, uint32_t timeout_ms)
 {
   struct timeval tv;
-  tv.tv_sec = (__time_t)(timeout_ms / 1000);
-  tv.tv_usec = (__suseconds_t)((timeout_ms % 1000) * 1000);
+  tv.tv_sec = (__time_t) (timeout_ms / 1000);
+  tv.tv_usec = (__suseconds_t) ((timeout_ms % 1000) * 1000);
 
   setsockopt(handle, SOL_SOCKET, SO_SNDTIMEO, (const char *) &tv, sizeof(tv));
 
@@ -166,8 +166,8 @@ ssize_t
 util_sock_tcp_recv(int handle, void *buffer, size_t size, uint32_t timeout_ms)
 {
   struct timeval tv;
-  tv.tv_sec = (__time_t)(timeout_ms / 1000);
-  tv.tv_usec = (__suseconds_t)((timeout_ms % 1000) * 1000);
+  tv.tv_sec = (__time_t) (timeout_ms / 1000);
+  tv.tv_usec = (__suseconds_t) ((timeout_ms % 1000) * 1000);
 
   setsockopt(handle, SOL_SOCKET, SO_RCVTIMEO, (const char *) &tv, sizeof(tv));
 

@@ -1,7 +1,8 @@
 /**
- * Communicate with the Andamiro "lxio" or ATMEGAPUMP or PIU HID. 
+ * Communicate with the Andamiro "lxio" or ATMEGAPUMP or PIU HID.
  * This device hosts all data in two address, and interrupt in and out.
- * Device needs to be written then read in that order. Every read needs a preceding write.
+ * Device needs to be written then read in that order. Every read needs a
+ * preceding write.
  */
 #define LOG_MODULE "ptapi-io-piuio-lxio"
 
@@ -13,8 +14,8 @@
 
 #include "util/log.h"
 
-#include "ptapi/io/piuio.h"
 #include "ptapi/io/piubtn.h"
+#include "ptapi/io/piuio.h"
 
 // Data going to/from lxio
 uint8_t lxio_btn_state_buffer[LXIO_MSG_SIZE];
@@ -95,19 +96,19 @@ void convert_output_to_lxio()
   /* Menu Buttons */
 
   for (uint8_t i = 0; i < 2; i++) {
-    //both UR and UL are mapped to "back"
+    // both UR and UL are mapped to "back"
     if (ptapi_piubtn_out[i].back) {
-      lxio_light_state_buffer[i+4] |= (1 << 0);
-      lxio_light_state_buffer[i+4] |= (1 << 1);
+      lxio_light_state_buffer[i + 4] |= (1 << 0);
+      lxio_light_state_buffer[i + 4] |= (1 << 1);
     }
     if (ptapi_piubtn_out[i].start) {
-      lxio_light_state_buffer[i+4] |= (1 << 2);
+      lxio_light_state_buffer[i + 4] |= (1 << 2);
     }
     if (ptapi_piubtn_out[i].left) {
-      lxio_light_state_buffer[i+4] |= (1 << 3);
+      lxio_light_state_buffer[i + 4] |= (1 << 3);
     }
     if (ptapi_piubtn_out[i].right) {
-      lxio_light_state_buffer[i+4] |= (1 << 4);
+      lxio_light_state_buffer[i + 4] |= (1 << 4);
     }
   }
 }
@@ -135,7 +136,6 @@ static void convert_input_to_piuio()
   ptapi_piuio_sys.clear = lxio_btn_state_buffer[8] & (1 << 7);
   ptapi_piuio_sys.coin = lxio_btn_state_buffer[8] & (1 << 2);
   ptapi_piuio_sys.coin2 = lxio_btn_state_buffer[9] & (1 << 2);
-
 }
 
 bool ptapi_io_piuio_recv(void)
@@ -208,20 +208,20 @@ void ptapi_io_piuio_set_output_cab(
       &ptapi_piuio_cab_out, outputs, sizeof(struct ptapi_io_piuio_cab_outputs));
 }
 
-const char* ptapi_io_piubtn_ident(void)
+const char *ptapi_io_piubtn_ident(void)
 {
   return "lxio";
 }
 
 bool ptapi_io_piubtn_open(void)
 {
-  //taken care of by piuio_open
+  // taken care of by piuio_open
   return true;
 }
 
 void ptapi_io_piubtn_close(void)
 {
-  //handled by piuio_close
+  // handled by piuio_close
 }
 
 bool ptapi_io_piubtn_recv(void)
@@ -236,33 +236,38 @@ bool ptapi_io_piubtn_send(void)
   return true;
 }
 
-void ptapi_io_piubtn_get_input(uint8_t player, struct ptapi_io_piubtn_inputs* inputs)
+void ptapi_io_piubtn_get_input(
+    uint8_t player, struct ptapi_io_piubtn_inputs *inputs)
 {
-  // Note: There could be consistancy issues if the two IOs are threaded by seperate threads
-  // Decided to take the risk of potentially lost button inputs. Testing has yielded
-  // good results.
+  // Note: There could be consistancy issues if the two IOs are threaded by
+  // seperate threads Decided to take the risk of potentially lost button
+  // inputs. Testing has yielded good results.
 
   // Set all inputs to off
   if (player == 0) {
-      inputs->left = lxio_btn_state_buffer[10] & (1 << 3);
-      inputs->right = lxio_btn_state_buffer[10] & (1 << 4);
-      inputs->start = lxio_btn_state_buffer[10] & (1 << 2);
+    inputs->left = lxio_btn_state_buffer[10] & (1 << 3);
+    inputs->right = lxio_btn_state_buffer[10] & (1 << 4);
+    inputs->start = lxio_btn_state_buffer[10] & (1 << 2);
 
-      //map both UR and UL to "back" as this is how kpump maps it.
-      inputs->back = (lxio_btn_state_buffer[10] & (1 << 0)) |
-                      (lxio_btn_state_buffer[10] & (1 << 1));
+    // map both UR and UL to "back" as this is how kpump maps it.
+    inputs->back = (lxio_btn_state_buffer[10] & (1 << 0)) |
+        (lxio_btn_state_buffer[10] & (1 << 1));
   } else {
-      inputs->left = lxio_btn_state_buffer[11] & (1 << 3);
-      inputs->right = lxio_btn_state_buffer[11] & (1 << 4);
-      inputs->start = lxio_btn_state_buffer[11] & (1 << 2);
+    inputs->left = lxio_btn_state_buffer[11] & (1 << 3);
+    inputs->right = lxio_btn_state_buffer[11] & (1 << 4);
+    inputs->start = lxio_btn_state_buffer[11] & (1 << 2);
 
-      //map both UR and UL to "back" as this is how kpump maps it.
-      inputs->back = (lxio_btn_state_buffer[11] & (1 << 0)) |
-                      (lxio_btn_state_buffer[11] & (1 << 1));
+    // map both UR and UL to "back" as this is how kpump maps it.
+    inputs->back = (lxio_btn_state_buffer[11] & (1 << 0)) |
+        (lxio_btn_state_buffer[11] & (1 << 1));
   }
 }
 
-void ptapi_io_piubtn_set_output(uint8_t player, const struct ptapi_io_piubtn_outputs* outputs)
+void ptapi_io_piubtn_set_output(
+    uint8_t player, const struct ptapi_io_piubtn_outputs *outputs)
 {
-  memcpy(&ptapi_piubtn_out[player], outputs, sizeof(struct ptapi_io_piubtn_outputs));
+  memcpy(
+      &ptapi_piubtn_out[player],
+      outputs,
+      sizeof(struct ptapi_io_piubtn_outputs));
 }

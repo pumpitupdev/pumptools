@@ -182,18 +182,13 @@ int32_t io_usb_control_transfer(
 }
 
 int32_t io_usb_interrupt_transfer(
-    void *handle,
-    int ep,
-    uint8_t *data,
-    uint16_t len,
-    uint32_t timeout)
+    void *handle, int ep, uint8_t *data, uint16_t len, uint32_t timeout)
 {
   struct usb_io_ctx *dev = (struct usb_io_ctx *) handle;
   int32_t ret, transferred;
 
   ret =
-      libusb_interrupt_transfer(
-        dev->dev, ep, data, len, &transferred, timeout);
+      libusb_interrupt_transfer(dev->dev, ep, data, len, &transferred, timeout);
 
   if (transferred != len) {
     log_error(

@@ -472,18 +472,18 @@ sec_hasp_asn1_encode_int(uint32_t val, uint8_t *buffer, size_t *offset)
     tmp[tmp_pos++] = (uint8_t) val;
   } else if (val <= 0xFFFF) {
     /* Big endian */
-    tmp[tmp_pos++] = (uint8_t)(val >> 8);
+    tmp[tmp_pos++] = (uint8_t) (val >> 8);
     tmp[tmp_pos++] = (uint8_t) val;
   } else if (val <= 0xFFFFFF) {
     /* Big endian */
-    tmp[tmp_pos++] = (uint8_t)(val >> 16);
-    tmp[tmp_pos++] = (uint8_t)(val >> 8);
+    tmp[tmp_pos++] = (uint8_t) (val >> 16);
+    tmp[tmp_pos++] = (uint8_t) (val >> 8);
     tmp[tmp_pos++] = (uint8_t) val;
   } else if (val <= 0xFFFFFFFF) {
     /* Big endian */
-    tmp[tmp_pos++] = (uint8_t)(val >> 24);
-    tmp[tmp_pos++] = (uint8_t)(val >> 16);
-    tmp[tmp_pos++] = (uint8_t)(val >> 8);
+    tmp[tmp_pos++] = (uint8_t) (val >> 24);
+    tmp[tmp_pos++] = (uint8_t) (val >> 16);
+    tmp[tmp_pos++] = (uint8_t) (val >> 8);
     tmp[tmp_pos++] = (uint8_t) val;
   } else if (val <= 0xFFFFFFFFFFFFFFFF) {
     // TODO quad words not supported in decode?
@@ -528,20 +528,20 @@ sec_hasp_asn1_encode_length(uint32_t len, uint8_t *buffer, size_t *offset)
   } else if (len <= 0xFFFF) {
     buffer[(*offset)++] = 0x82;
     /* Big endian */
-    buffer[(*offset)++] = (uint8_t)(len >> 8);
+    buffer[(*offset)++] = (uint8_t) (len >> 8);
     buffer[(*offset)++] = (uint8_t) len;
   } else if (len <= 0xFFFF) {
     buffer[(*offset)++] = 0x82;
     /* Big endian */
-    buffer[(*offset)++] = (uint8_t)(len >> 16);
-    buffer[(*offset)++] = (uint8_t)(len >> 8);
+    buffer[(*offset)++] = (uint8_t) (len >> 16);
+    buffer[(*offset)++] = (uint8_t) (len >> 8);
     buffer[(*offset)++] = (uint8_t) len;
   } else if (len <= 0xFFFFFFFF) {
     buffer[(*offset)++] = 0x84;
     /* Big endian */
-    buffer[(*offset)++] = (uint8_t)(len >> 24);
-    buffer[(*offset)++] = (uint8_t)(len >> 16);
-    buffer[(*offset)++] = (uint8_t)(len >> 8);
+    buffer[(*offset)++] = (uint8_t) (len >> 24);
+    buffer[(*offset)++] = (uint8_t) (len >> 16);
+    buffer[(*offset)++] = (uint8_t) (len >> 8);
     buffer[(*offset)++] = (uint8_t) len;
   }
 }
@@ -551,9 +551,9 @@ sec_hasp_asn1_encode_tag(uint16_t tag, uint8_t *buffer, size_t *offset)
 {
   if (tag > 0xFF) {
     /* Big endian */
-    buffer[(*offset)++] = (uint8_t)(tag >> 8);
-    buffer[(*offset)++] = (uint8_t)(tag);
+    buffer[(*offset)++] = (uint8_t) (tag >> 8);
+    buffer[(*offset)++] = (uint8_t) (tag);
   } else {
-    buffer[(*offset)++] = (uint8_t)(tag);
+    buffer[(*offset)++] = (uint8_t) (tag);
   }
 }

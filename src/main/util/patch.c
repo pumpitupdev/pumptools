@@ -36,7 +36,7 @@ void util_patch_function(uintptr_t func_addr, void *detour_func)
     offset += 4;
   }
 
-  uintptr_t call = (uintptr_t)(((uintptr_t) detour_func) - func_addr - offset);
+  uintptr_t call = (uintptr_t) (((uintptr_t) detour_func) - func_addr - offset);
 
   if (UNPROTECT(func_addr, 4096) != 0) {
     log_die("Unprotecting memory %p, len %d failed", func_addr);
