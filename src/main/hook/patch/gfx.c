@@ -7,6 +7,10 @@
 // OpenGL 3.x+
 #include <GL/glx.h>
 
+// For Frame Limiter
+#include <unistd.h> 
+#include <sys/time.h>
+
 #include "capnhook/hook/lib.h"
 
 #include "util/log.h"
@@ -30,11 +34,14 @@ typedef Window (*XCreateWindow_t)(
 typedef Display *(*XOpenDisplay_t)(const char *display_name);
 typedef XVisualInfo *(*glXChooseVisual_t)(
     Display *dpy, int screen, int *attribList);
+typedef void (*glXSwapBuffers_t)(Display *dpy, GLXDrawable drawable);
 
 static bool patch_gfx_initialized;
 static XCreateWindow_t patch_gfx_real_XCreateWindow;
 static XOpenDisplay_t patch_gfx_real_XOpenDisplay;
 static glXChooseVisual_t patch_gfx_real_GlXChooseVisual;
+static glXSwapBuffers_t patch_gfx_real_glXSwapBuffers;
+static uint16_t s_frame_limit = 0;
 
 static char *patch_gfx_attrib_list_to_str(int *attrib_list)
 {
@@ -54,6 +61,31 @@ static char *patch_gfx_attrib_list_to_str(int *attrib_list)
   }
 
   return str;
+}
+
+// Typical sleep until elapsed exit time
+void wait_frame_limit(unsigned int fps){
+    static unsigned int last_swap_time = 0;
+    unsigned int current_time = 0;
+    unsigned int swap_interval_usec = 1000000 / fps; // swap every 1/60th of a second
+    // Wait until it's time to swap again
+    do {
+        // Get the current time
+        struct timeval tv;
+        gettimeofday(&tv, NULL);
+        current_time = tv.tv_sec * 1000000 + tv.tv_usec;
+
+        // Calculate the time elapsed since the last swap
+        unsigned int elapsed_usec = current_time - last_swap_time;
+
+        // If less than 1/60th of a second has elapsed, wait
+        if (elapsed_usec < swap_interval_usec) {
+            usleep(swap_interval_usec - elapsed_usec);
+        }
+    } while (current_time - last_swap_time < swap_interval_usec);
+
+    // Record the time of this swap
+    last_swap_time = current_time;
 }
 
 Window XCreateWindow(
@@ -159,6 +191,19 @@ XVisualInfo *glXChooseVisual(Display *dpy, int screen, int *attribList)
   return res;
 }
 
+void glXSwapBuffers(Display *dpy, GLXDrawable drawable) {
+  if (!patch_gfx_real_glXSwapBuffers) {
+    patch_gfx_real_glXSwapBuffers =
+        (glXSwapBuffers_t) cnh_lib_get_func_addr("glXSwapBuffers");
+  }
+
+    patch_gfx_real_glXSwapBuffers(dpy, drawable);
+    // We'll wait until the next frame if we need to slow things down.
+    if(s_frame_limit){
+        wait_frame_limit(s_frame_limit);
+    }
+}
+
 void patch_gfx_init()
 {
   patch_gfx_initialized = true;
@@ -169,4 +214,8 @@ void patch_gfx_init()
 void patch_gfx_scale(enum patch_gfx_scale_mode scale_mode)
 {
   log_error("GFX scaling enabled but will not work. Temporarily removed due to issues with loading libGL.so");
+}
+
+void patch_gfx_frame_limit(uint16_t frame_limit){
+  s_frame_limit = frame_limit;
 }

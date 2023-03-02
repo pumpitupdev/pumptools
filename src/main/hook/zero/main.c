@@ -147,6 +147,9 @@ static void zerohook_patch_gfx_init(struct zerohook_options *options)
   if (options->patch.gfx.scaling_mode != PATCH_GFX_SCALE_MODE_INVALID) {
     patch_gfx_scale(options->patch.gfx.scaling_mode);
   }
+  if(options->patch.gfx.frame_limit > 0){
+    patch_gfx_frame_limit(options->patch.gfx.frame_limit);
+  }
 }
 
 static void zerohook_patch_game_init(struct zerohook_options *options)

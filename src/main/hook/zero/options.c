@@ -5,6 +5,7 @@
 #define ZEROHOOK_OPTIONS_STR_GAME_FORCE_UNLOCK "game.force_unlock"
 #define ZEROHOOK_OPTIONS_STR_GAME_SETTINGS "game.settings"
 #define ZEROHOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE "patch.gfx.scaling_mode"
+#define ZEROHOOK_OPTIONS_STR_PATCH_GFX_FRAME_LIMIT "patch.gfx.frame_limit"
 #define ZEROHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE "patch.hook_mon.file"
 #define ZEROHOOK_OPTIONS_STR_PATCH_HOOK_MON_FS "patch.hook_mon.fs"
 #define ZEROHOOK_OPTIONS_STR_PATCH_HOOK_MON_IO "patch.hook_mon.io"
@@ -44,6 +45,14 @@ static const struct util_options_def zerohook_options_def[] = {
     {
         .name = ZEROHOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE,
         .description = "Set a scaling mode for the rendered output. Available modes: 0 = disabled, 1 = SD 480 to pillarbox HD 720, 2 = SD 480 to pillarbox HD 1080, 3 = SD 480 to SD 960, 4 = HD 720 to HD 1080",
+        .param = 'z',
+        .type = UTIL_OPTIONS_TYPE_INT,
+        .is_secret_data = false,
+        .default_value.i = 0,
+    },
+    {
+        .name = ZEROHOOK_OPTIONS_STR_PATCH_GFX_FRAME_LIMIT,
+        .description = "Set a Frame Limit. Useful for systems that don't work with VSYNC. 0 = disabled, 60 = default",
         .param = 'z',
         .type = UTIL_OPTIONS_TYPE_INT,
         .is_secret_data = false,
@@ -189,6 +198,8 @@ bool zerohook_options_init(
       util_options_get_str(options_opt, ZEROHOOK_OPTIONS_STR_GAME_SETTINGS);
   options->patch.gfx.scaling_mode = util_options_get_int(
       options_opt, ZEROHOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE);
+  options->patch.gfx.frame_limit = util_options_get_int(
+      options_opt, ZEROHOOK_OPTIONS_STR_PATCH_GFX_FRAME_LIMIT);      
   options->patch.hook_mon.file = util_options_get_bool(
       options_opt, ZEROHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE);
   options->patch.hook_mon.fs = util_options_get_bool(

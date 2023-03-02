@@ -25,3 +25,5 @@ void patch_gfx_init();
  * @param scale_mode The scaling mode to apply
  */
 void patch_gfx_scale(enum patch_gfx_scale_mode scale_mode);
+
+void patch_gfx_frame_limit(uint16_t frame_limit);

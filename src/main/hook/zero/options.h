@@ -15,6 +15,7 @@ struct zerohook_options {
   struct patch {
     struct gfx {
       uint8_t scaling_mode;
+      uint16_t frame_limit;
     } gfx;
 
     struct hook_mon {
