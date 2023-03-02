@@ -78,11 +78,14 @@ Window XCreateWindow(
   }
 
   if (patch_gfx_initialized) {
-
-    if (valuemask == 0x80A) {
-      log_info("Patching to enable usage of non nvidia cards.");
-      /* enables usage of non nvidia cards and newer nvidia models */
-      valuemask = 0x280A;
+    // During early Exceed-Era code, CWColorMap was not included as a valuemask for creation of a window.
+    // Eventually, this was brought back, but it's suspected that NVIDIA cards, drivers at the time, or 
+    // perhaps even a combination of that and X11 supported querying the gpu itself for a colormap. 
+    // Either way, this no longer works consistently and we need to account for that.
+    if (valuemask & CWColormap == 0) {
+      log_info("Adding CWColorMap to ValueMask for Non-NVIDIA Cards.");
+      /* enables usage of nvidia cards where hardware colormaps are not available or supported */
+      valuemask |= CWColormap;
     }
   }
 
