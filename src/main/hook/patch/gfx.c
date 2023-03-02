@@ -35,13 +35,26 @@ typedef Display *(*XOpenDisplay_t)(const char *display_name);
 typedef XVisualInfo *(*glXChooseVisual_t)(
     Display *dpy, int screen, int *attribList);
 typedef void (*glXSwapBuffers_t)(Display *dpy, GLXDrawable drawable);
+typedef void (*glDrawPixels_t)(GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels);
 
-static bool patch_gfx_initialized;
 static XCreateWindow_t patch_gfx_real_XCreateWindow;
 static XOpenDisplay_t patch_gfx_real_XOpenDisplay;
 static glXChooseVisual_t patch_gfx_real_GlXChooseVisual;
 static glXSwapBuffers_t patch_gfx_real_glXSwapBuffers;
+static glDrawPixels_t patch_gfx_real_glDrawPixels;
+
+static bool patch_gfx_initialized;
 static uint16_t s_frame_limit = 0;
+static uint16_t s_init_display_width = 0;
+static uint16_t s_init_display_height = 0;
+static uint16_t s_target_display_width = 0;
+static uint16_t s_target_display_height = 0;
+static uint8_t s_scaling_mode = 0;
+static uint8_t s_resizable_window = 0;
+static uint8_t s_res_adjust_enabled = 0;
+static float s_zoom_factor_x = 0.0f;
+static float s_zoom_factor_y = 0.0f;
+
 
 static char *patch_gfx_attrib_list_to_str(int *attrib_list)
 {
@@ -88,6 +101,63 @@ void wait_frame_limit(unsigned int fps){
     last_swap_time = current_time;
 }
 
+void calculate_zoom_factors(int src_width, int src_height, int dest_width, int dest_height, float *zoom_x, float *zoom_y) {
+    *zoom_x = (float) dest_width / (float) src_width;
+    *zoom_y = (float) dest_height / (float) src_height;
+}
+
+// Check if our window dimensions changed and update our settings.
+void GetCurrentWindowDimensions(Display *dpy,GLXDrawable drawable){
+    Window root;
+    int x, y;
+    unsigned int width, height, border_width, depth;
+    XGetGeometry(dpy, drawable, &root, &x, &y, &width, &height, &border_width, &depth);
+	if(width != s_target_display_width || height != s_target_display_height){		
+		s_target_display_width = width;
+		s_target_display_height = height;
+		// Recalculate Zoom Factor
+		calculate_zoom_factors(s_init_display_width,s_init_display_height,s_target_display_width,s_target_display_height,&s_zoom_factor_x,&s_zoom_factor_y);
+	}
+}
+
+// A modified version of the S3DResize function from the engine to support multimode adjustment.
+void S3DResizeEx(void){
+  if(s_scaling_mode == PATCH_GFX_SCALE_MODE_STRETCH){
+    glViewport(0, 0, s_target_display_width, s_target_display_height);
+  }else if(s_scaling_mode == PATCH_GFX_SCALE_MODE_PIXEL_PERFECT){
+    float targetAspectRatio = s_init_display_width / (float)s_init_display_height;
+
+    // Figure out the largest area that fits in this resolution at the desired aspect ratio
+    int width = s_target_display_width;
+    int height = (int)(width / targetAspectRatio + 0.5f);
+
+    if (height > s_target_display_height) {
+        // It doesn't fit our height, we must switch to pillarbox then
+        height = s_target_display_height;
+        width = (int)(height * targetAspectRatio + 0.5f);
+    }
+
+    // Calculate pillarbox dimensions
+    int pillarbox_x = (s_target_display_width - width) / 2;
+    int pillarbox_y = (s_target_display_height - height) / 2;
+    if(width != s_target_display_width || height != s_target_display_height){
+      s_target_display_width = width;
+      s_target_display_height = height;
+      calculate_zoom_factors(s_init_display_width,s_init_display_height,s_target_display_width,s_target_display_height,&s_zoom_factor_x,&s_zoom_factor_y);
+    }
+
+    
+    // Set up the new viewport with pillarboxing
+    glViewport(pillarbox_x, pillarbox_y, width, height);
+
+  }
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glOrtho(0.0f, s_init_display_width, 0.0f, s_init_display_height, -500.0f, 500.0f);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();  
+}
+
 Window XCreateWindow(
     Display *display,
     Window parent,
@@ -119,6 +189,25 @@ Window XCreateWindow(
       /* enables usage of nvidia cards where hardware colormaps are not available or supported */
       valuemask |= CWColormap;
     }
+    // Cache startup dimensions.
+    s_init_display_width = width;
+    s_init_display_height = height;
+    // If our target dimensions were zero, we will disable the flag to do any resizing.
+    if(s_target_display_height == 0){
+      s_target_display_height = height;
+    }
+    if(s_target_display_width == 0){
+      s_target_display_width = width;
+    }  
+    // We also need zoom factor
+    calculate_zoom_factors(s_init_display_width,s_init_display_height,s_target_display_width,s_target_display_height,&s_zoom_factor_x,&s_zoom_factor_y);  
+
+    // If we're not using the resizable window flag and our resolutions match, we won't do any adjustment.
+    if(s_resizable_window != 0 || s_target_display_width != width || s_target_display_height != height){
+      s_res_adjust_enabled = 1;
+    }
+    width = s_target_display_width;
+    height = s_target_display_height;
   }
 
   return patch_gfx_real_XCreateWindow(
@@ -191,17 +280,60 @@ XVisualInfo *glXChooseVisual(Display *dpy, int screen, int *attribList)
   return res;
 }
 
+// Check for fullscreen draw calls and scale them appropriately.
+void glDrawPixels(GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels) {
+  if (!patch_gfx_real_glDrawPixels) {
+    patch_gfx_real_glDrawPixels =
+        (glDrawPixels_t) cnh_lib_get_func_addr("glDrawPixels");
+  }
+    // If our texture is the original screen size, we'll zoom, flip it because reasons, and then draw
+    // it to our updated zoom factor.    
+    if (width == s_init_display_width && height == s_init_display_height) {
+        // Do this - I don't remember why but do it.        
+        glRasterPos2i(0,0);       
+        glPixelZoom(s_zoom_factor_x, s_zoom_factor_y);
+        
+        // Create a new buffer to store the flipped image data
+        GLubyte *flippedPixels = malloc(width * height * sizeof(GLubyte) * 3);
+
+        // Flip the image data
+        for (int i = 0; i < height; i++) {
+            GLubyte *srcLine = ((GLubyte *)pixels) + i * width * 3;
+            GLubyte *dstLine = flippedPixels + (height - i - 1) * width * 3;
+            memcpy(dstLine, srcLine, width * 3);
+        }
+        // Draw our Updated Image Data
+        patch_gfx_real_glDrawPixels(width, height, format, type, flippedPixels);
+        // Free the flipped image data buffer
+        free(flippedPixels);
+        // Reset pixel zoom
+	      glPixelZoom(1.0, 1.0);
+
+    }else{
+        // Call the original glDrawPixels function
+        patch_gfx_real_glDrawPixels(width, height, format, type, pixels);
+    }
+}
+
 void glXSwapBuffers(Display *dpy, GLXDrawable drawable) {
   if (!patch_gfx_real_glXSwapBuffers) {
     patch_gfx_real_glXSwapBuffers =
         (glXSwapBuffers_t) cnh_lib_get_func_addr("glXSwapBuffers");
   }
+  // If we use a resizable window, we must refresh the target dimensions.
+  if(s_resizable_window){
+    GetCurrentWindowDimensions(dpy,drawable);
+  }
+  
+  if(s_scaling_mode){
+    S3DResizeEx();
+  }
 
-    patch_gfx_real_glXSwapBuffers(dpy, drawable);
-    // We'll wait until the next frame if we need to slow things down.
-    if(s_frame_limit){
-        wait_frame_limit(s_frame_limit);
-    }
+  patch_gfx_real_glXSwapBuffers(dpy, drawable);
+  // We'll wait until the next frame if we need to slow things down.
+  if(s_frame_limit){
+    wait_frame_limit(s_frame_limit);
+  }
 }
 
 void patch_gfx_init()
@@ -216,6 +348,10 @@ void patch_gfx_scale(enum patch_gfx_scale_mode scale_mode)
   log_error("GFX scaling enabled but will not work. Temporarily removed due to issues with loading libGL.so");
 }
 
-void patch_gfx_frame_limit(uint16_t frame_limit){
+void patch_gfx_display(uint8_t scaling_mode, uint8_t resizable_window, uint16_t screen_width, uint16_t screen_height, uint16_t frame_limit){
+  s_scaling_mode = scaling_mode;
+  s_resizable_window = resizable_window;
+  s_target_display_width = screen_width;
+  s_target_display_height = screen_height;
   s_frame_limit = frame_limit;
 }

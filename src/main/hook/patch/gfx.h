@@ -6,10 +6,8 @@
  */
 enum patch_gfx_scale_mode {
     PATCH_GFX_SCALE_MODE_INVALID = 0,
-    PATCH_GFX_SCALE_MODE_SD_480_TO_PILLARBOX_HD_720 = 1,
-    PATCH_GFX_SCALE_MODE_SD_480_TO_PILLARBOX_HD_1080 = 2,
-    PATCH_GFX_SCALE_MODE_SD_480_TO_SD_960 = 3,
-    PATCH_GFX_SCALE_MODE_HD_720_TO_HD_1080 = 4,
+    PATCH_GFX_SCALE_MODE_PIXEL_PERFECT = 1,
+    PATCH_GFX_SCALE_MODE_STRETCH = 2
 };
 
 /**
@@ -26,4 +24,4 @@ void patch_gfx_init();
  */
 void patch_gfx_scale(enum patch_gfx_scale_mode scale_mode);
 
-void patch_gfx_frame_limit(uint16_t frame_limit);
+void patch_gfx_display(uint8_t scaling_mode, uint8_t resizable_window, uint16_t screen_width, uint16_t screen_height, uint16_t frame_limit);

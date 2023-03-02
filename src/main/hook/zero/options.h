@@ -16,6 +16,9 @@ struct zerohook_options {
     struct gfx {
       uint8_t scaling_mode;
       uint16_t frame_limit;
+      uint8_t resizable_window;
+      uint16_t screen_width;
+      uint16_t screen_height;
     } gfx;
 
     struct hook_mon {

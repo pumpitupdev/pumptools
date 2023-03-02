@@ -5,6 +5,9 @@
 #define ZEROHOOK_OPTIONS_STR_GAME_FORCE_UNLOCK "game.force_unlock"
 #define ZEROHOOK_OPTIONS_STR_GAME_SETTINGS "game.settings"
 #define ZEROHOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE "patch.gfx.scaling_mode"
+#define ZEROHOOK_OPTIONS_STR_PATCH_GFX_RESIZABLE_WINDOW "patch.gfx.resizable_window"
+#define ZEROHOOK_OPTIONS_STR_PATCH_GFX_SCREEN_WIDTH "patch.gfx.screen_width"
+#define ZEROHOOK_OPTIONS_STR_PATCH_GFX_SCREEN_HEIGHT "patch.gfx.screen_height"
 #define ZEROHOOK_OPTIONS_STR_PATCH_GFX_FRAME_LIMIT "patch.gfx.frame_limit"
 #define ZEROHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE "patch.hook_mon.file"
 #define ZEROHOOK_OPTIONS_STR_PATCH_HOOK_MON_FS "patch.hook_mon.fs"
@@ -44,12 +47,36 @@ static const struct util_options_def zerohook_options_def[] = {
     },
     {
         .name = ZEROHOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE,
-        .description = "Set a scaling mode for the rendered output. Available modes: 0 = disabled, 1 = SD 480 to pillarbox HD 720, 2 = SD 480 to pillarbox HD 1080, 3 = SD 480 to SD 960, 4 = HD 720 to HD 1080",
+        .description = "Set a scaling mode for the rendered output. Available modes: 0 = disabled, 1 = pixel-perfect, 2 = stretch",
         .param = 'z',
         .type = UTIL_OPTIONS_TYPE_INT,
         .is_secret_data = false,
         .default_value.i = 0,
     },
+    {
+        .name = ZEROHOOK_OPTIONS_STR_PATCH_GFX_RESIZABLE_WINDOW,
+        .description = "Enable to allow dynamic resize of content via window. Available modes: 0 = disabled, 1 = enabled",
+        .param = 'f',
+        .type = UTIL_OPTIONS_TYPE_BOOL,
+        .is_secret_data = false,
+        .default_value.i = 0,
+    },    
+    {
+        .name = ZEROHOOK_OPTIONS_STR_PATCH_GFX_SCREEN_WIDTH,
+        .description = "Set a forced screen width in pixels. 0 = default",
+        .param = 'z',
+        .type = UTIL_OPTIONS_TYPE_INT,
+        .is_secret_data = false,
+        .default_value.i = 0,
+    },
+    {
+        .name = ZEROHOOK_OPTIONS_STR_PATCH_GFX_SCREEN_HEIGHT,
+        .description = "Set a forced screen height in pixels. 0 = default",
+        .param = 'z',
+        .type = UTIL_OPTIONS_TYPE_INT,
+        .is_secret_data = false,
+        .default_value.i = 0,
+    },        
     {
         .name = ZEROHOOK_OPTIONS_STR_PATCH_GFX_FRAME_LIMIT,
         .description = "Set a Frame Limit. Useful for systems that don't work with VSYNC. 0 = disabled, 60 = default",
@@ -200,6 +227,12 @@ bool zerohook_options_init(
       options_opt, ZEROHOOK_OPTIONS_STR_PATCH_GFX_SCALING_MODE);
   options->patch.gfx.frame_limit = util_options_get_int(
       options_opt, ZEROHOOK_OPTIONS_STR_PATCH_GFX_FRAME_LIMIT);      
+  options->patch.gfx.screen_width = util_options_get_int(
+      options_opt, ZEROHOOK_OPTIONS_STR_PATCH_GFX_SCREEN_WIDTH);         
+  options->patch.gfx.screen_height = util_options_get_int(
+      options_opt, ZEROHOOK_OPTIONS_STR_PATCH_GFX_SCREEN_HEIGHT); 
+ options->patch.gfx.resizable_window = util_options_get_bool(
+      options_opt, ZEROHOOK_OPTIONS_STR_PATCH_GFX_RESIZABLE_WINDOW);                
   options->patch.hook_mon.file = util_options_get_bool(
       options_opt, ZEROHOOK_OPTIONS_STR_PATCH_HOOK_MON_FILE);
   options->patch.hook_mon.fs = util_options_get_bool(
