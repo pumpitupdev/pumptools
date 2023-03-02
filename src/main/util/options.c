@@ -648,7 +648,10 @@ static bool util_options_init_from_file(
               options->defs->defs[j].param,
               options->defs->defs[j].name,
               options->defs->defs[j].type,
-              val ? (options->defs->defs[j].is_secret_data ? "[REDACTED-SECRET]" : val) : "NULL");
+              val ?
+                  (options->defs->defs[j].is_secret_data ? "[REDACTED-SECRET]" :
+                                                           val) :
+                  "NULL");
 
           options->values[j].avail = true;
           break;

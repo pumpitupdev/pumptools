@@ -468,9 +468,7 @@ static bool _patch_net_profile_download_profile_file(
           virtual_file->buffer,
           virtual_file->file_info->file_size)) {
     log_error(
-        "Downloading file player %d, file_type %d, failed",
-        player,
-        file_type);
+        "Downloading file player %d, file_type %d, failed", player, file_type);
     return false;
   }
 
@@ -536,16 +534,12 @@ static bool _patch_net_profile_upload_profile_file(
           virtual_file->buffer,
           virtual_file->file_info->file_size)) {
     log_error(
-        "Uploading file player %d, file_type %d, failed",
-        player,
-        file_type);
+        "Uploading file player %d, file_type %d, failed", player, file_type);
     return false;
   }
 
   log_info(
-      "Uploading file player %d, file_type %d, successful",
-      player,
-      file_type);
+      "Uploading file player %d, file_type %d, successful", player, file_type);
   return true;
 }
 
@@ -641,10 +635,7 @@ void patch_net_profile_init(
 
   pthread_mutex_init(&_patch_net_profile_mutex, NULL);
 
-  log_info(
-      "Initialized: game %d, server %s",
-      game,
-      pumpnet_server_addr);
+  log_info("Initialized: game %d, server %s", game, pumpnet_server_addr);
 }
 
 void patch_net_profile_shutdown()

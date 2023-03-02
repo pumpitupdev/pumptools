@@ -54,11 +54,7 @@ int32_t io_usb_control_transfer(
  * @return Number of bytes read/written or -1 on error
  */
 int32_t io_usb_interrupt_transfer(
-    void *handle, 
-    int ep, 
-    uint8_t *data,
-    uint16_t len, 
-    uint32_t timeout);
+    void *handle, int ep, uint8_t *data, uint16_t len, uint32_t timeout);
 /**
  * Close a opened usb device
  *

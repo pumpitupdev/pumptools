@@ -27,7 +27,7 @@
 
 #define LIB_MAIN_TRAP_MAIN(func_before_main, func_after_main)              \
   typedef int (*func_libc_start_main_t)(                                   \
-      int *(main)(int, char **, char **),                                  \
+      int *(main) (int, char **, char **),                                 \
       int argc,                                                            \
       char **ubp_av,                                                       \
       void (*init)(void),                                                  \
@@ -58,7 +58,7 @@
   }                                                                        \
                                                                            \
   int __libc_start_main(                                                   \
-      int *(main)(int, char **, char **),                                  \
+      int *(main) (int, char **, char **),                                 \
       int argc,                                                            \
       char **ubp_av,                                                       \
       void (*init)(void),                                                  \

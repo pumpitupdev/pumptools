@@ -12,7 +12,7 @@
 void util_time_sleep_ns(uint64_t time_ns)
 {
   struct timespec t;
-  t.tv_sec = (__time_t)(time_ns / (1000 * 1000 * 1000));
+  t.tv_sec = (__time_t) (time_ns / (1000 * 1000 * 1000));
   t.tv_nsec = (__syscall_slong_t) time_ns % (1000 * 1000 * 1000);
 
   nanosleep(&t, NULL);
@@ -21,8 +21,8 @@ void util_time_sleep_ns(uint64_t time_ns)
 void util_time_sleep_us(uint64_t time_us)
 {
   struct timespec t;
-  t.tv_sec = (__time_t)(time_us / (1000 * 1000));
-  t.tv_nsec = (__syscall_slong_t)(time_us % (1000 * 1000)) * 1000;
+  t.tv_sec = (__time_t) (time_us / (1000 * 1000));
+  t.tv_nsec = (__syscall_slong_t) (time_us % (1000 * 1000)) * 1000;
 
   nanosleep(&t, NULL);
 }
@@ -30,8 +30,8 @@ void util_time_sleep_us(uint64_t time_us)
 void util_time_sleep_ms(uint64_t time_ms)
 {
   struct timespec t;
-  t.tv_sec = (__time_t)(time_ms / 1000);
-  t.tv_nsec = (__syscall_slong_t)(time_ms % 1000) * 1000 * 1000;
+  t.tv_sec = (__time_t) (time_ms / 1000);
+  t.tv_nsec = (__syscall_slong_t) (time_ms % 1000) * 1000 * 1000;
 
   nanosleep(&t, NULL);
 }

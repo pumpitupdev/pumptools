@@ -202,7 +202,7 @@ enum cnh_result cnh_iobuf_write_be16(struct cnh_iobuf *dest, uint16_t value)
     return CNH_RESULT_ERROR_INSUFFICIENT_BUFFER;
   }
 
-  dest->bytes[dest->pos++] = (uint8_t)(value >> 8);
+  dest->bytes[dest->pos++] = (uint8_t) (value >> 8);
   dest->bytes[dest->pos++] = (uint8_t) value;
 
   return CNH_RESULT_SUCCESS;
@@ -216,9 +216,9 @@ enum cnh_result cnh_iobuf_write_be32(struct cnh_iobuf *dest, uint32_t value)
     return CNH_RESULT_ERROR_INSUFFICIENT_BUFFER;
   }
 
-  dest->bytes[dest->pos++] = (uint8_t)(value >> 24);
-  dest->bytes[dest->pos++] = (uint8_t)(value >> 16);
-  dest->bytes[dest->pos++] = (uint8_t)(value >> 8);
+  dest->bytes[dest->pos++] = (uint8_t) (value >> 24);
+  dest->bytes[dest->pos++] = (uint8_t) (value >> 16);
+  dest->bytes[dest->pos++] = (uint8_t) (value >> 8);
   dest->bytes[dest->pos++] = (uint8_t) value;
 
   return CNH_RESULT_SUCCESS;
@@ -233,7 +233,7 @@ enum cnh_result cnh_iobuf_write_le16(struct cnh_iobuf *dest, uint16_t value)
   }
 
   dest->bytes[dest->pos++] = (uint8_t) value;
-  dest->bytes[dest->pos++] = (uint8_t)(value >> 8);
+  dest->bytes[dest->pos++] = (uint8_t) (value >> 8);
 
   return CNH_RESULT_SUCCESS;
 }
@@ -247,9 +247,9 @@ enum cnh_result cnh_iobuf_write_le32(struct cnh_iobuf *dest, uint32_t value)
   }
 
   dest->bytes[dest->pos++] = (uint8_t) value;
-  dest->bytes[dest->pos++] = (uint8_t)(value >> 8);
-  dest->bytes[dest->pos++] = (uint8_t)(value >> 16);
-  dest->bytes[dest->pos++] = (uint8_t)(value >> 24);
+  dest->bytes[dest->pos++] = (uint8_t) (value >> 8);
+  dest->bytes[dest->pos++] = (uint8_t) (value >> 16);
+  dest->bytes[dest->pos++] = (uint8_t) (value >> 24);
 
   return CNH_RESULT_SUCCESS;
 }
