@@ -82,7 +82,7 @@ Window XCreateWindow(
     // Eventually, this was brought back, but it's suspected that NVIDIA cards, drivers at the time, or 
     // perhaps even a combination of that and X11 supported querying the gpu itself for a colormap. 
     // Either way, this no longer works consistently and we need to account for that.
-    if (valuemask & CWColormap == 0) {
+    if ((valuemask & CWColormap) == 0) {
       log_info("Adding CWColorMap to ValueMask for Non-NVIDIA Cards.");
       /* enables usage of nvidia cards where hardware colormaps are not available or supported */
       valuemask |= CWColormap;
