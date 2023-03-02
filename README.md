@@ -28,12 +28,21 @@ Additional documentation on different topics related to pumptools are located in
 For release distribution packages, you can find a `doc.zip` file inside the `pumptools.zip` package that contains all
 documentation also referenced from here:
 
-* [pumptools api](doc/api/api.md)
-* [pumptools development](doc/development/development.md)
-* [pumptools's architecture](doc/development/architecture.md)
-* [general game related stuff like pad codes, unlocks etc](https://github.com/pumpitupdev/piu-game-docs)
-* [hardware: boards, cabinets, etc](https://github.com/Shizmob/arcade-docs)
-* [game hook libraries](doc/hook/hook.md)
+### Developers
+
+* [API](doc/api/api.md): Pumptools public API documentation to write your own integrations with
+  pumptools, e.g. IO
+* [Development](doc/development/development.md): How to develop for and with pumptools, e.g.
+  development environment setup, building
+* [Architecture](doc/development/architecture.md): Describes the architecture of pumptools outlining the most important
+  high level aspects
+
+### Users
+
+* [Hook library documentation](doc/hook/hook.md): User documentation how to setup and use the hook libraries
+* [Hardware docs](https://github.com/Shizmob/arcade-docs): Boards, cabinets, IOs etc.
+* [Game documentation](https://github.com/pumpitupdev/piu-game-docs): General game related stuff like pad codes, unlocks
+  etc
 
 ## Hook libraries
 
@@ -97,7 +106,7 @@ section before as well to be aware of any known issues when you encounter them.
 
 ## Building
 
-Make sure you have the [required tools](doc/development.md) installed. Once that's done, simply run
+Make sure you have the [required tools](doc/development/development.md) installed. Once that's done, simply run
 
 ```shell script
 make build
@@ -116,22 +125,6 @@ make build-docker
 ```
 
 The build output from the docker image is located in `build/docker`.
-
-## Development
-
-## API
-
-Please refer to the [API documentation](doc/api/api.md).
-
-## Architecture
-
-A dedicate [architecture document](doc/architecture.md) outlines the architecture of pumptools and points out the most
-important aspects you should know before you get started with development.
-
-## Pumptools development
-
-Please refer to the [development readme](doc/development.md) regarding what you have to know when you want to develop
-something for pumptools.
 
 ## License
 
