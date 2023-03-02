@@ -48,9 +48,12 @@ libc-version:
 	$(V)mkdir -p $(BUILDDIR)
 	$(V)echo "$(libcver)" > $(BUILDDIR)/libc-version
 
+# Do not format external imports
 .PHONY: clang-format # Apply code style defined in .clang-format style to all code in src/
 clang-format:
-	$(V)find src/ -iname *.h -o -iname *.c | xargs clang-format -i -style=file
+	$(V)find src/api -iname *.h -o -iname *.c | xargs clang-format -i -style=file
+	$(V)find src/main -iname *.h -o -iname *.c | xargs clang-format -i -style=file
+	$(V)find src/test -iname *.h -o -iname *.c | xargs clang-format -i -style=file
 
 .PHONY: package # Package the build output into distribution zip files
 package: $(BUILDDIR)/pumptools.zip $(BUILDDIR)/pumptools-public.zip
