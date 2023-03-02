@@ -7,12 +7,17 @@ This document covers various aspects of developing for pumptools. For developing
 with the codebase and its features, definitely recommended to read this first.
 
 ## Development environment setup
+
+Pumptools targets the Linux-based Piu games. Therefore, you need a 64-bit Linux distribution of
+your choice.
+
 Pumptools is written entirely in C and built using cmake. Various helper scripts are written as bash/shell scripts.
 Therefore, you need the following tools on your development setup:
 * gcc
 * cmake
 * make
 * bash or compatible shell
+* clang-format
 
 Pumptools requires the following dependencies to be installed on your development OS:
 * libcurl4 i386
