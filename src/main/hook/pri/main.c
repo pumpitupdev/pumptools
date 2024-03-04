@@ -26,6 +26,7 @@
 #include "hook/patch/redir.h"
 #include "hook/patch/sigsegv.h"
 #include "hook/patch/sound.h"
+#include "hook/patch/sysinfo.h"
 #include "hook/patch/usb-emu.h"
 #include "hook/patch/usb-init-fix.h"
 #include "hook/patch/usb-mnt.h"
@@ -149,6 +150,13 @@ static void prihook_patch_gfx_init(struct prihook_options *options)
   if (options->patch.gfx.scaling_mode != PATCH_GFX_SCALE_MODE_INVALID) {
     patch_gfx_scale(options->patch.gfx.scaling_mode);
   }
+}
+
+static void prihook_patch_sysinfo_init(struct prihook_options *options)
+{
+  log_assert(options);
+
+  patch_sysinfo_init();
 }
 
 static void prihook_patch_main_loop_init(struct prihook_options *options)
@@ -283,6 +291,7 @@ void prihook_trap_before_main(int argc, char **argv)
   prihook_fs_redirs_init(&options, game_data_path);
   prihook_patch_fs_mounting_init();
   prihook_patch_gfx_init(&options);
+  prihook_patch_sysinfo_init(&options);
   prihook_patch_main_loop_init(&options);
   prihook_patch_sound_init(&options);
   prihook_patch_sigsegv_init(&options);

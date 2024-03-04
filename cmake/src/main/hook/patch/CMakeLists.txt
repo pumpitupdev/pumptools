@@ -26,6 +26,7 @@ set(SOURCE_FILES
         ${SRC}/redir.c
         ${SRC}/sigsegv.c
         ${SRC}/sound.c
+        ${SRC}/sysinfo.c
         ${SRC}/usb-emu.c
         ${SRC}/usb-init-fix.c
         ${SRC}/usb-mnt.c
