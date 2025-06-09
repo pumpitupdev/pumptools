@@ -1,6 +1,6 @@
 # Pumptools: The ultimate toolset to run all Linux based PIU games on any* kernel and distribution
 
-Version: 1.13
+Version: 1.14
 
 [Release history](CHANGELOG.md)
 
