@@ -1,24 +1,11 @@
 # Pumptools: The ultimate toolset to run all Linux based PIU games on any* kernel and distribution
 
-Version: 1.12
+Version: 1.13
 
 [Release history](CHANGELOG.md)
 
 This tool-set provides hook libraries that can be pre-loaded to run vanilla dumps of all Pump It Up games running on
 Linux. This also includes the only exclusive MK5 hardware based game Exceed and the MK3 Linux ports.
-
-## Public release note
-
-Currently, the public release contains all source code required to run all games listed
-[here](#games-and-latest-versions-supported). The following games however are currently not working due to missing
-dongle key tables and raw hdd areas (dummy files exist to allow full compilation of the project):
-
-* Fiesta
-* FiestaEX
-* Fiesta 2
-* Prime
-
-The required assets to run these games will follow with future releases.
 
 ## Documentation
 
@@ -74,9 +61,6 @@ available per game version)
 * [NX2](doc/hook/nx2hook.md): 154
 * [Pro2](doc/hook/pro2hook.md): R5 nodongle
 * [NXA](doc/hook/nxahook.md): 110
-
-Not available, yet:
-
 * [Fiesta](doc/hook/fsthook.md): 120
 * [FiestaEX](doc/hook/fexhook.md): 151
 * [Fiesta 2](doc/hook/f2hook.md): 161
