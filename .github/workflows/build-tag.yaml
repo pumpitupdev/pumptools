@@ -8,7 +8,7 @@ on:
 
 jobs:
   build:
-    runs-on: "ubuntu-20.04"
+    runs-on: "ubuntu-22.04"
     steps:
       - name: "Checkout repository"
         uses: "actions/checkout@v2"
@@ -42,7 +42,7 @@ jobs:
 
   publish-release:
     needs: "build"
-    runs-on: "ubuntu-20.04"
+    runs-on: "ubuntu-22.04"
     steps:
       # This already extracts the contents of the artifact
       - name: "Download artifact"
