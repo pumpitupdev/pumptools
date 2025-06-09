@@ -32,7 +32,7 @@ jobs:
           cd ..
 
       - name: "Upload artifact"
-        uses: "actions/upload-artifact@v2"
+        uses: "actions/upload-artifact@v4"
         with:
           name: pumptools-${{ github.sha }}
           retention-days: 30
@@ -46,7 +46,7 @@ jobs:
     steps:
       # This already extracts the contents of the artifact
       - name: "Download artifact"
-        uses: "actions/download-artifact@v2"
+        uses: "actions/download-artifact@v4"
         with:
           name: pumptools-${{ github.sha }}
 
