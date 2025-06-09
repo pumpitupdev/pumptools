@@ -9,6 +9,24 @@ Note: Entries prior 1.12 will not be updated accordingly.
 
 ## [Unreleased]
 
+## [1.13] - 2025-06-09
+
+### Added
+
+* Added dongle key and hdd raw area files to support
+  * Fiesta
+  * FiestaEx
+  * Fiesta2
+  * Prime
+
+### Changed
+
+N/A
+
+### Removed
+
+N/A
+
 ## [1.12] - 2019-04-12
 
 ### Added
