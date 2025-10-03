@@ -9,6 +9,20 @@ Note: Entries prior 1.12 will not be updated accordingly.
 
 ## [Unreleased]
 
+## [1.14] - 2025-10-03
+
+### Added
+
+N/A
+
+### Changed
+
+* fix: packaging of release and release pipeline to include all hooks
+
+### Removed
+
+N/A
+
 ## [1.13] - 2025-06-09
 
 ### Added
