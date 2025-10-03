@@ -56,7 +56,7 @@ clang-format:
 	$(V)find src/test -iname *.h -o -iname *.c | xargs clang-format -i -style=file
 
 .PHONY: package # Package the build output into distribution zip files
-package: $(BUILDDIR)/pumptools.zip $(BUILDDIR)/pumptools-public.zip
+package: $(BUILDDIR)/pumptools.zip
 
 include Package.mk
 

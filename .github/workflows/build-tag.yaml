@@ -28,7 +28,7 @@ jobs:
         run: |
           mkdir artifact
           cd artifact
-          unzip ../build/docker/pumptools-public.zip
+          unzip ../build/docker/pumptools.zip
           cd ..
 
       - name: "Upload artifact"
