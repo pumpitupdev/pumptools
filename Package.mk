@@ -236,25 +236,3 @@ $(builddir)/pumptools.zip: \
 		$(builddir)/libc-version
 	$(V)echo ... $@
 	$(V)zip -j $@ $^
-
-$(builddir)/pumptools-public.zip: \
-		$(zipdir)/api.zip \
-		$(zipdir)/doc.zip \
-		$(zipdir)/exchook.zip \
-		$(zipdir)/mk3hook.zip \
-		$(zipdir)/nxhook.zip \
-		$(zipdir)/nx2hook.zip \
-		$(zipdir)/nxahook.zip \
-		$(zipdir)/piubtn.zip \
-		$(zipdir)/piuio.zip \
-		$(zipdir)/pro2hook.zip \
-		$(zipdir)/prohook.zip \
-		$(zipdir)/x2hook.zip \
-		$(zipdir)/zerohook.zip \
-		CHANGELOG.md \
-		LICENSE \
-		README.md \
-		$(builddir)/git-version \
-		$(builddir)/libc-version
-	$(V)echo ... $@
-	$(V)zip -j $@ $^
