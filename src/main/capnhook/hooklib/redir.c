@@ -205,7 +205,7 @@ static enum cnh_result _cnh_redir_fshook_rename(struct cnh_fshook_irp *irp)
   _cnh_redir_init();
 
   res_old = _cnh_redir_check(irp->rename_old);
-  res_new = _cnh_redir_check(irp->rename_old);
+  res_new = _cnh_redir_check(irp->rename_new);
 
   if (res_old != NULL) {
     irp->rename_old = res_old;
