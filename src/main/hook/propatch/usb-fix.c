@@ -1,5 +1,6 @@
 #define LOG_MODULE "usb-fix"
 
+#include <ctype.h>
 #include <unistd.h>
 
 #include "capnhook/hook/lib.h"
@@ -69,9 +70,12 @@ ssize_t propatch_usb_fix_readlink(const char *path, char *buf, size_t len)
 
       toks = util_str_split(buf, "/", &count);
 
+      log_debug("Parsing USB device path with %zu tokens", count);
+
       // some sanity checks to ensure the format isn't different
-      if (count != 12 || strcmp(toks[0], "..") != 0 ||
-          strcmp(toks[1], "devices") != 0 || strcmp(toks[10], "block") != 0) {
+      // The format can vary between 12 and 13 tokens depending on USB hierarchy depth
+      if (count < 12 || count > 13 || strcmp(toks[0], "..") != 0 ||
+          strcmp(toks[1], "devices") != 0 || strcmp(toks[count-2], "block") != 0) {
         log_error(
             "/sys/block device readlink format changed, usb thumb drive "
             "profiles will likely not work!: %s",
@@ -82,10 +86,26 @@ ssize_t propatch_usb_fix_readlink(const char *path, char *buf, size_t len)
 
       int bus;
       int port;
-      const char *device = toks[11];
+      const char *device = toks[count-1];
 
-      if (sscanf(toks[5], "%d-%d", &bus, &port) != 2) {
-        log_error("Parsing bus-port of %s failed", buf);
+      // Find the USB device identifier token (format: X-Y or X-Y.Z or X-Y.Z.W etc.)
+      // It should be one of the tokens that starts with a digit and contains a dash
+      bool found_usb_id = false;
+      for (size_t i = 4; i < count - 3; i++) {  // Skip initial path components and final ones
+        if (isdigit(toks[i][0]) && strchr(toks[i], '-')) {
+          log_debug("Checking USB identifier token[%zu]: %s", i, toks[i]);
+          // Try to parse the main bus-port from this token
+          char *dash_pos = strchr(toks[i], '-');
+          if (dash_pos && sscanf(toks[i], "%d-%d", &bus, &port) == 2) {
+            log_debug("Successfully parsed USB bus %d, port %d from token: %s", bus, port, toks[i]);
+            found_usb_id = true;
+            break;
+          }
+        }
+      }
+      
+      if (!found_usb_id) {
+        log_error("Could not find valid USB bus-port identifier in path: %s", buf);
         util_str_free_split(toks, count);
         return 0;
       }
