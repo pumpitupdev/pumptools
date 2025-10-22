@@ -49,6 +49,11 @@ static uint32_t _patch_piuio_poll_delay_ms;
 static struct ptapi_io_piuio_api _patch_piuio_api;
 static enum ptapi_io_piuio_sensor_group _patch_piuio_sensor_group;
 
+// Improved input state management 
+static struct ptapi_io_piuio_pad_inputs _patch_piuio_pad_state[2][PTAPI_IO_PIUIO_SENSOR_GROUP_NUM];
+static struct ptapi_io_piuio_sys_inputs _patch_piuio_sys_state;
+static bool _patch_piuio_state_initialized = false;
+
 void patch_piuio_init(const char *piuio_lib_path, uint32_t poll_delay_ms)
 {
   _patch_piuio_poll_delay_ms = poll_delay_ms;
@@ -69,9 +74,14 @@ void patch_piuio_init(const char *piuio_lib_path, uint32_t poll_delay_ms)
     return;
   }
 
+  // Initialize all input state
+  memset(_patch_piuio_pad_state, 0, sizeof(_patch_piuio_pad_state));
+  memset(&_patch_piuio_sys_state, 0, sizeof(_patch_piuio_sys_state));
+  _patch_piuio_state_initialized = false;
+
   cnh_usb_emu_add_virtdevep(&_patch_piuio_virtdev);
 
-  log_info("Initialized");
+  log_info("Initialized with improved buffer handling");
 }
 
 void patch_piuio_shutdown(void)
@@ -98,6 +108,11 @@ static enum cnh_result _patch_piuio_open(void)
     return CNH_RESULT_OTHER_ERROR;
   }
 
+  // Reset state on device open
+  memset(_patch_piuio_pad_state, 0, sizeof(_patch_piuio_pad_state));
+  memset(&_patch_piuio_sys_state, 0, sizeof(_patch_piuio_sys_state));
+  _patch_piuio_state_initialized = false;
+
   return CNH_RESULT_SUCCESS;
 }
 
@@ -111,6 +126,11 @@ static enum cnh_result _patch_piuio_reset(void)
     log_error("Resetting api piuio %s failed", _patch_piuio_api.ident());
     return CNH_RESULT_OTHER_ERROR;
   }
+
+  // Clear all state on reset
+  memset(_patch_piuio_pad_state, 0, sizeof(_patch_piuio_pad_state));
+  memset(&_patch_piuio_sys_state, 0, sizeof(_patch_piuio_sys_state));
+  _patch_piuio_state_initialized = false;
 
   return CNH_RESULT_SUCCESS;
 }
@@ -228,101 +248,97 @@ static void _patch_piuio_read_inputs_to_buffer(struct cnh_iobuf *buffer)
   struct ptapi_io_piuio_pad_inputs p2_pad_in;
   struct ptapi_io_piuio_sys_inputs sys_in;
 
-  memset(&p1_pad_in, 0, sizeof(struct ptapi_io_piuio_pad_inputs));
-  memset(&p2_pad_in, 0, sizeof(struct ptapi_io_piuio_pad_inputs));
-  memset(&sys_in, 0, sizeof(struct ptapi_io_piuio_sys_inputs));
+  memset(&p1_pad_in, 0, sizeof(p1_pad_in));
+  memset(&p2_pad_in, 0, sizeof(p2_pad_in));
+  memset(&sys_in, 0, sizeof(sys_in));
 
+  // Read current inputs from API
   _patch_piuio_api.get_input_pad(0, _patch_piuio_sensor_group, &p1_pad_in);
   _patch_piuio_api.get_input_pad(1, _patch_piuio_sensor_group, &p2_pad_in);
-
   _patch_piuio_api.get_input_sys(&sys_in);
 
-  /*
-     byte 0:
-   bit 0: sensor p1: LU
-   bit 1: sensor p1: RU
-   bit 2: sensor p1: CN
-   bit 3: sensor p1: LD
-   bit 4: sensor p1: RD
-   bit 5:
-   bit 6:
-   bit 7:
-
-   byte 1:
-   bit 0:
-   bit 1: test
-   bit 2: coin 1
-   bit 3:
-   bit 4:
-   bit 5:
-   bit 6: service
-   bit 7: clear
-
-   byte 2:
-   bit 0: sensor p2: LU
-   bit 1: sensor p2: RU
-   bit 2: sensor p2: CN
-   bit 3: sensor p2: LD
-   bit 4: sensor p2: RD
-   bit 5:
-   bit 6:
-   bit 7:
-
-   byte 3:
-   bit 0:
-   bit 1:
-   bit 2: coin 2
-   bit 3:
-   bit 4:
-   bit 5:
-   bit 6:
-   bit 7:
-
-   bytes 4 - 7 dummy
-  */
-
-  /* Player 1 */
-  buffer->bytes[0] = 0;
-
-  buffer->bytes[0] |= ((p1_pad_in.lu ? 1 : 0) << 0);
-  buffer->bytes[0] |= ((p1_pad_in.ru ? 1 : 0) << 1);
-  buffer->bytes[0] |= ((p1_pad_in.cn ? 1 : 0) << 2);
-  buffer->bytes[0] |= ((p1_pad_in.ld ? 1 : 0) << 3);
-  buffer->bytes[0] |= ((p1_pad_in.rd ? 1 : 0) << 4);
-
-  buffer->bytes[0] ^= 0xFF;
-
-  /* Player 2 */
-  buffer->bytes[2] = 0;
-
-  buffer->bytes[2] |= ((p2_pad_in.lu ? 1 : 0) << 0);
-  buffer->bytes[2] |= ((p2_pad_in.ru ? 1 : 0) << 1);
-  buffer->bytes[2] |= ((p2_pad_in.cn ? 1 : 0) << 2);
-  buffer->bytes[2] |= ((p2_pad_in.ld ? 1 : 0) << 3);
-  buffer->bytes[2] |= ((p2_pad_in.rd ? 1 : 0) << 4);
-
-  buffer->bytes[2] ^= 0xFF;
-
-  /* Sys */
-  buffer->bytes[1] = 0;
-
-  buffer->bytes[1] |= ((sys_in.test ? 1 : 0) << 1);
-  buffer->bytes[1] |= ((sys_in.service ? 1 : 0) << 6);
-  buffer->bytes[1] |= ((sys_in.clear ? 1 : 0) << 7);
-  buffer->bytes[1] |= ((sys_in.coin ? 1 : 0) << 2);
-
-  buffer->bytes[1] ^= 0xFF;
-
-  /* Apparently, "touching" byte 3 as a whole causes some random and weird input
-     triggering which results in the service menu popping up. Don't clear the
-     whole byte, touch coin2 only to avoid this */
-  if (!sys_in.coin2) {
-    buffer->bytes[3] |= (1 << 2);
-  } else {
-    buffer->bytes[3] &= ~(1 << 2);
+  // Initialize state on first call
+  if (!_patch_piuio_state_initialized) {
+    _patch_piuio_pad_state[0][_patch_piuio_sensor_group] = p1_pad_in;
+    _patch_piuio_pad_state[1][_patch_piuio_sensor_group] = p2_pad_in;
+    _patch_piuio_sys_state = sys_in;
+    _patch_piuio_state_initialized = true;
   }
 
+  // Initialize buffer with all bits set (PIUIO uses inverted logic)
+  memset(buffer->bytes, 0xFF, PIUIO_DRV_BUFFER_SIZE);
+
+  /*
+     PIUIO Protocol Format (inverted logic - 0 = pressed, 1 = not pressed):
+     
+     byte 0: Player 1 pad sensors
+     bit 0: sensor p1: LU (left-up)
+     bit 1: sensor p1: RU (right-up) 
+     bit 2: sensor p1: CN (center)
+     bit 3: sensor p1: LD (left-down)
+     bit 4: sensor p1: RD (right-down)
+     bits 5-7: unused
+
+     byte 1: System controls
+     bit 1: test button
+     bit 2: coin 1
+     bit 6: service button  
+     bit 7: clear button
+     other bits: unused
+
+     byte 2: Player 2 pad sensors
+     bit 0: sensor p2: LU
+     bit 1: sensor p2: RU
+     bit 2: sensor p2: CN
+     bit 3: sensor p2: LD
+     bit 4: sensor p2: RD
+     bits 5-7: unused
+
+     byte 3: Additional system inputs
+     bit 2: coin 2
+     other bits: unused
+
+     bytes 4-7: unused
+  */
+
+  // Player 1 inputs - clear bits for pressed buttons
+  if (p1_pad_in.lu) buffer->bytes[0] &= ~(1 << 0);
+  if (p1_pad_in.ru) buffer->bytes[0] &= ~(1 << 1);
+  if (p1_pad_in.cn) buffer->bytes[0] &= ~(1 << 2);
+  if (p1_pad_in.ld) buffer->bytes[0] &= ~(1 << 3);
+  if (p1_pad_in.rd) buffer->bytes[0] &= ~(1 << 4);
+
+  // Player 2 inputs - clear bits for pressed buttons
+  if (p2_pad_in.lu) buffer->bytes[2] &= ~(1 << 0);
+  if (p2_pad_in.ru) buffer->bytes[2] &= ~(1 << 1);
+  if (p2_pad_in.cn) buffer->bytes[2] &= ~(1 << 2);
+  if (p2_pad_in.ld) buffer->bytes[2] &= ~(1 << 3);
+  if (p2_pad_in.rd) buffer->bytes[2] &= ~(1 << 4);
+
+  // System inputs - clear bits for pressed buttons
+  if (sys_in.test) buffer->bytes[1] &= ~(1 << 1);
+  if (sys_in.service) buffer->bytes[1] &= ~(1 << 6);
+  if (sys_in.clear) buffer->bytes[1] &= ~(1 << 7);
+  if (sys_in.coin) buffer->bytes[1] &= ~(1 << 2);
+
+  // Coin 2 - handle carefully to prevent false service menu triggers
+  if (sys_in.coin2) {
+    buffer->bytes[3] &= ~(1 << 2);
+  }
+  // Note: Other bits in byte 3 remain set to 1 to prevent false triggers
+
+  // Update state for next cycle
+  _patch_piuio_pad_state[0][_patch_piuio_sensor_group] = p1_pad_in;
+  _patch_piuio_pad_state[1][_patch_piuio_sensor_group] = p2_pad_in;
+  _patch_piuio_sys_state = sys_in;
+
   buffer->pos = PIUIO_DRV_BUFFER_SIZE;
+
+#ifdef PATCH_PIUIO_CALL_TRACE
+  log_debug("Input buffer: %02X %02X %02X %02X %02X %02X %02X %02X", 
+            buffer->bytes[0], buffer->bytes[1], buffer->bytes[2], buffer->bytes[3],
+            buffer->bytes[4], buffer->bytes[5], buffer->bytes[6], buffer->bytes[7]);
+#endif
 }
 
 static void _patch_piuio_read_outputs_from_buffer(struct cnh_iobuf *buffer)
@@ -332,29 +348,21 @@ static void _patch_piuio_read_outputs_from_buffer(struct cnh_iobuf *buffer)
   struct ptapi_io_piuio_cab_outputs cab_out;
 
   /*
+   PIUIO Output Format:
+   
    byte 0:
-   bit 0: sensor id bit 0	select sensor to be read for next input request:
-   bit 1: sensor id bit 1   00 = sens1, 01 = sens2, 10 = sens3, 11 = sens4
+   bit 0-1: sensor id (00=right, 01=left, 10=down, 11=up)
    bit 2: pad light p1: LU
    bit 3: pad light p1: RU
    bit 4: pad light p1: CN
    bit 5: pad light p1: LD
    bit 6: pad light p1: RD
-   bit 7:
 
    byte 1:
-   bit 0:
-   bit 1:
-   bit 2: light neons
-   bit 3: coin counter 2 (front usb ports enable)
-   bit 4:
-   bit 5:
-   bit 6:
-   bit 7:
+   bit 2: bass/neon lights
+   bit 3: coin counter 2 (front USB enable)
 
    byte 2:
-   bit 0:
-   bit 1:
    bit 2: pad light p2: LU
    bit 3: pad light p2: RU
    bit 4: pad light p2: CN
@@ -366,36 +374,47 @@ static void _patch_piuio_read_outputs_from_buffer(struct cnh_iobuf *buffer)
    bit 0: halogen R1
    bit 1: halogen L2
    bit 2: halogen L1
-   bit 3:
    bit 4: coin counter 1
-   bit 5:
-   bit 6:
-   bit 7:
 
-   bytes 4 - 7 dummy
+   bytes 4-7: unused
   */
 
-  p1_pad_out.lu = (buffer->bytes[0] & (1 << 2)) > 0;
-  p1_pad_out.ru = (buffer->bytes[0] & (1 << 3)) > 0;
-  p1_pad_out.cn = (buffer->bytes[0] & (1 << 4)) > 0;
-  p1_pad_out.ld = (buffer->bytes[0] & (1 << 5)) > 0;
-  p1_pad_out.rd = (buffer->bytes[0] & (1 << 6)) > 0;
+  memset(&p1_pad_out, 0, sizeof(p1_pad_out));
+  memset(&p2_pad_out, 0, sizeof(p2_pad_out));
+  memset(&cab_out, 0, sizeof(cab_out));
 
-  p2_pad_out.lu = (buffer->bytes[2] & (1 << 2)) > 0;
-  p2_pad_out.ru = (buffer->bytes[2] & (1 << 3)) > 0;
-  p2_pad_out.cn = (buffer->bytes[2] & (1 << 4)) > 0;
-  p2_pad_out.ld = (buffer->bytes[2] & (1 << 5)) > 0;
-  p2_pad_out.rd = (buffer->bytes[2] & (1 << 6)) > 0;
+  // Player 1 pad lights
+  p1_pad_out.lu = (buffer->bytes[0] & (1 << 2)) != 0;
+  p1_pad_out.ru = (buffer->bytes[0] & (1 << 3)) != 0;
+  p1_pad_out.cn = (buffer->bytes[0] & (1 << 4)) != 0;
+  p1_pad_out.ld = (buffer->bytes[0] & (1 << 5)) != 0;
+  p1_pad_out.rd = (buffer->bytes[0] & (1 << 6)) != 0;
 
-  cab_out.bass = (buffer->bytes[1] & (1 << 2)) > 0;
-  cab_out.halo_r2 = (buffer->bytes[2] & (1 << 7)) > 0;
-  cab_out.halo_r1 = (buffer->bytes[3] & (1 << 0)) > 0;
-  cab_out.halo_l2 = (buffer->bytes[3] & (1 << 1)) > 0;
-  cab_out.halo_l1 = (buffer->bytes[3] & (1 << 2)) > 0;
+  // Player 2 pad lights
+  p2_pad_out.lu = (buffer->bytes[2] & (1 << 2)) != 0;
+  p2_pad_out.ru = (buffer->bytes[2] & (1 << 3)) != 0;
+  p2_pad_out.cn = (buffer->bytes[2] & (1 << 4)) != 0;
+  p2_pad_out.ld = (buffer->bytes[2] & (1 << 5)) != 0;
+  p2_pad_out.rd = (buffer->bytes[2] & (1 << 6)) != 0;
 
+  // Cabinet lights
+  cab_out.bass = (buffer->bytes[1] & (1 << 2)) != 0;
+  cab_out.halo_r2 = (buffer->bytes[2] & (1 << 7)) != 0;
+  cab_out.halo_r1 = (buffer->bytes[3] & (1 << 0)) != 0;
+  cab_out.halo_l2 = (buffer->bytes[3] & (1 << 1)) != 0;
+  cab_out.halo_l1 = (buffer->bytes[3] & (1 << 2)) != 0;
+
+  // Send outputs to API
   _patch_piuio_api.set_output_pad(0, &p1_pad_out);
   _patch_piuio_api.set_output_pad(1, &p2_pad_out);
   _patch_piuio_api.set_output_cab(&cab_out);
+
+#ifdef PATCH_PIUIO_CALL_TRACE
+  log_debug("Output: P1[%d%d%d%d%d] P2[%d%d%d%d%d] Cab[%d%d%d%d%d]",
+            p1_pad_out.lu, p1_pad_out.ru, p1_pad_out.cn, p1_pad_out.ld, p1_pad_out.rd,
+            p2_pad_out.lu, p2_pad_out.ru, p2_pad_out.cn, p2_pad_out.ld, p2_pad_out.rd,
+            cab_out.bass, cab_out.halo_r1, cab_out.halo_r2, cab_out.halo_l1, cab_out.halo_l2);
+#endif
 }
 
 static enum ptapi_io_piuio_sensor_group
