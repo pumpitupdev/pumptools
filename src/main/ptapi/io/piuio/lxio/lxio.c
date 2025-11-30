@@ -79,6 +79,11 @@ void convert_output_to_lxio()
     lxio_light_state_buffer[1] |= (1 << 2);
   }
 
+  /* enable usb inhibitor and coins, always on */
+  lxio_light_state_buffer[3] |= (1 << 4);
+  lxio_light_state_buffer[3] |= (1 << 5);
+  lxio_light_state_buffer[3] |= (1 << 6);
+
   /* Halogens */
 
   if (ptapi_piuio_cab_out.halo_r1) {
