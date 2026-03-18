@@ -12,4 +12,4 @@ add_library(${PROJECT_NAME} SHARED ${SOURCE_FILES})
 set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-fPIC")
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
-target_link_libraries(${PROJECT_NAME} hook-core patch ptapi-io-piuio-util util dl pthread)
+target_link_libraries(${PROJECT_NAME} hook-core patch propatch ptapi-io-piuio-util util dl pthread)
