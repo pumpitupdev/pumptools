@@ -12,6 +12,12 @@
 #define PRO2HOOK_OPTIONS_STR_PATCH_PIUIO_EMU_LIB "patch.piuio.emu_lib"
 #define PRO2HOOK_OPTIONS_STR_PATCH_PIUIO_EXIT_TEST_SERV \
   "patch.piuio_exit.test_serv"
+#define PRO2HOOK_OPTIONS_STR_PATCH_USB_PROFILE_P1_BUS_PORT \
+    "patch.usb_profile.p1.bus_port"
+#define PRO2HOOK_OPTIONS_STR_PATCH_USB_PROFILE_P2_BUS_PORT \
+    "patch.usb_profile.p2.bus_port"
+#define PRO2HOOK_OPTIONS_STR_PATCH_USB_PROFILE_DEV_NODES \
+    "patch.usb_profile.dev_nodes"
 #define PRO2HOOK_OPTIONS_STR_PATCH_X11_EVENT_LOOP_INPUT_HANDLER \
   "patch_x11_event_loop.input_handler_lib"
 #define PRO2HOOK_OPTIONS_STR_PATCH_X11_EVENT_LOOP_INPUT_HANDLER2 \
@@ -95,6 +101,36 @@ const struct util_options_def pro2hook_options_def[] = {
         .default_value.b = false,
     },
     {
+        .name = PRO2HOOK_OPTIONS_STR_PATCH_USB_PROFILE_P1_BUS_PORT,
+        .description = "Bus and port (format: X-X, e.g. 1-2) of the USB slot "
+                       "to assign to Player 1 when a USB thumb "
+                       "drive is plugged in",
+        .param = 'a',
+        .type = UTIL_OPTIONS_TYPE_STR,
+        .is_secret_data = false,
+        .default_value.str = NULL,
+    },
+    {
+        .name = PRO2HOOK_OPTIONS_STR_PATCH_USB_PROFILE_P2_BUS_PORT,
+        .description = "Bus and port (format: X-X, e.g. 1-2) of the USB slot "
+                       "to assign to Player 2 when a USB thumb "
+                       "drive is plugged in",
+        .param = 'k',
+        .type = UTIL_OPTIONS_TYPE_STR,
+        .is_secret_data = false,
+        .default_value.str = NULL,
+    },
+    {
+        .name = PRO2HOOK_OPTIONS_STR_PATCH_USB_PROFILE_DEV_NODES,
+        .description = "Device nodes of plugged in USB thumb drives to "
+                       "consider for mounting for usb profiles, format: "
+                       "sdX,sdY e.g. sde,sdf",
+        .param = 't',
+        .type = UTIL_OPTIONS_TYPE_STR,
+        .is_secret_data = false,
+        .default_value.str = NULL,
+    },
+    {
         .name = PRO2HOOK_OPTIONS_STR_PATCH_X11_EVENT_LOOP_INPUT_HANDLER,
         .description = "Path to a library implementing the x11-input-handler "
                        "api to capture X11 keyboard inputs",
@@ -172,6 +208,12 @@ bool pro2hook_options_init(
       options_opt, PRO2HOOK_OPTIONS_STR_PATCH_PIUIO_EMU_LIB);
   options->patch.piuio.exit_test_serv = util_options_get_bool(
       options_opt, PRO2HOOK_OPTIONS_STR_PATCH_PIUIO_EXIT_TEST_SERV);
+  options->patch.usb_profile.device_nodes = util_options_get_str(
+      options_opt, PRO2HOOK_OPTIONS_STR_PATCH_USB_PROFILE_DEV_NODES);
+  options->patch.usb_profile.p1_bus_port = util_options_get_str(
+      options_opt, PRO2HOOK_OPTIONS_STR_PATCH_USB_PROFILE_P1_BUS_PORT);
+  options->patch.usb_profile.p2_bus_port = util_options_get_str(
+      options_opt, PRO2HOOK_OPTIONS_STR_PATCH_USB_PROFILE_P2_BUS_PORT);
   options->patch.x11_event_loop.api_lib = util_options_get_str(
       options_opt, PRO2HOOK_OPTIONS_STR_PATCH_X11_EVENT_LOOP_INPUT_HANDLER);
   options->patch.x11_event_loop.api_lib2 = util_options_get_str(
