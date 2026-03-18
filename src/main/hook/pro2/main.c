@@ -19,6 +19,8 @@
 #include "hook/patch/usb-init-fix.h"
 #include "hook/patch/x11-event-loop.h"
 
+#include "hook/propatch/usb-fix.h"
+
 #include "hook/patch/piubtn.h"
 #include "hook/patch/piuio.h"
 
@@ -160,6 +162,14 @@ static void pro2hook_patch_x11_event_loop_init(struct pro2hook_options *options)
   }
 }
 
+static void pro2hook_patch_usbprofiles(struct pro2hook_options *options)
+{
+  propatch_usb_fix_init(
+      options->patch.usb_profile.device_nodes,
+      options->patch.usb_profile.p1_bus_port,
+      options->patch.usb_profile.p2_bus_port);
+}
+
 static void pro2hook_patch_piuio_init(struct pro2hook_options *options)
 {
   log_assert(options);
@@ -236,6 +246,7 @@ void pro2hook_trap_before_main(int argc, char **argv)
   pro2hook_fs_redirs_init(&options);
   pro2hook_patch_sigsegv_init(&options);
   pro2hook_patch_x11_event_loop_init(&options);
+  pro2hook_patch_usbprofiles(&options);
   pro2hook_patch_piuio_init(&options);
   pro2hook_patch_piubtn_init(&options);
   pro2hook_patch_secure_binary();
@@ -245,6 +256,7 @@ void pro2hook_trap_before_main(int argc, char **argv)
 
 void pro2hook_trap_after_main(void)
 {
+  propatch_usb_fix_shutdown();
   patch_piubtn_shutdown();
   patch_piuio_shutdown();
 }

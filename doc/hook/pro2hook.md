@@ -64,6 +64,15 @@ Each folder with the content from the dump.
 ## USB thumb drive/profile support
 See instructions on the [prohook readme](prohook.md#usb-thumb-driveprofile-support).
 
+When using `pro2hook.so`, make sure your `hook.conf` contains the same USB
+profile keys used by Pro 1:
+
+```text
+patch.usb_profile.p1.bus_port=2-1
+patch.usb_profile.p2.bus_port=2-2
+patch.usb_profile.dev_nodes=sdb,sdc
+```
+
 ## Troubleshooting and FAQ
 Since the game is based on Pro 1, have a look at the
 [troubleshooting section there](19-pro.md#troubleshooting-and-faq). Most of the things listed there
