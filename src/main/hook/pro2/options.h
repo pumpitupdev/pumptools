@@ -29,6 +29,12 @@ struct pro2hook_options {
       bool exit_test_serv;
     } piuio;
 
+    struct usb_profile {
+      const char *device_nodes;
+      const char *p1_bus_port;
+      const char *p2_bus_port;
+    } usb_profile;
+
     struct x11_event_loop {
       const char *api_lib;
       const char *api_lib2;
