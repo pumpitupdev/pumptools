@@ -73,6 +73,19 @@ patch.usb_profile.p2.bus_port=2-2
 patch.usb_profile.dev_nodes=sdb,sdc
 ```
 
+Additionally these settings in `Static.ini` must be set as follows:
+```text
+MemoryCardProfiles=1
+MemoryCardUsbBusP1=-1
+MemoryCardUsbBusP2=-1
+MemoryCardUsbLevelP1=1
+MemoryCardUsbLevelP2=1
+MemoryCardUsbPortP1=2
+MemoryCardUsbPortP2=1
+```
+The file is located in `game/Data/Static.ini`.
+When this is not set, the first plugged USB thumb drive will always be connected to Player 1, no matter what port it is connected into.
+
 ## Troubleshooting and FAQ
 Since the game is based on Pro 1, have a look at the
 [troubleshooting section there](19-pro.md#troubleshooting-and-faq). Most of the things listed there
