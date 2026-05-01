@@ -2,7 +2,8 @@
 #define LXIO_DRV_DEFS_H
 
 #define LXIO_VID 0x0D2F
-#define LXIO_PID 0x1020
+static const int LXIO_PID[] = { 0x1040, 0x1020 };
+#define LXIO_PID_COUNT  (sizeof(LXIO_PID) / sizeof(LXIO_PID[0]))
 
 #define LXIO_DRV_USB_REQ_TIMEOUT 10000
 
