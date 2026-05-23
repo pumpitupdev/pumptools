@@ -49,7 +49,7 @@ You need two main folders:
 * `game` folder with the following contents
     * All data zip files (e.g. `data0.zip`, `data1.zip`, ..., `encore.zip`)
     * An empty file `FX` (if you run this on a FX or other cabinet with a widescreen monitor)
-* `save ` folder. Contents are generated automatically if empty.
+* `save` folder and `MachineProfile` inside of it . You must create these folders manually, rest of the files will populate themselves. **Without doing so the game will not save settings or high scores between boots.**
 
 ## USB thumb drive/profile support
 Without any patches, the game's way of handling USB thumb drives is incompatible to the kernels of the last years.
