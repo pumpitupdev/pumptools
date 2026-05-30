@@ -243,7 +243,7 @@ _cnh_usb_emu_usbhook_find_devices(struct cnh_usbhook_irp *irp)
         /* Append at end of bus chain */
         it->next = fakebus;
         /* Keep doubly linked list intact */
-        fakebus->prev = it->next;
+        fakebus->prev = it;
       }
 
       fakebus_dev_tail = NULL;
