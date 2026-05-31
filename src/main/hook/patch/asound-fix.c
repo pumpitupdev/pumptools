@@ -1,7 +1,11 @@
 #define LOG_MODULE "patch-asound-fix"
 
+#include <stdbool.h>
 #include <errno.h>
 #include <grp.h>
+#include <limits.h>
+#include <string.h>
+#include <sys/types.h>
 
 #include "capnhook/hook/lib.h"
 
@@ -17,6 +21,64 @@ typedef int (*getgrnam_r_t)(
     struct group **result);
 
 static getgrnam_r_t patch_asound_fix_real_getgrnam_r;
+
+static char **patch_asound_fix_split_user_list_str(const char *user_list_str);
+
+static char *patch_asound_fix_dup_span(const char *start, size_t len)
+{
+  char *out = util_xmalloc(len + 1);
+
+  memcpy(out, start, len);
+  out[len] = '\0';
+
+  return out;
+}
+
+static bool patch_asound_fix_parse_group_line(
+    const char *line, struct group *grp)
+{
+  const char *c1 = strchr(line, ':');
+  const char *c2;
+  const char *c3;
+  const char *extra;
+  char *gid_end;
+  long gid;
+
+  if (c1 == NULL) {
+    return false;
+  }
+
+  c2 = strchr(c1 + 1, ':');
+
+  if (c2 == NULL) {
+    return false;
+  }
+
+  c3 = strchr(c2 + 1, ':');
+
+  if (c3 == NULL) {
+    return false;
+  }
+
+  extra = strchr(c3 + 1, ':');
+
+  if (extra != NULL) {
+    return false;
+  }
+
+  gid = strtol(c2 + 1, &gid_end, 10);
+
+  if (gid_end != c3 || gid < 0 || gid > UINT_MAX) {
+    return false;
+  }
+
+  grp->gr_name = patch_asound_fix_dup_span(line, c1 - line);
+  grp->gr_passwd = patch_asound_fix_dup_span(c1 + 1, c2 - (c1 + 1));
+  grp->gr_gid = (gid_t) gid;
+  grp->gr_mem = patch_asound_fix_split_user_list_str(c3 + 1);
+
+  return true;
+}
 
 static char **patch_asound_fix_split_user_list_str(const char *user_list_str)
 {
@@ -87,22 +149,48 @@ int getgrnam_r(
 
     FILE *file = fopen("/etc/group", "r");
 
+    if (file == NULL) {
+      log_error("Opening /etc/group failed: %s", strerror(errno));
+      *result = NULL;
+      return -1;
+    }
+
     fseek(file, 0, SEEK_END);
     size_t file_size = ftell(file);
     fseek(file, 0, SEEK_SET);
 
-    char *buffer = (char *) util_xmalloc(file_size);
+    char *buffer = (char *) util_xmalloc(file_size + 1);
 
     if (fread(buffer, file_size, 1, file) != 1) {
       log_error("Reading /etc/group file failed: %s", strerror(errno));
+      fclose(file);
       free(buffer);
       *result = NULL;
       return -1;
     }
 
-    char *str_audio_pos = strstr(buffer, name);
+    fclose(file);
+    buffer[file_size] = '\0';
 
-    if (str_audio_pos == NULL) {
+    char *line = buffer;
+    char *audio_line = NULL;
+
+    while (line != NULL && *line != '\0') {
+      char *next = strchr(line, '\n');
+
+      if (next != NULL) {
+        *next = '\0';
+      }
+
+      if (!strncmp(line, "audio:", strlen("audio:"))) {
+        audio_line = line;
+        break;
+      }
+
+      line = next ? next + 1 : NULL;
+    }
+
+    if (audio_line == NULL) {
       log_error(
           "Could not find 'audio' group in /etc/group required by libasound "
           "likely for defaults.pcm.ipc_gid"
@@ -112,38 +200,13 @@ int getgrnam_r(
       return -1;
     }
 
-    char *tok = strtok(str_audio_pos, ":");
-    uint8_t cnt = 0;
-
-    while (tok != NULL) {
-      switch (cnt) {
-        case 0:
-          grp->gr_name = util_str_dup(tok);
-          break;
-
-        case 1:
-          grp->gr_passwd = util_str_dup(tok);
-          break;
-
-        case 2:
-          grp->gr_gid = strtol(tok, NULL, 10);
-          break;
-
-        case 3:
-          grp->gr_mem = patch_asound_fix_split_user_list_str(tok);
-          break;
-
-        default:
-          log_error(
-              "audio group entry format in /etc/group invalid. Check your "
-              "/etc/group file!");
-          free(buffer);
-          *result = NULL;
-          return -1;
-      }
-
-      cnt++;
-      tok = strtok(NULL, ":");
+    if (!patch_asound_fix_parse_group_line(audio_line, grp)) {
+      log_error(
+          "audio group entry format in /etc/group invalid. Check your "
+          "/etc/group file!");
+      free(buffer);
+      *result = NULL;
+      return -1;
     }
 
     char *grp_mem_str = patch_asound_fix_user_list_to_str(grp->gr_mem);
@@ -154,6 +217,7 @@ int getgrnam_r(
         grp->gr_gid,
         grp_mem_str);
     free(grp_mem_str);
+    free(buffer);
 
     *result = grp;
 
