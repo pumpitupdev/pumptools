@@ -22,6 +22,7 @@
 #include "hook/patch/sigsegv.h"
 #include "hook/patch/sound.h"
 #include "hook/patch/usb-emu.h"
+#include "hook/patch/usb-init-fix.h"
 
 #include "util/fs.h"
 #include "util/glibc.h"
@@ -195,6 +196,7 @@ static void mk3hook_patch_piuio_init(struct mk3hook_options *options)
     patch_piuio_exit_init();
   }
 
+  patch_usb_init_fix_init();
   patch_usb_emu_init();
 
   if (options->patch.piuio.api_lib) {
