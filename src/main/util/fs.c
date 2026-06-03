@@ -210,15 +210,39 @@ char *util_fs_get_filename(const char *path)
 
 char *util_fs_get_abs_path(const char *path)
 {
+  size_t path_len;
   char *real_path;
+
+  if (!path) {
+    return NULL;
+  }
+
+  path_len = strlen(path);
+
+  if (path_len == 0) {
+    real_path = (char *) util_xmalloc(1);
+    real_path[0] = '\0';
+    return real_path;
+  }
+
+  /* Keep explicit absolute paths untouched to support external mount points. */
+  if (path[0] == '/') {
+    real_path = (char *) util_xmalloc(path_len + 1);
+    memcpy(real_path, path, path_len + 1);
+    return real_path;
+  }
 
   real_path = realpath(path, NULL);
 
   if (!real_path) {
-    log_error(
+    log_warn(
         "Resolving path '%s' to absolute path failed: %s",
         path,
         strerror(errno));
+
+    /* Fall back to the original path and let the dynamic loader resolve it. */
+    real_path = (char *) util_xmalloc(path_len + 1);
+    memcpy(real_path, path, path_len + 1);
   }
 
   return real_path;
