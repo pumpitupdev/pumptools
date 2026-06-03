@@ -60,6 +60,21 @@ bool ptapi_io_piubtn_open()
   struct io_util_joystick_util_device_info device_info[MAX_NUM_JOYSTICKS];
   size_t devices_connected;
 
+  if (util_proc_get_folder_path_shared_object(
+          (void *) ptapi_io_piubtn_open, path, sizeof(path))) {
+    config_path = util_str_merge(path, CONFIG_FILENAME);
+
+    log_info("Loading configuration from emu lib path: %s", config_path);
+
+    if (ptapi_io_piubtn_joystick_util_conf_read_from_file(
+            &ptapi_io_piubtn_joystick_util_conf, config_path)) {
+      free(config_path);
+      goto conf_loaded;
+    }
+
+    free(config_path);
+  }
+
   // The game changes the working directory to the 'game' sub-folder. Therefore,
   // ./my-config does not work here.
   if (!util_proc_get_folder_path_executable_no_ld_linux(path, sizeof(path))) {
@@ -69,6 +84,8 @@ bool ptapi_io_piubtn_open()
 
   config_path = util_str_merge(path, CONFIG_FILENAME);
 
+  log_info("Loading configuration from executable path: %s", config_path);
+
   if (!ptapi_io_piubtn_joystick_util_conf_read_from_file(
           &ptapi_io_piubtn_joystick_util_conf, config_path)) {
     log_error("Loading joystick config file %s failed.", CONFIG_FILENAME);
@@ -77,6 +94,8 @@ bool ptapi_io_piubtn_open()
   }
 
   free(config_path);
+
+conf_loaded:
 
   devices_connected =
       io_util_joystick_util_scan(device_info, MAX_NUM_JOYSTICKS);

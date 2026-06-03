@@ -1,5 +1,6 @@
 #define LOG_MODULE "util-proc"
 
+#include <dlfcn.h>
 #include <errno.h>
 #include <linux/limits.h>
 #include <string.h>
@@ -203,6 +204,40 @@ bool util_proc_get_folder_path_executable_no_ld_linux(char *buffer, size_t size)
   } else {
     return util_proc_get_folder_path_executable(buffer, size);
   }
+}
+
+bool util_proc_get_folder_path_shared_object(
+    void *symbol, char *buffer, size_t size)
+{
+  Dl_info info;
+
+  if (!symbol || !buffer || size == 0) {
+    return false;
+  }
+
+  if (!dladdr(symbol, &info) || !info.dli_fname) {
+    return false;
+  }
+
+  if (strlen(info.dli_fname) >= size) {
+    return false;
+  }
+
+  strcpy(buffer, info.dli_fname);
+
+  // If shared object in the root folder, keep the single /
+  size_t pos = strlen(buffer) - 1;
+  while (pos > 0 && buffer[pos] != '/') {
+    buffer[pos] = '\0';
+    pos--;
+  }
+
+  // delete /
+  if (pos > 0) {
+    buffer[pos] = '\0';
+  }
+
+  return true;
 }
 
 void util_proc_log_info()

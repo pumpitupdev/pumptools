@@ -44,6 +44,18 @@ bool util_proc_get_folder_path_executable_no_ld_linux(
     char *buffer, size_t size);
 
 /**
+ * Get the full path of the folder of the shared object that contains the
+ * supplied symbol.
+ *
+ * @param symbol Pointer to any symbol in the target shared object.
+ * @param buffer Buffer to read the path into.
+ * @param size Size of the buffer.
+ * @return True on success, false on failure.
+ */
+bool util_proc_get_folder_path_shared_object(
+    void *symbol, char *buffer, size_t size);
+
+/**
  * Log information about the current process to the console.
  */
 void util_proc_log_info();
