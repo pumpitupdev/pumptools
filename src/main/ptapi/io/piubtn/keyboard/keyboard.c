@@ -48,6 +48,22 @@ bool ptapi_io_piubtn_open()
   char path[PATH_MAX];
   char *config_path;
 
+  if (util_proc_get_folder_path_shared_object(
+          (void *) ptapi_io_piubtn_open, path, sizeof(path))) {
+    config_path = util_str_merge(path, CONFIG_FILENAME);
+
+    log_info("Loading configuration from emu lib path: %s", config_path);
+
+    if (ptapi_io_piubtn_keyboard_util_conf_read_from_file(
+            &ptapi_io_piubtn_keyboard_conf, config_path)) {
+      free(config_path);
+      memset(ptapi_io_piubtn_keyboard_buffer, 0, sizeof(bool) * KEY_MAP_SIZE);
+      return true;
+    }
+
+    free(config_path);
+  }
+
   // The game changes the working directory to the 'game' sub-folder. Therefore,
   // ./my-config does not work here.
   if (!util_proc_get_folder_path_executable_no_ld_linux(path, sizeof(path))) {
@@ -56,6 +72,8 @@ bool ptapi_io_piubtn_open()
   }
 
   config_path = util_str_merge(path, CONFIG_FILENAME);
+
+  log_info("Loading configuration from executable path: %s", config_path);
 
   if (!ptapi_io_piubtn_keyboard_util_conf_read_from_file(
           &ptapi_io_piubtn_keyboard_conf, config_path)) {
