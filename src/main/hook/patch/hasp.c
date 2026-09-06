@@ -1,5 +1,7 @@
 #define LOG_MODULE "patch-hasp"
 
+#include <inttypes.h>
+
 #include "sec/hasp/old/hasp.h"
 
 #include "util/log.h"
@@ -26,7 +28,10 @@ static const uint8_t patch_hasp_login_sig[] = {
 static const uint8_t patch_hasp_id_sig[] = {
     0x53, 0x83, 0xEC, 0x48, 0xC7, 0x44, 0x24, 0x10};
 
-void patch_hasp_init(const uint8_t *key_data, size_t len)
+void patch_hasp_init(
+    const uint8_t *key_data,
+    size_t len,
+    uintptr_t addr_get_sessioninfo)
 {
   void *func_api_login;
   void *func_api_logout;
@@ -73,6 +78,11 @@ void patch_hasp_init(const uint8_t *key_data, size_t len)
   util_patch_function((uintptr_t) func_api_logout, sec_hasp_api_logout);
   util_patch_function((uintptr_t) func_api_decrypt, sec_hasp_api_decrypt);
   util_patch_function((uintptr_t) func_api_getid, sec_hasp_api_getid);
+
+  if (addr_get_sessioninfo) {
+    log_debug("ApiGetSessionInfo at 0x%" PRIxPTR, addr_get_sessioninfo);
+    util_patch_function(addr_get_sessioninfo, sec_hasp_api_get_sessioninfo);
+  }
 
   sec_hasp_init(key_data, len);
 

@@ -95,3 +95,14 @@ int sec_hasp_api_decrypt(int handle, void *buffer, size_t length)
 
   return 0;
 }
+
+int sec_hasp_api_get_sessioninfo(int handle, const char *format, const char **info)
+{
+  static const char dummy_info[] = "p ";
+
+  if (info) {
+    *info = dummy_info;
+  }
+
+  return 0;
+}

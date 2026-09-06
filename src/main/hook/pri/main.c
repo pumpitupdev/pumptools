@@ -197,7 +197,8 @@ static void prihook_patch_dongle_init()
   patch_hasp_init(
       (const uint8_t *) _binary_prihook_hasp_key_start,
       ((uintptr_t) &_binary_prihook_hasp_key_end -
-       (uintptr_t) &_binary_prihook_hasp_key_start));
+       (uintptr_t) &_binary_prihook_hasp_key_start),
+      0);
 }
 
 static void prihook_patch_hdd_check_init()
