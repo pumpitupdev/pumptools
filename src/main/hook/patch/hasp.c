@@ -74,6 +74,8 @@ void patch_hasp_init(const uint8_t *key_data, size_t len)
   util_patch_function((uintptr_t) func_api_decrypt, sec_hasp_api_decrypt);
   util_patch_function((uintptr_t) func_api_getid, sec_hasp_api_getid);
 
+  util_patch_function(0x80dbd50, sec_hasp_api_get_sessioninfo);
+
   sec_hasp_init(key_data, len);
 
   log_info("Initialized");
