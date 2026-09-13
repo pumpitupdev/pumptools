@@ -26,6 +26,7 @@
 #include "util/glibc.h"
 #include "util/log.h"
 #include "util/patch.h"
+#include "util/str.h"
 #include "util/sys-info.h"
 
 #include "options.h"
@@ -110,6 +111,21 @@ static void pro2hook_fs_redir_data(struct pro2hook_options *options)
   log_assert(options);
 
   if (options->game.data) {
+    char *machine_profile_path =
+        util_str_merge(options->game.data, "/Save/MachineProfile");
+
+    if (!util_fs_path_exists(machine_profile_path)) {
+      log_info(
+          "Machine profile path %s does not exist, creating",
+          machine_profile_path);
+
+      if (!util_fs_mkdir(machine_profile_path)) {
+        log_error("Creating directory %s failed", machine_profile_path);
+      }
+    }
+
+    free(machine_profile_path);
+
     char *abs_path = util_fs_get_abs_path(options->game.data);
 
     cnh_redir_add("/pro2", abs_path);

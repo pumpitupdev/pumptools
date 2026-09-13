@@ -27,6 +27,7 @@
 #include "util/fs.h"
 #include "util/glibc.h"
 #include "util/log.h"
+#include "util/str.h"
 #include "util/sys-info.h"
 
 #include "options.h"
@@ -80,6 +81,21 @@ static void prohook_fs_redir_settings(struct prohook_options *options)
         log_error("Creating directory %s failed", options->game.settings);
       }
     }
+
+    char *machine_profile_path =
+        util_str_merge(options->game.settings, "/MachineProfile");
+
+    if (!util_fs_path_exists(machine_profile_path)) {
+      log_info(
+          "Machine profile path %s does not exist, creating",
+          machine_profile_path);
+
+      if (!util_fs_mkdir(machine_profile_path)) {
+        log_error("Creating directory %s failed", machine_profile_path);
+      }
+    }
+
+    free(machine_profile_path);
 
     char *abs_path = util_fs_get_abs_path(options->game.settings);
 
