@@ -21,7 +21,7 @@
 | Sam-I-Am | Uprock |  | `` | 10
 | Gyfted | Crazy |  | `` | 11 
 | Big metra | Panuelito Rojo |  | `` | 12
-| PXNDX | Procedimientos para Ilegar a un com... |  | `` | 13
+| PXNDX | Procedimientos para Ilegar a un comun acuerdo |  | `` | 13
 | Nina Pilots | Digan Lo Que Digan |  | `` | 14
 | Thaide & lil V | Pump Breakers |  | `` | 15
 | Wang Li Hong (Original) | Change Myself |  | `` | 16
@@ -34,9 +34,9 @@
 | Banya Production | K.O.A: Alice In Wonderland |  | `` | 23
 | Banya Production | My Dream |  | `` | 24
 | Banya Production | Toccata |  | `` | 25
-|  |  | UNKNOWN | `` | 26
-|  |  | UNKNOWN | `` | 27
-|  |  | UNKNOWN | `` | 28
+| House Rules | Do It! | (unlock? Special) | `` | 26
+| Vassline | Dawn of the Apocalypse | (unlock? Special) | `` | 27
+| YAHPP | Final Audition EP. 2-X | (unlock? Special) | `` | 28
 | YAHPP | Solitary 1.5 |  | `` | 29
 | YAHPP | Faster Z  |  | `` | 30
 | YAHPP | Pumptris Quattro |  | `` | 31
@@ -120,7 +120,7 @@
 | CLON | Funky Tonight |  | `` | 109
 | Fin.K.L | Forever Love |  | `` | 110
 | DJ Dookie | Hybs |  | `` | 111
-|  |  |  | `` | 112
+|  |  | UNKNOWN | `` | 112
 | Sam-I-Am | Haley |  | `` | 113
 | Gyfted | We Goin' Fly Remix |  | `` | 114
 | Sonic Dimension | Chopstix | |`` | 115
@@ -146,50 +146,54 @@
 | Lee, Jung-Hyun | Come! | UNLOCK | `` | 127
 | Banana Girl | Chocolate |  | `` | 128
 | Nina Pilots | Digan Lo Que Digan |  | `` | 129
-| Big Metra | Trato De No Trabarme | UNLOCK | `` | 130
+| Big Metra | Trato De No Trabarme | UNLOCK SPECIAL | `` | 130
 | Gyfted | Crazy |  | `` | 131
 | Super Junior M | U |  | `` | 132
 | Wang Li Hong (Original) | Change Myself |  | `` | 133
 | JLT | Enter The Dragon |  | `` | 134
-| HEaDTriP | Beat # No.4 | 135
-| Taiji Boys | Come Back Home |  | 136
+| HEaDTriP | Beat # No.4 |  | `` |135
+| Taiji Boys | Come Back Home | | `` | 136
 | Bada | V. I. P. |  | `` | 137
 | Wonder Girls | Tell Me |  | `` | 138
 | BanYa | Love is a Danger Zone 2 | | `` | 139
 | YAHPP | Beat of The War 2 |  | `` | 140
 | YAHPP | Canon D Fullmix |  | `` | 141
 | Crash | Dignity Fullmix |  | `` | 142
-|  | 45RPM & Eun Ji Won Mix |  | `` | 143
-| Banya Production | Ugly duck Toccata |  | `` | 144
-|  |  | UNLOCK | `` | 145
-|  |  | UNLOCK | `` | 146
-|  |  | UNLOCK | `` | 147
-|  | Jam O Beat # no 4 |  | `` | 148
-|  | YG REMIX |  | `` | 149
-|  | Nina PXNDX Mix |  | `` | 150
-|  | Big metra Remix |  | `` | 151
-|  | NXA Hip Hop Mix |  | `` | 152
-|  |  | UNLOCK | `` | 153
-|  | Mr. Fire Fighter Falls in Love |  | `` | 154
+
+### Remix
+
+| Artist | Song | NOTE | Offset | Offset # | 
+|---|---|---|---|---:|
+| 45RPM & Eun Ji Won | 45RPM & Eun Ji Won Mix |  | `` | 143
+| Banya Production | The People didn't know Pumping Up | UNLOCK | `` | (? 144-145)
+| Banya Production | Ugly duck Toccata  |  | `` | (? 144-145)
+| Banya Production | Caprice of DJ Otada | UNLOCK | `` | 146
+| Banya Production | Dr.Koa | UNLOCK | `` | 147
+| HEaDTrip & Banya Production | Jam O Beat # no 4 |  | `` | 148
+| Big Bang & Perry | YG REMIX |  | `` | 149
+| Nina Pilots & PXNDX | Nina PXNDX Mix |  | `` | 150
+| Big metra | Big metra Remix |  | `` | 151
+| DJ Missill & Gyfted | NXA Hip Hop Mix |  | `` | 152
+| Novasonic | Novasonic Mix ver.3 | UNLOCK | `` | 153
+| Spooky Banana & No Brain | Mr. Fire Fighter Falls in Love with me|  | `` | 154
 | Banya production | J knows that Old Bong |  | `` | 155
 | Banya production | Turkey Virus |  | `` | 156
-|  |  | UNLOCK | `` | 157
+| msgoon | msgoon RMX pt.1 | UNLOCK | `` | 157
 | msgoon | msgoon RMX pt.2 |  | `` | 158
-|  |  | UNLOCK | `` | 159
+| msgoon | msgoon RMX pt.3 | UNLOCK | `` | 159
 | Banya Production | Banya-P Guitar Remix |  | `` | 160
 | Banya Production | Money Fingers |  | `` | 161
-|  | NX2 K-Pop Dance Remix 1 |  | `` | 162
-|  | NX2 K-Pop Dance Remix 2 |  | `` | 163
-|  | NX2 Diva Remix |  | `` | 164
-|  | Groove Party |  | `` | 165
+| U;NEE & Duke & D.O | NX2 K-Pop Remix 1 |  | `` | 162
+| Mina & Baechigi | NX2 K-Pop Remix 2 |  | `` | 163
+| Joanne & Bada | NX2 Diva Remix |  | `` | 164
+| Tashannie & CLON | Groove Party |  | `` | 165
 | YAHPP | WI-EX-DOC-VA |  | `` | 166
 | YAHPP | Bemera |  | `` | 167
-|  | Love is a Danger Zone 2 Try to B.P.M |  | `` | 168
-|  | Tream Vook of The War |  | `` | 169
-|  | BanYa Hiphop Remix |  | `` | 170
-|  | EXTRA BanYa Remix |  | `` | 171
+| BanYa | Love is a Danger Zone 2 Try to B.P.M |  | `` | 168
+| BanYa | Tream Vook of The War |  | `` | 169
+| BanYa | BanYa Hiphop Remix |  | `` | 170
+| BanYa | EXTRA BanYa Remix |  | `` | 171
 
-https://www.youtube.com/watch?v=9oKhcCsjunw
 
 ### Another Step
 
@@ -201,14 +205,14 @@ https://www.youtube.com/watch?v=9oKhcCsjunw
 | Novasonic | Slam |  | `` | 175
 | BanYa | Moonlight |  | `` | 176
 | Banya Production | Toccata |  | `` | 177
-|  |  |  | `` | 178
-|  |  |  | `` | 179
+| YAHPP | Arch of Darkness | UNLOCK | `` | 178
+| YAHPP | Pumptris 8Bit ver. | UNLOCK | `` | 179
 | BanYa | Naissance |  | `` | 180
-|  |  |  | `` | 181
-|  |  |  | `` | 182
-|  |  |  | `` | 183
+| BanYa | Will-O-The-Wisp | UNLOCK | `` | 181
+| YAHPP | Blaze Emotion | UNLOCK | `` | 182
+| Banya Production | My Dream | UNLOCK | `` | 183
 | Crash | Dignity |  | `` | 184
-|  |  |  | `` | 185
+| YAHPP | Cannon X.1 | UNLOCK | `` | 185
 | Banana Girl | Chocolate |  | `` | 186
 | BanYa | Solitary |  | `` | 187
 | Banya Production | Ugly Dee |  | `` | 188
@@ -233,13 +237,13 @@ https://www.youtube.com/watch?v=9oKhcCsjunw
 | YAHPP | Chimera |  | `` | 207
 | BanYa | Beethoven Virus |  | `` | 208
 | BanYa | Bee |  | `` | 209
-|  | Final Audition Ep. 1 |  | `` | 210
-|  | Final Audition Ep. 2-1 |  | `` | 211
-|  | Final Audition Ep. 2-2 |  | `` | 212
-|  | Witch Doctor #1 |  | `` | 213
-|  | Dr M. |  | `` | 214
-|  | Phantom |  | `` | 215
-|  | Hi Bi |  | `` | 216
+| BanYa | Final Audition Ep. 1 |  | `` | 210
+| YAHPP | Final Audition Ep. 2-1 |  | `` | 211
+| YAHPP | Final Audition Ep. 2-2 |  | `` | 212
+| YAHPP | Witch Doctor #1 |  | `` | 213
+| BanYa | Dr. M |  | `` | 214
+| BanYa | Phantom |  | `` | 215
+| BanYa | Hi Bi |  | `` | 216
 |  |  |  | `` | 217-255
 
 
