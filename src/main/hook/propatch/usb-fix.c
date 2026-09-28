@@ -103,7 +103,7 @@ ssize_t propatch_usb_fix_readlink(const char *path, char *buf, size_t len)
           }
         }
       }
-      
+
       if (!found_usb_id) {
         log_error("Could not find valid USB bus-port identifier in path: %s", buf);
         util_str_free_split(toks, count);
