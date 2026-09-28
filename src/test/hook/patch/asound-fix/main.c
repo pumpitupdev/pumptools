@@ -169,6 +169,20 @@ static void test_audio_group_without_final_newline(void **state)
   assert_audio_group("audio:x:29:alice,bob,carol", 29, members, 3);
 }
 
+static void test_audio_group_after_garbage_lines(void **state)
+{
+  const char *members[] = {"alice"};
+
+  assert_audio_group(
+      "garbage\n"
+      ":not:a:group:\n"
+      "audio:x:29:alice\n"
+      "more garbage\n",
+      29,
+      members,
+      1);
+}
+
 static void test_missing_audio_group(void **state)
 {
   assert_audio_group_rejected(
@@ -184,6 +198,21 @@ static void test_group_with_extra_field(void **state)
 static void test_group_with_non_numeric_gid(void **state)
 {
   assert_audio_group_rejected("audio:x:not-a-number:alice\n");
+}
+
+static void test_group_with_trailing_gid_garbage(void **state)
+{
+  assert_audio_group_rejected("audio:x:29garbage:alice\n");
+}
+
+static void test_group_with_missing_fields(void **state)
+{
+  assert_audio_group_rejected("audio:x:29\n");
+}
+
+static void test_only_garbage(void **state)
+{
+  assert_audio_group_rejected("garbage\n\001\002\003\nnot a group\n");
 }
 
 static void test_unrelated_lookup_delegates(void **state)
@@ -211,11 +240,18 @@ int main(int argc, char *argv[])
       cmocka_unit_test_setup_teardown(
           test_audio_group_without_final_newline, setup, teardown),
       cmocka_unit_test_setup_teardown(
+          test_audio_group_after_garbage_lines, setup, teardown),
+      cmocka_unit_test_setup_teardown(
           test_missing_audio_group, setup, teardown),
       cmocka_unit_test_setup_teardown(
           test_group_with_extra_field, setup, teardown),
       cmocka_unit_test_setup_teardown(
           test_group_with_non_numeric_gid, setup, teardown),
+      cmocka_unit_test_setup_teardown(
+          test_group_with_trailing_gid_garbage, setup, teardown),
+      cmocka_unit_test_setup_teardown(
+          test_group_with_missing_fields, setup, teardown),
+      cmocka_unit_test_setup_teardown(test_only_garbage, setup, teardown),
       cmocka_unit_test_setup_teardown(
           test_unrelated_lookup_delegates, setup, teardown)};
 
