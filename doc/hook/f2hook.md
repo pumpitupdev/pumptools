@@ -20,7 +20,8 @@ You need two main folders:
 
 ## Data folder
 Contents of the folder:
-* game: The binaries of the custom "AMFS". File names must be lower case.
+* game: The binaries of the custom "AMFS". File names must be lower case
+(e.g. `f2_1430828800.amf`) on a case sensitive file system.
 * lib: Put any libraries (especially older versions of libraries that can't be
 installed anymore using the package manager) the game uses and aren't installed
 on your system in here.
