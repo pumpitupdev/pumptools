@@ -240,11 +240,9 @@ bool nx2hook_options_init(
       options_opt, NX2HOOK_OPTIONS_STR_PATCH_HOOK_MAIN_LOOP_X11_INPUT_HANDLER);
   options->patch.net.server = util_options_get_str(
       options_opt, NX2HOOK_OPTIONS_STR_PATCH_NET_PROFILE_SERVER);
-  options->patch.net.machine_id = strtoull(
-      util_options_get_str(
-          options_opt, NX2HOOK_OPTIONS_STR_PATCH_NET_PROFILE_MACHINE_ID),
-      NULL,
-      16);
+  const char *machine_id_str = util_options_get_str(
+      options_opt, NX2HOOK_OPTIONS_STR_PATCH_NET_PROFILE_MACHINE_ID);
+  options->patch.net.machine_id = machine_id_str ? strtoull(machine_id_str, NULL, 16) : 0;
   options->patch.net.verbose_log_output = util_options_get_bool(
       options_opt, NX2HOOK_OPTIONS_STR_PATCH_NET_PROFILE_VERBOSE_LOG_OUTPUT);
   options->patch.net.cert_dir_path = util_options_get_str(
