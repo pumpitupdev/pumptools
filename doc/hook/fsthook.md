@@ -21,7 +21,9 @@ You need two main folders:
 ## Data folder
 Contents of the folder:
 * game: The binaries of the custom "Fiesta FS". These are stored in raw areas
-of the HDD and have to be extraced. File names must be upper case.
+of the HDD and have to be extraced. File names must be upper case (e.g. `_DM0GA.BIN`)
+on a case sensitive file system.
+
 * lib: Put any libraries (especially older versions of libraries that can't be
 installed anymore using the package manager) the game uses and aren't installed
 on your system in here.
