@@ -31,9 +31,9 @@ static enum cnh_result _patch_piuio_control_msg(
 static void _patch_piuio_close(void);
 
 static void _patch_piuio_read_inputs_to_buffer(struct cnh_iobuf *buffer);
-static void _patch_piuio_read_outputs_from_buffer(struct cnh_iobuf *buffer);
+static void _patch_piuio_read_outputs_from_buffer(const uint8_t *bytes);
 static enum ptapi_io_piuio_sensor_group
-_patch_piuio_get_sensor_group_from_buffer(struct cnh_iobuf *buffer);
+_patch_piuio_get_sensor_group_from_buffer(const uint8_t *bytes);
 
 static const struct cnh_usb_emu_virtdev_ep _patch_piuio_virtdev = {
     .pid = PIUIO_DRV_PID,
@@ -163,18 +163,25 @@ static enum cnh_result _patch_piuio_control_msg(
   } else if (
       request_type == PIUIO_DRV_USB_CTRL_TYPE_OUT &&
       request == PIUIO_DRV_USB_CTRL_REQUEST) {
+    uint8_t output_buffer[PIUIO_DRV_BUFFER_SIZE];
+
     if (buffer->nbytes != PIUIO_DRV_BUFFER_SIZE) {
       log_error("Invalid buffer size for ctrl out: %d", buffer->nbytes);
       return CNH_RESULT_INVALID_PARAMETER;
     }
 
-    _patch_piuio_read_outputs_from_buffer(buffer);
+    /* The game owns this buffer and may access it from another thread. Take a
+       single snapshot so one request cannot combine bytes from different
+       states. */
+    memcpy(output_buffer, buffer->bytes, sizeof(output_buffer));
+
+    _patch_piuio_read_outputs_from_buffer(output_buffer);
 
     // Sync properly with sensor cycling by application
     // Note: Naturally, the update code below will break if sensors are not
     // cycled as expected
     _patch_piuio_sensor_group =
-        _patch_piuio_get_sensor_group_from_buffer(buffer);
+        _patch_piuio_get_sensor_group_from_buffer(output_buffer);
 
 #ifdef PATCH_PIUIO_CALL_TRACE
     log_debug("Write: %d", _patch_piuio_sensor_group);
@@ -224,6 +231,7 @@ static void _patch_piuio_close(void)
 
 static void _patch_piuio_read_inputs_to_buffer(struct cnh_iobuf *buffer)
 {
+  uint8_t input_buffer[PIUIO_DRV_BUFFER_SIZE];
   struct ptapi_io_piuio_pad_inputs p1_pad_in;
   struct ptapi_io_piuio_pad_inputs p2_pad_in;
   struct ptapi_io_piuio_sys_inputs sys_in;
@@ -236,6 +244,10 @@ static void _patch_piuio_read_inputs_to_buffer(struct cnh_iobuf *buffer)
   _patch_piuio_api.get_input_pad(1, _patch_piuio_sensor_group, &p2_pad_in);
 
   _patch_piuio_api.get_input_sys(&sys_in);
+
+  /* PIUIO inputs are active-low. Build the complete response locally before
+     publishing it to the game-owned transfer buffer in one copy. */
+  memset(input_buffer, 0xFF, sizeof(input_buffer));
 
   /*
      byte 0:
@@ -282,50 +294,32 @@ static void _patch_piuio_read_inputs_to_buffer(struct cnh_iobuf *buffer)
   */
 
   /* Player 1 */
-  buffer->bytes[0] = 0;
-
-  buffer->bytes[0] |= ((p1_pad_in.lu ? 1 : 0) << 0);
-  buffer->bytes[0] |= ((p1_pad_in.ru ? 1 : 0) << 1);
-  buffer->bytes[0] |= ((p1_pad_in.cn ? 1 : 0) << 2);
-  buffer->bytes[0] |= ((p1_pad_in.ld ? 1 : 0) << 3);
-  buffer->bytes[0] |= ((p1_pad_in.rd ? 1 : 0) << 4);
-
-  buffer->bytes[0] ^= 0xFF;
+  input_buffer[0] &= ~((p1_pad_in.lu ? 1 : 0) << 0);
+  input_buffer[0] &= ~((p1_pad_in.ru ? 1 : 0) << 1);
+  input_buffer[0] &= ~((p1_pad_in.cn ? 1 : 0) << 2);
+  input_buffer[0] &= ~((p1_pad_in.ld ? 1 : 0) << 3);
+  input_buffer[0] &= ~((p1_pad_in.rd ? 1 : 0) << 4);
 
   /* Player 2 */
-  buffer->bytes[2] = 0;
-
-  buffer->bytes[2] |= ((p2_pad_in.lu ? 1 : 0) << 0);
-  buffer->bytes[2] |= ((p2_pad_in.ru ? 1 : 0) << 1);
-  buffer->bytes[2] |= ((p2_pad_in.cn ? 1 : 0) << 2);
-  buffer->bytes[2] |= ((p2_pad_in.ld ? 1 : 0) << 3);
-  buffer->bytes[2] |= ((p2_pad_in.rd ? 1 : 0) << 4);
-
-  buffer->bytes[2] ^= 0xFF;
+  input_buffer[2] &= ~((p2_pad_in.lu ? 1 : 0) << 0);
+  input_buffer[2] &= ~((p2_pad_in.ru ? 1 : 0) << 1);
+  input_buffer[2] &= ~((p2_pad_in.cn ? 1 : 0) << 2);
+  input_buffer[2] &= ~((p2_pad_in.ld ? 1 : 0) << 3);
+  input_buffer[2] &= ~((p2_pad_in.rd ? 1 : 0) << 4);
 
   /* Sys */
-  buffer->bytes[1] = 0;
+  input_buffer[1] &= ~((sys_in.test ? 1 : 0) << 1);
+  input_buffer[1] &= ~((sys_in.service ? 1 : 0) << 6);
+  input_buffer[1] &= ~((sys_in.clear ? 1 : 0) << 7);
+  input_buffer[1] &= ~((sys_in.coin ? 1 : 0) << 2);
 
-  buffer->bytes[1] |= ((sys_in.test ? 1 : 0) << 1);
-  buffer->bytes[1] |= ((sys_in.service ? 1 : 0) << 6);
-  buffer->bytes[1] |= ((sys_in.clear ? 1 : 0) << 7);
-  buffer->bytes[1] |= ((sys_in.coin ? 1 : 0) << 2);
+  input_buffer[3] &= ~((sys_in.coin2 ? 1 : 0) << 2);
 
-  buffer->bytes[1] ^= 0xFF;
-
-  /* Apparently, "touching" byte 3 as a whole causes some random and weird input
-     triggering which results in the service menu popping up. Don't clear the
-     whole byte, touch coin2 only to avoid this */
-  if (!sys_in.coin2) {
-    buffer->bytes[3] |= (1 << 2);
-  } else {
-    buffer->bytes[3] &= ~(1 << 2);
-  }
-
+  memcpy(buffer->bytes, input_buffer, sizeof(input_buffer));
   buffer->pos = PIUIO_DRV_BUFFER_SIZE;
 }
 
-static void _patch_piuio_read_outputs_from_buffer(struct cnh_iobuf *buffer)
+static void _patch_piuio_read_outputs_from_buffer(const uint8_t *bytes)
 {
   struct ptapi_io_piuio_pad_outputs p1_pad_out;
   struct ptapi_io_piuio_pad_outputs p2_pad_out;
@@ -375,23 +369,23 @@ static void _patch_piuio_read_outputs_from_buffer(struct cnh_iobuf *buffer)
    bytes 4 - 7 dummy
   */
 
-  p1_pad_out.lu = (buffer->bytes[0] & (1 << 2)) > 0;
-  p1_pad_out.ru = (buffer->bytes[0] & (1 << 3)) > 0;
-  p1_pad_out.cn = (buffer->bytes[0] & (1 << 4)) > 0;
-  p1_pad_out.ld = (buffer->bytes[0] & (1 << 5)) > 0;
-  p1_pad_out.rd = (buffer->bytes[0] & (1 << 6)) > 0;
+  p1_pad_out.lu = (bytes[0] & (1 << 2)) > 0;
+  p1_pad_out.ru = (bytes[0] & (1 << 3)) > 0;
+  p1_pad_out.cn = (bytes[0] & (1 << 4)) > 0;
+  p1_pad_out.ld = (bytes[0] & (1 << 5)) > 0;
+  p1_pad_out.rd = (bytes[0] & (1 << 6)) > 0;
 
-  p2_pad_out.lu = (buffer->bytes[2] & (1 << 2)) > 0;
-  p2_pad_out.ru = (buffer->bytes[2] & (1 << 3)) > 0;
-  p2_pad_out.cn = (buffer->bytes[2] & (1 << 4)) > 0;
-  p2_pad_out.ld = (buffer->bytes[2] & (1 << 5)) > 0;
-  p2_pad_out.rd = (buffer->bytes[2] & (1 << 6)) > 0;
+  p2_pad_out.lu = (bytes[2] & (1 << 2)) > 0;
+  p2_pad_out.ru = (bytes[2] & (1 << 3)) > 0;
+  p2_pad_out.cn = (bytes[2] & (1 << 4)) > 0;
+  p2_pad_out.ld = (bytes[2] & (1 << 5)) > 0;
+  p2_pad_out.rd = (bytes[2] & (1 << 6)) > 0;
 
-  cab_out.bass = (buffer->bytes[1] & (1 << 2)) > 0;
-  cab_out.halo_r2 = (buffer->bytes[2] & (1 << 7)) > 0;
-  cab_out.halo_r1 = (buffer->bytes[3] & (1 << 0)) > 0;
-  cab_out.halo_l2 = (buffer->bytes[3] & (1 << 1)) > 0;
-  cab_out.halo_l1 = (buffer->bytes[3] & (1 << 2)) > 0;
+  cab_out.bass = (bytes[1] & (1 << 2)) > 0;
+  cab_out.halo_r2 = (bytes[2] & (1 << 7)) > 0;
+  cab_out.halo_r1 = (bytes[3] & (1 << 0)) > 0;
+  cab_out.halo_l2 = (bytes[3] & (1 << 1)) > 0;
+  cab_out.halo_l1 = (bytes[3] & (1 << 2)) > 0;
 
   _patch_piuio_api.set_output_pad(0, &p1_pad_out);
   _patch_piuio_api.set_output_pad(1, &p2_pad_out);
@@ -399,7 +393,7 @@ static void _patch_piuio_read_outputs_from_buffer(struct cnh_iobuf *buffer)
 }
 
 static enum ptapi_io_piuio_sensor_group
-_patch_piuio_get_sensor_group_from_buffer(struct cnh_iobuf *buffer)
+_patch_piuio_get_sensor_group_from_buffer(const uint8_t *bytes)
 {
-  return (enum ptapi_io_piuio_sensor_group)(buffer->bytes[0] & 0x03);
+  return (enum ptapi_io_piuio_sensor_group)(bytes[0] & 0x03);
 }
