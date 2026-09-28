@@ -181,7 +181,8 @@ static void f2hook_patch_dongle_init()
   patch_hasp_init(
       (const uint8_t *) _binary_f2hook_hasp_key_start,
       ((uintptr_t) &_binary_f2hook_hasp_key_end -
-       (uintptr_t) &_binary_f2hook_hasp_key_start));
+       (uintptr_t) &_binary_f2hook_hasp_key_start),
+      0x80dbd50);
 }
 
 static void f2hook_patch_hdd_check_init()

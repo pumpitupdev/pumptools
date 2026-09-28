@@ -1,3 +1,4 @@
+#include <unistd.h>
 
 #include "capnhook/hook/usbhook.h"
 
@@ -65,7 +66,7 @@ static enum cnh_result patch_piuio_exit_usbhook(struct cnh_usbhook_irp *irp)
           if (((~irp->ctrl_buffer.bytes[1]) & (1 << 1)) &&
               ((~irp->ctrl_buffer.bytes[1]) & (1 << 6))) {
             log_info("Exit on service + test enabled and hit, bye");
-            exit(0);
+            _exit(0);
           }
         }
       }

@@ -32,4 +32,6 @@ unsigned int sec_hasp_api_getid(void);
 
 int sec_hasp_api_decrypt(int handle, void *buffer, size_t length);
 
+int sec_hasp_api_get_sessioninfo(int handle, const char *format, const char **info);
+
 #endif
