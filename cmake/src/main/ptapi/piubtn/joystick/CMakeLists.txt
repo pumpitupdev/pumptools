@@ -12,4 +12,4 @@ set_target_properties(${PROJECT_NAME} PROPERTIES LINK_FLAGS "-fPIC")
 # Remove library name "lib" prefix
 set_target_properties(${PROJECT_NAME} PROPERTIES PREFIX "")
 
-target_link_libraries(${PROJECT_NAME} ptapi-io-piubtn-joystick-util io-util util)
+target_link_libraries(${PROJECT_NAME} ptapi-io-piubtn-joystick-util io-util util dl)

@@ -50,7 +50,8 @@ bool util_proc_get_folder_path_executable_no_ld_linux(
  * @param symbol Pointer to any symbol in the target shared object.
  * @param buffer Buffer to read the path into.
  * @param size Size of the buffer.
- * @return True on success, false on failure.
+ * @return True on success, false when the symbol cannot be resolved, the
+ *         resolved name has no folder, or the buffer is too small.
  */
 bool util_proc_get_folder_path_shared_object(
     void *symbol, char *buffer, size_t size);

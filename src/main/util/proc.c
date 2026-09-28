@@ -210,6 +210,8 @@ bool util_proc_get_folder_path_shared_object(
     void *symbol, char *buffer, size_t size)
 {
   Dl_info info;
+  const char *separator;
+  size_t folder_len;
 
   if (!symbol || !buffer || size == 0) {
     return false;
@@ -219,23 +221,20 @@ bool util_proc_get_folder_path_shared_object(
     return false;
   }
 
-  if (strlen(info.dli_fname) >= size) {
+  separator = strrchr(info.dli_fname, '/');
+
+  if (!separator) {
     return false;
   }
 
-  strcpy(buffer, info.dli_fname);
+  folder_len = separator == info.dli_fname ? 1 : separator - info.dli_fname;
 
-  // If shared object in the root folder, keep the single /
-  size_t pos = strlen(buffer) - 1;
-  while (pos > 0 && buffer[pos] != '/') {
-    buffer[pos] = '\0';
-    pos--;
+  if (folder_len >= size) {
+    return false;
   }
 
-  // delete /
-  if (pos > 0) {
-    buffer[pos] = '\0';
-  }
+  memcpy(buffer, info.dli_fname, folder_len);
+  buffer[folder_len] = '\0';
 
   return true;
 }
