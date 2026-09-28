@@ -12,6 +12,28 @@ we have, the easier it might get to solve the issue.
 
 When creating new issues, use our template for reporting bugs. It tells you what kind of information we need.
 
+# Use of LLM tools
+
+Using large language models and other generative tools is allowed. The person using the tool remains responsible for
+the contribution and its communication.
+
+LLMs should assist with work that the contributor understands well enough to direct, review, and validate. They may
+perform implementation, research, analysis, documentation, or other leg work, but the contributor must check their
+output before submitting it to maintainers. The usual requirements for correctness, testing, documentation, security,
+and compatibility apply regardless of how the work was produced.
+
+An exception may be made when the maintainers have agreed in advance to receive an explicitly unvetted or deliberately
+rough prototype. Its purpose, limitations, and verification status must be clear.
+
+Interactions with maintainers in issues and pull requests must be actively driven by a human. Reviewed LLM-generated
+material may be included directly when it usefully communicates code analysis, technical explanations, test results,
+or similar evidence; rewriting it solely to conceal its origin is not required. However, a human must decide what is
+relevant, provide the surrounding context, initiate and guide the discussion, and respond to maintainer feedback.
+
+Do not use an LLM or automated agent to autonomously post comments, reviews, or replies, or to flood maintainers with
+unfiltered output. Contributions and discussions should present concise, relevant, human-reviewed information rather
+than transferring the burden of reviewing raw LLM output to the maintainers.
+
 # Pull requests: bugfixes, new features or other code contributions
 
 Pull requests are welcome! May it be a PR to an already known issue or a new feature that you consider as a valuable
