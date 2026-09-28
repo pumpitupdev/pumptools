@@ -7,6 +7,20 @@ The following libraries implement pumptool's PIUBTN API interface. Set the confi
 in your hook configuration to point to the library you want to use, e.g.
 `patch.piubtn.emu_lib=./ptapi-io-piubtn-null.so`.
 
+The path can select a library installed beside one game or a library in a shared folder used by multiple games. For
+keyboard input, the applicable X11 input-handler option must point to the same library.
+
+The keyboard and joystick implementations first load their mapping file from the folder containing the selected
+library. If that fails, they fall back to the folder containing the game's `piu` executable. This supports both of the
+following layouts:
+
+* Per-game: place the library and mapping file beside `piu` and use a relative path such as
+  `patch.piubtn.emu_lib=./ptapi-io-piubtn-keyboard.so`.
+* Shared: place the library and mapping file in one common folder and configure every game with the same absolute path,
+  such as `patch.piubtn.emu_lib=/opt/pumptools/io/ptapi-io-piubtn-keyboard.so`.
+
+When mapping files exist in both locations, the file beside the selected library takes precedence.
+
 ### Null: ptapi-io-piubtn-null.so
 A null implementation for API dummy testing against libraries/applications calling API implementations.
 
@@ -20,8 +34,8 @@ Support all (USB) Joysticks and Gamepads that are detected by the Linux kernel. 
 Button mappings are configured by using the `ptapi-io-piubtn-joystick-conf` (this is an executable!) tool. You might
 have to `chmod +x ptapi-io-piubtn-joystick-conf` it prior being able to run it: `./ptapi-io-piubtn-joystick-conf`. Run
 the tool and follow the instructions. Once successfully completed, a `piubtn-joystick-conf.bin` configuration file is
-located in the same folder. This must be located next to the `ptapi-io-piubtn-joystick.so` file which should be located
-next to your `piu` executable.
+located in the same folder. Keep it beside `ptapi-io-piubtn-joystick.so`, either in the game's folder or in a shared
+folder.
 
 Configure your `hook.conf` file accordingly:
 ```
@@ -34,8 +48,8 @@ Support for inputs via your standard keyboard using the X11 API.
 Button mappings are configured by using the `ptapi-io-piubtn-keyboard-conf` (this is an executable!) tool. You might
 have to `chmod +x ptapi-io-piubtn-keyboard-conf` it prior being able to run it: `./ptapi-io-piubtn-keyboard-conf`. Run
 the tool and follow the instructions. Once successfully completed, a `piubtn-keyboard-conf.bin` configuration file is
-located in the same folder. This must be located next to the `ptapi-io-piubtn-keyboard.so` file which should be located
-next to your `piu` executable.
+located in the same folder. Keep it beside `ptapi-io-piubtn-keyboard.so`, either in the game's folder or in a shared
+folder.
 
 Configure your `hook.conf` file accordingly:
 ```
